@@ -1,0 +1,1194 @@
+C51 COMPILER V7.20   OSDTABLE003                                                           10/05/2015 09:30:17 PAGE 1   
+
+
+C51 COMPILER V7.20, COMPILATION OF MODULE OSDTABLE003
+OBJECT MODULE PLACED IN .\Output\OsdTable003.obj
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE OSD\OSD003\OsdTable003.c LARGE OPTIMIZE(9,SPEED) BROWSE DEBUG OBJECTEXTEND 
+                    -PRINT(.\Output\OsdTable003.lst) OBJECT(.\Output\OsdTable003.obj)
+
+line level    source
+
+   1          
+   2          
+   3          #define __OSDTABLE003__
+   4          
+   5          
+   6          #include "Core\Header\Include.h"
+   7          
+   8          
+   9          #if(_OSD_TYPE == _OSD003)
+  10          
+  11          //------------------------------------------------------------
+  12          
+  13          // Menu item's define
+  14          // Option : _DISABLE_NOT_SHOW,_EN_PUB_KEYEVENT,_KEYMAP_EN_IN_NOSIGNAL
+  15          code SMenuItem g_tMenuItem[] = 
+  16          {
+  17              // _MI_MENU_NONE
+  18              {
+  19                  0,                      //BYTE Option;
+  20                  tKOMenuNone,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+  21                  MMenuNoneProc,          //funcpProc Proc;
+  22                  CEnable,                //funcpEnable Enable;
+  23              },
+  24              // MainMenu\Color(_MI_COLOR)
+  25              {
+  26                  _EN_PUB_KEYEVENT,       //BYTE Option;
+  27                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+  28                  MMainMenuProc,          //funcpProc Proc;
+  29                  CEnable,                //funcpEnable Enable;
+  30              },
+  31              // MainMenu\Adjust(_MI_ADJUST)
+  32              {
+  33                  _EN_PUB_KEYEVENT,       //BYTE Option;
+  34                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+  35                  MMainMenuProc,          //funcpProc Proc;
+  36                  CVgaEnable,             //funcpEnable Enable;
+  37              },
+  38              // MainMenu\OSD(_MI_OSD)
+  39              {
+  40                  _EN_PUB_KEYEVENT,       //BYTE Option;
+  41                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+  42                  MMainMenuProc,          //funcpProc Proc;
+  43                  CEnable,                //funcpEnable Enable;
+  44              },
+  45              // MainMenu\TV(_MI_TV)
+  46              {
+  47                  #if(_VIDEO_TV_SUPPORT)
+                      _EN_PUB_KEYEVENT,       //BYTE Option;
+                      tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+                      MMainMenuProc,          //funcpProc Proc;
+                      CTVEnable,              //funcpEnable Enable;
+                      #else
+  53                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+  54                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+C51 COMPILER V7.20   OSDTABLE003                                                           10/05/2015 09:30:17 PAGE 2   
+
+  55                  MMainMenuProc,          //funcpProc Proc;
+  56                  CMITVEnable,            //funcpEnable Enable;
+  57                  #endif
+  58              },
+  59              // MainMenu\Function(_MI_FUNCTION)
+  60              {
+  61                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+  62                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+  63                  MMainMenuProc,          //funcpProc Proc;
+  64                  CEnable,                //funcpEnable Enable;
+  65              },
+  66              // MainMenu\Sound(_MI_SOUND)
+  67              {
+  68                  _EN_PUB_KEYEVENT,       //BYTE Option;
+  69                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+  70                  MMainMenuProc,          //funcpProc Proc;
+  71                  CEnable,                //funcpEnable Enable;
+  72              },
+  73              // MainMenu\Color\Brightness(_MI_BRIGHTNESS)
+  74              {
+  75                  _EN_PUB_KEYEVENT,       //BYTE Option;
+  76                  tKOSubMenu,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+  77                  MColorProc,             //funcpProc Proc;
+  78                  CEnable,                //funcpEnable Enable;
+  79              },
+  80              // MainMenu\Color\Contrast(_MI_CONTRAST)
+  81              {
+  82                  _EN_PUB_KEYEVENT,       //BYTE Option;
+  83                  tKOSubMenu,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+  84                  MColorProc,             //funcpProc Proc;
+  85                  CEnable,                //funcpEnable Enable;
+  86              },
+  87              // MainMenu\Color\Hue(_MI_HUE)
+  88              {
+  89                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+  90                  tKOSubMenu,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+  91                  MColorProc,             //funcpProc Proc;
+  92                  CVideoNTSCEnable,       //funcpEnable Enable;
+  93              },
+  94              // MainMenu\Color\Saturation(_MI_SATURATION)
+  95              {
+  96                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+  97                  tKOSubMenu,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+  98                  MColorProc,             //funcpProc Proc;
+  99                  CVideoEnable,           //funcpEnable Enable;
+ 100              },
+ 101              // MainMenu\Color\ColorTemp(_MI_COLORTEMP)
+ 102              {
+ 103                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+ 104                  tKOSubMenu1,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 105                  MColorProc,             //funcpProc Proc;
+ 106                  CVgaEnable,             //funcpEnable Enable;
+ 107              },
+ 108                  #if(_KEY_TYPE == _KT_PCB2660_003_5KEY)
+ 109              // MainMenu\Color\Brightness\BrgintAdj(_MI_BRIGHTADJ)
+ 110              {
+ 111                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 112                  tKOAdjust,              //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 113                  MBrightnessProc,        //funcpProc Proc;
+ 114                  CEnable,                //funcpEnable Enable;
+ 115              },
+ 116              // MainMenu\Color\Contrast\ContrastAdj(_MI_CONTRASTADJ)
+C51 COMPILER V7.20   OSDTABLE003                                                           10/05/2015 09:30:17 PAGE 3   
+
+ 117              {
+ 118                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 119                  tKOAdjust,              //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 120                  MContrastProc,        //funcpProc Proc;
+ 121                  CEnable,                //funcpEnable Enable;
+ 122              },    
+ 123              // MainMenu\Color\Hue\HueAdj(_MI_HUEADJ)
+ 124              {
+ 125                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+ 126                  tKOAdjust,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 127                  MHueProc,             //funcpProc Proc;
+ 128                  CVideoNTSCEnable,       //funcpEnable Enable;
+ 129              },
+ 130              // MainMenu\Color\Saturation\SaturationAdj(_MI_SATURATIONADJ)
+ 131              {
+ 132                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+ 133                  tKOAdjust,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 134                  MSaturationProc,             //funcpProc Proc;
+ 135                  CVideoEnable,           //funcpEnable Enable;
+ 136              },
+ 137                  #endif
+ 138              // MainMenu\Color\ColorTemp\9300(_MI_9300)
+ 139              {
+ 140                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 141                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 142                  MColorTempProc,         //funcpProc Proc;
+ 143                  CEnable,                //funcpEnable Enable;
+ 144              },
+ 145              // MainMenu\Color\ColorTemp\6500(_MI_6500)
+ 146              {
+ 147                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 148                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 149                  MColorTempProc,         //funcpProc Proc;
+ 150                  CEnable,                //funcpEnable Enable;
+ 151              },
+ 152              // MainMenu\Color\ColorTemp\User(_MI_USER)
+ 153              {
+ 154                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 155                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 156                  MColorTempProc,         //funcpProc Proc;
+ 157                  CEnable,                //funcpEnable Enable;
+ 158              },    
+ 159              // MainMenu\Color\ColorTemp\User(_MI_USER_R)
+ 160              {
+ 161                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 162                  tKOSubMenu,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 163                  MColorUserProc,         //funcpProc Proc;
+ 164                  CEnable,                //funcpEnable Enable;
+ 165              },    
+ 166              // MainMenu\Color\ColorTemp\User(_MI_USER_G)
+ 167              {
+ 168                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 169                  tKOSubMenu,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 170                  MColorUserProc,         //funcpProc Proc;
+ 171                  CEnable,                //funcpEnable Enable;
+ 172              },    
+ 173              // MainMenu\Color\ColorTemp\User(_MI_USER_B)
+ 174              {
+ 175                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 176                  tKOSubMenu,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 177                  MColorUserProc,         //funcpProc Proc;
+ 178                  CEnable,                //funcpEnable Enable;
+C51 COMPILER V7.20   OSDTABLE003                                                           10/05/2015 09:30:17 PAGE 4   
+
+ 179              },    
+ 180                  #if(_KEY_TYPE == _KT_PCB2660_003_5KEY)
+ 181              //MainMenu\Color\ColorTemp\User\RAdj(_MI_USER_RADJ)
+ 182              {
+ 183                  _EN_PUB_KEYEVENT,
+ 184                  tKOAdjust,
+ 185                  MRProc,
+ 186                  CEnable,
+ 187              },
+ 188              //MainMenu\Color\ColorTemp\User\GAdj(_MI_USER_GADJ)
+ 189              {
+ 190                  _EN_PUB_KEYEVENT,
+ 191                  tKOAdjust,
+ 192                  MGProc,
+ 193                  CEnable,
+ 194              },
+ 195              //MainMenu\Color\ColorTemp\User\BAdj(_MI_USER_BADJ)
+ 196              {
+ 197                  _EN_PUB_KEYEVENT,
+ 198                  tKOAdjust,
+ 199                  MBProc,
+ 200                  CEnable,
+ 201              },
+ 202                  #endif          
+ 203              // MainMenu\Adjust\AutoAdjust(_MI_AUTOADJUST)
+ 204              {
+ 205                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 206                  tKOSubMenu1,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 207                  MAdjustProc,            //funcpProc Proc;
+ 208                  CEnable,                //funcpEnable Enable;
+ 209              },
+ 210              // MainMenu\Adjust\HPosition(_MI_HPOSITION)
+ 211              {
+ 212                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 213                  tKOSubMenu,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 214                  MAdjustProc,            //funcpProc Proc;
+ 215                  CEnable,                //funcpEnable Enable;
+ 216              },
+ 217              // MainMenu\Adjust\VPosition(_MI_VPOSITION)
+ 218              {
+ 219                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 220                  tKOSubMenu,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 221                  MAdjustProc,            //funcpProc Proc;
+ 222                  CEnable,                //funcpEnable Enable;
+ 223              },
+ 224              // MainMenu\Adjust\Phase(_MI_PHASE)
+ 225              {
+ 226                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 227                  tKOSubMenu,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 228                  MAdjustProc,            //funcpProc Proc;
+ 229                  CEnable,                //funcpEnable Enable;
+ 230              },
+ 231              // MainMenu\Adjust\Clock(_MI_CLOCK)
+ 232              {
+ 233                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 234                  tKOSubMenu,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 235                  MAdjustProc,            //funcpProc Proc;
+ 236                  CEnable,                //funcpEnable Enable;
+ 237              },
+ 238              // MainMenu\Adjust\AutoAdjust\AutoAdjust_OK(_MI_AUTOADJUST_OK)
+ 239              {
+ 240                  _EN_PUB_KEYEVENT,       //BYTE Option;
+C51 COMPILER V7.20   OSDTABLE003                                                           10/05/2015 09:30:17 PAGE 5   
+
+ 241                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 242                  MAutoAdjustProc,        //funcpProc Proc;
+ 243                  CEnable,                //funcpEnable Enable;
+ 244              },
+ 245              // MainMenu\Adjust\AutoAdjust\AutoAdjust_Cancel(_MI_AUTOADJUST_CANCEL)
+ 246              {
+ 247                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 248                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 249                  MAutoAdjustProc,        //funcpProc Proc;
+ 250                  CEnable,                //funcpEnable Enable;
+ 251              },
+ 252                  #if(_KEY_TYPE == _KT_PCB2660_003_5KEY)
+ 253              // MainMenu\Adjust\HPosition(_MI_ADJUST_HPOSITIONADJ)
+ 254              {
+ 255                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 256                  tKOAdjust,              //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 257                  MAdjustHPositionProc,   //funcpProc Proc;
+ 258                  CEnable,                //funcpEnable Enable;
+ 259              },
+ 260              // MainMenu\Adjust\VPosition(_MI_ADJUST_VPOSITIONADJ)
+ 261              {
+ 262                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 263                  tKOAdjust,              //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 264                  MAdjustVPositionProc,   //funcpProc Proc;
+ 265                  CEnable,                //funcpEnable Enable;
+ 266              },
+ 267                  // MainMenu\Adjust\PhaseAdj (_MI_ADJUST_PHASEADJ)
+ 268                  {
+ 269                      _EN_PUB_KEYEVENT,       //BYTE Option;
+ 270                  tKOAdjust,              //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 271                  MAdjustPhaseProc,   //funcpProc Proc;
+ 272                  CEnable,                //funcpEnable Enable;
+ 273                  },
+ 274                  // MainMenu\Adjust\ClockAdj (_MI_ADJUST_CLOCKADJ)
+ 275                  {
+ 276                      _EN_PUB_KEYEVENT,       //BYTE Option;
+ 277                  tKOAdjust,              //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 278                  MAdjustClockProc,   //funcpProc Proc;
+ 279                  CEnable,                //funcpEnable Enable;
+ 280                  },
+ 281                  #endif  
+ 282              // MainMenu\OSD\Language(_MI_LANGUAGE)
+ 283              {
+ 284                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 285                  tKOSubMenu1,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 286                  MOSDProc,               //funcpProc Proc;
+ 287                  CEnable,                //funcpEnable Enable;
+ 288              },
+ 289              // MainMenu\OSD\HPosition(_MI_OSD_HPOSITION)
+ 290              {
+ 291                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 292                  tKOSubMenu,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 293                  MOSDProc,               //funcpProc Proc;
+ 294                  CEnable,                //funcpEnable Enable;
+ 295              },
+ 296              // MainMenu\OSD\VPosition(_MI_OSD_VPOSITION)
+ 297              {
+ 298                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 299                  tKOSubMenu,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 300                  MOSDProc,               //funcpProc Proc;
+ 301                  CEnable,                //funcpEnable Enable;
+ 302              },
+C51 COMPILER V7.20   OSDTABLE003                                                           10/05/2015 09:30:17 PAGE 6   
+
+ 303              // MainMenu\OSD\Timer(_MI_TIMER)
+ 304              {
+ 305                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 306                  tKOSubMenu,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 307                  MOSDProc,               //funcpProc Proc;
+ 308                  CEnable,                //funcpEnable Enable;
+ 309              },
+ 310              // MainMenu\OSD\Double(_MI_DOUBLE)
+ 311              {
+ 312                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+ 313                  tKOSubMenu1,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 314                  MOSDProc,               //funcpProc Proc;
+ 315                  COSDDoubleEN,           //funcpEnable Enable;
+ 316              },
+ 317              // MainMenu\OSD\Transparent(_MI_TRANSPARENT)
+ 318              {
+ 319                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 320                  tKOSubMenu,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 321                  MOSDProc,               //funcpProc Proc;
+ 322                  CEnable,                //funcpEnable Enable;
+ 323              },
+ 324          
+ 325              // MainMenu\OSD\Language\English(_MI_ENGLISH)
+ 326              {
+ 327                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+ 328                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 329                  MLanguageProc,          //funcpProc Proc;
+ 330                  CEngEnable,             //funcpEnable Enable;
+ 331              },
+ 332              // MainMenu\OSD\Language\CHI_S(_MI_CHI_S)
+ 333              {
+ 334                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+ 335                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 336                  MLanguageProc,          //funcpProc Proc;
+ 337                  CCHI_S_Enable,          //funcpEnable Enable;
+ 338              },
+ 339              // MainMenu\OSD\Language\FRA(_MI_FRA)
+ 340              {
+ 341                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+ 342                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 343                  MLanguageProc,          //funcpProc Proc;
+ 344                  CFRA_Enable,            //funcpEnable Enable;
+ 345              },
+ 346              // MainMenu\OSD\Language\ITA(_MI_ITA)
+ 347              {
+ 348                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+ 349                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 350                  MLanguageProc,          //funcpProc Proc;
+ 351                  CITA_Enable,            //funcpEnable Enable;
+ 352              },
+ 353              // MainMenu\OSD\Language\DEU(_MI_DEU)
+ 354              {
+ 355                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+ 356                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 357                  MLanguageProc,          //funcpProc Proc;
+ 358                  CDEU_Enable,            //funcpEnable Enable;
+ 359              },
+ 360              // MainMenu\OSD\Language\ESP(_MI_ESP)
+ 361              {
+ 362                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+ 363                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 364                  MLanguageProc,          //funcpProc Proc;
+C51 COMPILER V7.20   OSDTABLE003                                                           10/05/2015 09:30:17 PAGE 7   
+
+ 365                  CESP_Enable,            //funcpEnable Enable;
+ 366              },
+ 367              // MainMenu\OSD\Language\CHI_T(_MI_CHI_T)
+ 368              {
+ 369                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+ 370                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 371                  MLanguageProc,          //funcpProc Proc;
+ 372                  CCHI_T_Enable,          //funcpEnable Enable;
+ 373              },
+ 374              // MainMenu\OSD\Language\JAP(_MI_JAP)
+ 375              {
+ 376                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+ 377                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 378                  MLanguageProc,          //funcpProc Proc;
+ 379                  CJAP_Enable,            //funcpEnable Enable;
+ 380              },
+ 381              // MainMenu\OSD\Language\KOR(_MI_KOR)
+ 382              {
+ 383                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+ 384                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 385                  MLanguageProc,          //funcpProc Proc;
+ 386                  CKOR_Enable,            //funcpEnable Enable;
+ 387              },
+ 388              // MainMenu\OSD\Language\RUS(_MI_RUS)
+ 389              {
+ 390                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+ 391                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 392                  MLanguageProc,          //funcpProc Proc;
+ 393                  CRUS_Enable,            //funcpEnable Enable;
+ 394              },
+ 395                  #if(_KEY_TYPE == _KT_PCB2660_003_5KEY)
+ 396              // MainMenu\OSD\HPosition
+ 397              {
+ 398                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 399                  tKOAdjust,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 400                  MHPositionProc,               //funcpProc Proc;
+ 401                  CEnable,                //funcpEnable Enable;
+ 402              },    
+ 403              // MainMenu\OSD\VPosition
+ 404              {
+ 405                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 406                  tKOAdjust,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 407                  MVPositionProc,               //funcpProc Proc;
+ 408                  CEnable,                //funcpEnable Enable;
+ 409              },    
+ 410              // MainMenu\OSD\Timer\TimerADJ(_MI_TIMERADJ)
+ 411              {
+ 412                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 413                  tKOAdjust,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 414                  MTimerProc,               //funcpProc Proc;
+ 415                  CEnable,                //funcpEnable Enable;
+ 416              },  
+ 417                  #endif  
+ 418              // MainMenu\OSD\Double\Double_On(_MI_DOUBLE_ON)
+ 419              {
+ 420                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 421                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 422                  MDoubleProc,            //funcpProc Proc;
+ 423                  CEnable,                //funcpEnable Enable;
+ 424              },
+ 425              // MainMenu\OSD\Double\Double_Off(_MI_DOUBLE_OFF)
+ 426              {
+C51 COMPILER V7.20   OSDTABLE003                                                           10/05/2015 09:30:17 PAGE 8   
+
+ 427                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 428                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 429                  MDoubleProc,            //funcpProc Proc;
+ 430                  CEnable,                //funcpEnable Enable;
+ 431              },
+ 432                  #if(_KEY_TYPE == _KT_PCB2660_003_5KEY)
+ 433              // MainMenu\OSD\Transparent\TransparentADJ(_MI_TIMERADJ)
+ 434              {
+ 435                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 436                  tKOAdjust,              //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 437                  MTransparentProc,       //funcpProc Proc;
+ 438                  CEnable,                //funcpEnable Enable;
+ 439              }, 
+ 440                  #endif  
+ 441              // MainMenu\TV\Channel(_MI_CHANNEL)
+ 442              {
+ 443                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 444                  tKOSubMenu,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 445                  MTVProc,                //funcpProc Proc;
+ 446                  CEnable,                //funcpEnable Enable;
+ 447              },
+ 448              // MainMenu\TV\System(_MI_SYSTEM)
+ 449              {
+ 450                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 451                  tKOSubMenu1,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 452                  MTVProc,                //funcpProc Proc;
+ 453                  CEnable,                //funcpEnable Enable;
+ 454              },
+ 455              // MainMenu\TV\AutoSearch(_MI_AUTOSEARCH)
+ 456              {
+ 457                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 458                  tKOSubMenu1,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 459                  MTVProc,                //funcpProc Proc;
+ 460                  CEnable,                //funcpEnable Enable;
+ 461              },
+ 462              // MainMenu\TV\ManualSearch(_MI_MANUALSEARCH)
+ 463              {
+ 464                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 465                  tKOSubMenu1,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 466                  MTVProc,                //funcpProc Proc;
+ 467                  CEnable,                //funcpEnable Enable;
+ 468              },
+ 469              // MainMenu\TV\Tuning(_MI_TUNING)
+ 470              {
+ 471                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 472                  tKOSubMenu,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 473                  MTVProc,                //funcpProc Proc;
+ 474                  CEnable,                //funcpEnable Enable;
+ 475              },
+ 476              // MainMenu\TV\Skip(_MI_SKIP)
+ 477              {
+ 478                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 479                  tKOSubMenu1,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 480                  MTVProc,                //funcpProc Proc;
+ 481                  CEnable,                //funcpEnable Enable;
+ 482              },
+ 483              // MainMenu\TV\Swap(_MI_SWAP)
+ 484              {
+ 485                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 486                  tKOSubMenu,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 487                  MTVProc,                //funcpProc Proc;
+ 488                  CEnable,                //funcpEnable Enable;
+C51 COMPILER V7.20   OSDTABLE003                                                           10/05/2015 09:30:17 PAGE 9   
+
+ 489              },
+ 490              // MainMenu\TV\AFC(_MI_AFC)
+ 491              {
+ 492                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+ 493                  tKOSubMenu1,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 494                  MTVProc,                //funcpProc Proc;
+ 495                  CAFCEnable,             //funcpEnable Enable;
+ 496              },
+ 497                  #if(_KEY_TYPE == _KT_PCB2660_003_5KEY)    
+ 498              // MainMenu\TV\Channel(_MI_CHANNEL)
+ 499              {
+ 500                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 501                  tKOAdjust,              //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 502                  MChannelProc,           //funcpProc Proc;
+ 503                  CEnable,                //funcpEnable Enable;
+ 504              },
+ 505                  #endif    
+ 506              // MainMenu\TV\System\S_NTSC_M(_MI_S_NTSC_M)
+ 507              {
+ 508                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+ 509                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 510                  MSystemProc,            //funcpProc Proc;
+ 511                  CEnNtsc_M,              //funcpEnable Enable;
+ 512              },
+ 513              // MainMenu\TV\System\S_NTSC_4_BG(_MI_S_NTSC_4_BG)
+ 514              {
+ 515                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+ 516                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 517                  MSystemProc,            //funcpProc Proc;
+ 518                  CEnNtsc_BG,             //funcpEnable Enable;
+ 519              },
+ 520              // MainMenu\TV\System\S_NTSC_4_DK(_MI_S_NTSC_4_DK)
+ 521              {
+ 522                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+ 523                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 524                  MSystemProc,            //funcpProc Proc;
+ 525                  CEnNtsc_DK,             //funcpEnable Enable;
+ 526              },
+ 527              // MainMenu\TV\System\S_NTSC_4_I(_MI_S_NTSC_4_I)
+ 528              {
+ 529                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+ 530                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 531                  MSystemProc,            //funcpProc Proc;
+ 532                  CEnNtsc_I,              //funcpEnable Enable;
+ 533              },
+ 534              // MainMenu\TV\System\S_TV_PAL_M(_MI_S_TV_PAL_M)
+ 535              {
+ 536                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+ 537                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 538                  MSystemProc,            //funcpProc Proc;
+ 539                  CEnPal_M,               //funcpEnable Enable;
+ 540              },
+ 541              // MainMenu\TV\System\S_PAL_BG(_MI_S_PAL_BG)
+ 542              {
+ 543                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+ 544                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 545                  MSystemProc,            //funcpProc Proc;
+ 546                  CEnPal_BG,              //funcpEnable Enable;
+ 547              },
+ 548              // MainMenu\TV\System\S_PAL_I(_MI_S_PAL_I)
+ 549              {
+ 550                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+C51 COMPILER V7.20   OSDTABLE003                                                           10/05/2015 09:30:17 PAGE 10  
+
+ 551                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 552                  MSystemProc,            //funcpProc Proc;
+ 553                  CEnPal_I,               //funcpEnable Enable;
+ 554              },
+ 555              // MainMenu\TV\System\S_PAL_DK(_MI_S_PAL_DK)
+ 556              {
+ 557                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+ 558                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 559                  MSystemProc,            //funcpProc Proc;
+ 560                  CEnPal_DK,              //funcpEnable Enable;
+ 561              },
+ 562              // MainMenu\TV\System\S_PAL_N(_MI_S_PAL_N)
+ 563              {
+ 564                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+ 565                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 566                  MSystemProc,            //funcpProc Proc;
+ 567                  CEnPal_N,               //funcpEnable Enable;
+ 568              },
+ 569              // MainMenu\TV\System\S_SECAM_BG(_MI_S_SECAM_BG)
+ 570              {
+ 571                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+ 572                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 573                  MSystemProc,            //funcpProc Proc;
+ 574                  CEnSecam_BG,            //funcpEnable Enable;
+ 575              },
+ 576              // MainMenu\TV\System\S_SECAM_DK(_MI_S_SECAM_DK)
+ 577              {
+ 578                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+ 579                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 580                  MSystemProc,            //funcpProc Proc;
+ 581                  CEnSecam_DK,            //funcpEnable Enable;
+ 582              },
+ 583              // MainMenu\TV\System\S_SECAM_L(_MI_S_SECAM_L)
+ 584              {
+ 585                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+ 586                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 587                  MSystemProc,            //funcpProc Proc;
+ 588                  CEnSecam_L,             //funcpEnable Enable;
+ 589              },
+ 590              // MainMenu\TV\System\S_SECAM_LL(_MI_S_SECAM_LL)
+ 591              {
+ 592                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+ 593                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 594                  MSystemProc,            //funcpProc Proc;
+ 595                  CEnSecam_LL,            //funcpEnable Enable;
+ 596              },
+ 597          
+ 598              // MainMenu\TV\AutoSearch\AutoSearch_OK(_MI_AUTOSEARCH_OK)
+ 599              {
+ 600                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 601                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 602                  MAutoSearchProc,        //funcpProc Proc;
+ 603                  CEnable,                //funcpEnable Enable;
+ 604              },
+ 605              // MainMenu\TV\AutoSearch\AutoSearch_Cancel(_MI_AUTOSEARCH_CANCEL)
+ 606              {
+ 607                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 608                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 609                  MAutoSearchProc,        //funcpProc Proc;
+ 610                  CEnable,                //funcpEnable Enable;
+ 611              },
+ 612              // MainMenu\TV\ManualSearch\ManualSearch_Up(_MI_MANUALSEARCH_UP)
+C51 COMPILER V7.20   OSDTABLE003                                                           10/05/2015 09:30:17 PAGE 11  
+
+ 613              {
+ 614                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 615                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 616                  MManualSearchProc,      //funcpProc Proc;
+ 617                  CEnable,                //funcpEnable Enable;
+ 618              },
+ 619              // MainMenu\TV\ManualSearch\ManualSearch_Down(_MI_MANUALSEARCH_DOWN)
+ 620              {
+ 621                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 622                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 623                  MManualSearchProc,      //funcpProc Proc;
+ 624                  CEnable,                //funcpEnable Enable;
+ 625              },
+ 626                  #if(_KEY_TYPE == _KT_PCB2660_003_5KEY)    
+ 627              // MainMenu\TV\Tuning(_MI_TUNING)
+ 628              {
+ 629                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 630                  tKOAdjust,              //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 631                  MTuningProc,           //funcpProc Proc;
+ 632                  CEnable,                //funcpEnable Enable;
+ 633              },
+ 634                  #endif    
+ 635              // MainMenu\TV\Skip\Skip_On(_MI_SKIP_ON)
+ 636              {
+ 637                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 638                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 639                  MSkipProc,              //funcpProc Proc;
+ 640                  CEnable,                //funcpEnable Enable;
+ 641              },
+ 642              // MainMenu\TV\Skip\Skip_Off(_MI_SKIP_OFF)
+ 643              {
+ 644                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 645                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 646                  MSkipProc,              //funcpProc Proc;
+ 647                  CEnable,                //funcpEnable Enable;
+ 648              },
+ 649          
+ 650              // MainMenu\TV\AFC\AFC_On(_MI_AFC_ON)
+ 651              {
+ 652                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 653                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 654                  MAFCProc,              //funcpProc Proc;
+ 655                  CAFCEnable,                //funcpEnable Enable;
+ 656              },
+ 657              // MainMenu\TV\AFC\AFC_Off(_MI_AFC_OFF)
+ 658              {
+ 659                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 660                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 661                  MAFCProc,              //funcpProc Proc;
+ 662                  CAFCEnable,                //funcpEnable Enable;
+ 663              },
+ 664              
+ 665              // MainMenu\Function\Reset(_MI_RESET)
+ 666              {
+ 667                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 668                  tKOSubMenu1,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 669                  MFunctionProc,          //funcpProc Proc;
+ 670                  CEnable,                //funcpEnable Enable;
+ 671              },
+ 672              // MainMenu\Function\DisplayRatio(_MI_DISPLAYRATIO)
+ 673              {
+ 674                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+C51 COMPILER V7.20   OSDTABLE003                                                           10/05/2015 09:30:17 PAGE 12  
+
+ 675                  tKOSubMenu1,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 676                  MFunctionProc,          //funcpProc Proc;
+ 677                  MDisplayRatioEnable,    //funcpEnable Enable;
+ 678              },
+ 679              // MainMenu\Function\AutoPowerDown(_MI_AUTOPOWERDOWN)
+ 680              {
+ 681                  _EN_PUB_KEYEVENT| _DISABLE_NOT_SHOW,       //BYTE Option;
+ 682                  tKOSubMenu1,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 683                  MFunctionProc,          //funcpProc Proc;
+ 684                  CEnable,                //funcpEnable Enable;
+ 685              },
+ 686              // MainMenu\Function\BlueScreen(_MI_BLUESCREEN)
+ 687              {
+ 688                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+ 689                  tKOSubMenu1,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 690                  MFunctionProc,          //funcpProc Proc;
+ 691                  CEnable,                //funcpEnable Enable;
+ 692              },
+ 693              // MainMenu\Function\Sharpness(_MI_SHARPNESS)
+ 694              {
+ 695                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 696                  tKOSubMenu1,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 697                  MFunctionProc,          //funcpProc Proc;
+ 698                  CEnable,                //funcpEnable Enable;
+ 699              },
+ 700          
+ 701              // MainMenu\Function\Reset\Reest_OK(_MI_RESET_OK)
+ 702              {
+ 703                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 704                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 705                  MResetProc,             //funcpProc Proc;
+ 706                  CEnable,                //funcpEnable Enable;
+ 707              },
+ 708              // MainMenu\Function\Reset\Reset_Cancel(_MI_RESET_CANCEL)
+ 709              {
+ 710                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 711                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 712                  MResetProc,             //funcpProc Proc;
+ 713                  CEnable,                //funcpEnable Enable;
+ 714              },
+ 715              // MainMenu\Function\DisplayRatio\DisplayRatio_Full(_MI_DISPLAYRATIO_FULL)
+ 716              {
+ 717                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 718                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 719                  MDisplayRatioProc,      //funcpProc Proc;
+ 720                  CEnable,                //funcpEnable Enable;
+ 721              },
+ 722              // MainMenu\Function\DisplayRatio\DisplayRatio_4_3(_MI_DISPLAYRATIO_4_3)
+ 723              {
+ 724                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 725                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 726                  MDisplayRatioProc,      //funcpProc Proc;
+ 727                  CEnable,                //funcpEnable Enable;
+ 728              },
+ 729              // MainMenu\Function\AutoPowerDown\AutoPowerDown_Off(_MI_AUTOPOWERDOWN_OFF)
+ 730              {
+ 731                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 732                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 733                  MDisplayRatioProc,      //funcpProc Proc;
+ 734                  CEnable,                //funcpEnable Enable;
+ 735              },
+ 736              // MainMenu\Function\AutoPowerDown\AutoPowerDown_Off(_MI_AUTOPOWERDOWN_OFF)
+C51 COMPILER V7.20   OSDTABLE003                                                           10/05/2015 09:30:17 PAGE 13  
+
+ 737              {
+ 738                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+ 739                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 740                  MAutoPowerDownProc,     //funcpProc Proc;
+ 741                  CEnable,                //funcpEnable Enable;
+ 742              },
+ 743              // MainMenu\Function\AutoPowerDown\APD_15(_MI_APD_15)
+ 744              {
+ 745                  _EN_PUB_KEYEVENT| _DISABLE_NOT_SHOW,       //BYTE Option;
+ 746                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 747                  MAutoPowerDownProc,     //funcpProc Proc;
+ 748                  CEnable,                //funcpEnable Enable;
+ 749              },
+ 750              // MainMenu\Function\AutoPowerDown\APD_30(_MI_APD_30)
+ 751              {
+ 752                  _EN_PUB_KEYEVENT| _DISABLE_NOT_SHOW,       //BYTE Option;
+ 753                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 754                  MAutoPowerDownProc,     //funcpProc Proc;
+ 755                  CEnable,                //funcpEnable Enable;
+ 756              },
+ 757              // MainMenu\Function\AutoPowerDown\APD_45(_MI_APD_45)
+ 758              {
+ 759                  _EN_PUB_KEYEVENT| _DISABLE_NOT_SHOW,       //BYTE Option;
+ 760                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 761                  MAutoPowerDownProc,     //funcpProc Proc;
+ 762                  CEnable,                //funcpEnable Enable;
+ 763              },
+ 764              // MainMenu\Function\AutoPowerDown\APD_60(_MI_APD_60)
+ 765              {
+ 766                  _EN_PUB_KEYEVENT| _DISABLE_NOT_SHOW,       //BYTE Option;
+ 767                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 768                  MAutoPowerDownProc,     //funcpProc Proc;
+ 769                  CEnable,                //funcpEnable Enable;
+ 770              },
+ 771              // MainMenu\Function\AutoPowerDown\APD_75(_MI_APD_75)
+ 772              {
+ 773                  _EN_PUB_KEYEVENT| _DISABLE_NOT_SHOW,       //BYTE Option;
+ 774                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 775                  MAutoPowerDownProc,     //funcpProc Proc;
+ 776                  CEnable,                //funcpEnable Enable;
+ 777              },
+ 778              // MainMenu\Function\AutoPowerDown\APD_90(_MI_APD_90)
+ 779              {
+ 780                  _EN_PUB_KEYEVENT| _DISABLE_NOT_SHOW,       //BYTE Option;
+ 781                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 782                  MAutoPowerDownProc,     //funcpProc Proc;
+ 783                  CEnable,                //funcpEnable Enable;
+ 784              },
+ 785              // MainMenu\Function\AutoPowerDown\APD_105(_MI_APD_105)
+ 786              {
+ 787                  _EN_PUB_KEYEVENT| _DISABLE_NOT_SHOW,       //BYTE Option;
+ 788                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 789                  MAutoPowerDownProc,     //funcpProc Proc;
+ 790                  CEnable,                //funcpEnable Enable;
+ 791              },
+ 792              // MainMenu\Function\AutoPowerDown\APD_120(_MI_APD_120)
+ 793              {
+ 794                  _EN_PUB_KEYEVENT| _DISABLE_NOT_SHOW,       //BYTE Option;
+ 795                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 796                  MAutoPowerDownProc,     //funcpProc Proc;
+ 797                  CEnable,                //funcpEnable Enable;
+ 798              },
+C51 COMPILER V7.20   OSDTABLE003                                                           10/05/2015 09:30:17 PAGE 14  
+
+ 799          
+ 800              // MainMenu\Function\BlueScreen\BlueScreen_On(_MI_BLUESCREEN_ON)
+ 801              {
+ 802                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+ 803                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 804                  MBlueScreenProc,        //funcpProc Proc;
+ 805                  CEnable,                //funcpEnable Enable;
+ 806              },
+ 807              // MainMenu\Function\BlueScreen\BlueScreen_Off(_MI_BLUESCREEN_OFF)
+ 808              {
+ 809                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+ 810                  tKOMainMenu,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 811                  MBlueScreenProc,        //funcpProc Proc;
+ 812                  CEnable,                //funcpEnable Enable;
+ 813              },
+ 814                  #if(_KEY_TYPE == _KT_PCB2660_003_5KEY)
+ 815              // MainMenu\Function\Sharpness\SharpnessADJ(_MI_SHARPNESS_ADJ)
+ 816              {
+ 817                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 818                  tKOAdjust,              //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 819                  MSharpnessProc,         //funcpProc Proc;
+ 820                  CEnable,                //funcpEnable Enable;
+ 821              },          
+ 822                  #endif   
+ 823              // MainMenu\Sound\Volume(_MI_VOLUME)
+ 824              {
+ 825                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 826                  tKOSubMenu,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 827                  MSoundProc,             //funcpProc Proc;
+ 828                  CEnable,                //funcpEnable Enable;
+ 829              },
+ 830              // MainMenu\Sound\Balance(_MI_BALANCE)
+ 831              {
+ 832                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+ 833                  tKOSubMenu,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 834                  MSoundProc,             //funcpProc Proc;
+ 835                  MSoundEnable,           //funcpEnable Enable;
+ 836              },
+ 837              // MainMenu\Sound\Bass(_MI_BASS)
+ 838              {
+ 839                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+ 840                  tKOSubMenu,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 841                  MSoundProc,             //funcpProc Proc;
+ 842                  MSoundEnable,           //funcpEnable Enable;
+ 843              },
+ 844              // MainMenu\Sound\Treble(_MI_TREBLE)
+ 845              {
+ 846                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+ 847                  tKOSubMenu,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 848                  MSoundProc,             //funcpProc Proc;
+ 849                  MSoundEnable,           //funcpEnable Enable;
+ 850              },
+ 851              // MainMenu\Sound\SRS(_MI_SRS)
+ 852              {
+ 853                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+ 854                  tKOSubMenu,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 855                  MSoundProc,             //funcpProc Proc;
+ 856                  MNJW1144Enable,         //funcpEnable Enable;
+ 857              },
+ 858              // MainMenu\Sound\BBE(_MI_BBE)
+ 859              {
+ 860                  _EN_PUB_KEYEVENT | _DISABLE_NOT_SHOW,       //BYTE Option;
+C51 COMPILER V7.20   OSDTABLE003                                                           10/05/2015 09:30:17 PAGE 15  
+
+ 861                  tKOSubMenu,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 862                  MSoundProc,             //funcpProc Proc;
+ 863                  MNJW1144Enable,         //funcpEnable Enable;
+ 864              },
+ 865                  #if(_KEY_TYPE == _KT_PCB2660_003_5KEY)
+ 866                  // MainMenu\Sound\Volume\VolumeADJ(_MI_VOLUMEADJ)
+ 867              {
+ 868                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 869                  tKOAdjust,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 870                  MVolumeProc,             //funcpProc Proc;
+ 871                  CEnable,                //funcpEnable Enable;
+ 872              },          
+ 873                  // MainMenu\Sound\Balance\BalanceADJ(_MI_BALANCEADJ)
+ 874              {
+ 875                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 876                  tKOAdjust,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 877                  MBalanceProc,             //funcpProc Proc;
+ 878                  MSoundEnable,                //funcpEnable Enable;
+ 879              },          
+ 880                  // MainMenu\Sound\Bass\BassADJ(_MI_BASSADJ)
+ 881              {
+ 882                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 883                  tKOAdjust,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 884                  MBassProc,             //funcpProc Proc;
+ 885                  MSoundEnable,                //funcpEnable Enable;
+ 886              },                  
+ 887                  // MainMenu\Sound\Treble\TrebleADJ(_MI_TREBLEADJ)
+ 888              {
+ 889                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 890                  tKOAdjust,              //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 891                  MTrebleProc,            //funcpProc Proc;
+ 892                  MSoundEnable,           //funcpEnable Enable;
+ 893              },                  
+ 894                  #endif
+ 895          #if(_CHANGE_SOURCE_METHOD == _CHANGE_SOURCE_METHOD_0)
+ 896                  // Source
+ 897              // Source\VGA(_MI_SOURCE_VGA)
+ 898              {
+ 899                  _DISABLE_NOT_SHOW | _KEYMAP_EN_IN_NOSIGNAL,       //BYTE Option;
+ 900                  tKOSource,              //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 901                  MSourceProc,            //funcpProc Proc;
+ 902                  CMIVgaEnable,           //funcpEnable Enable;
+ 903              },
+ 904              // Source\DVI(_MI_SOURCE_DVI)
+ 905              {
+ 906                  _DISABLE_NOT_SHOW | _KEYMAP_EN_IN_NOSIGNAL,       //BYTE Option;
+ 907                  tKOSource,              //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 908                  MSourceProc,            //funcpProc Proc;
+ 909                  CMIDVIEnable,             //funcpEnable Enable;
+ 910              },
+ 911              // Source\HDMI(_MI_SOURCE_HDMI)
+ 912              {
+ 913                  _DISABLE_NOT_SHOW | _KEYMAP_EN_IN_NOSIGNAL,       //BYTE Option;
+ 914                  tKOSource,              //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 915                  MSourceProc,            //funcpProc Proc;
+ 916                  CMIHDMIEnable,            //funcpEnable Enable;
+ 917              },
+ 918              // Source\YPBPR(_MI_SOURCE_YPBPR)
+ 919              {
+ 920                  _DISABLE_NOT_SHOW | _KEYMAP_EN_IN_NOSIGNAL,       //BYTE Option;
+ 921                  tKOSource,              //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 922                  MSourceProc,            //funcpProc Proc;
+C51 COMPILER V7.20   OSDTABLE003                                                           10/05/2015 09:30:17 PAGE 16  
+
+ 923                  CMIYPBPREnable,         //funcpEnable Enable;
+ 924              },
+ 925              // Source\AV(_MI_SOURCE_AV)
+ 926              {
+ 927                  _DISABLE_NOT_SHOW | _KEYMAP_EN_IN_NOSIGNAL,       //BYTE Option;
+ 928                  tKOSource,              //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 929                  MSourceProc,            //funcpProc Proc;
+ 930                  CMIAVEnable,            //funcpEnable Enable;
+ 931              },
+ 932              // Source\SV(_MI_SOURCE_SV)
+ 933              {
+ 934                  _DISABLE_NOT_SHOW | _KEYMAP_EN_IN_NOSIGNAL,       //BYTE Option;
+ 935                  tKOSource,              //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 936                  MSourceProc,            //funcpProc Proc;
+ 937                  CMISVEnable,            //funcpEnable Enable;
+ 938              },
+ 939              // Source\TV(_MI_SOURCE_TV)
+ 940              {
+ 941                  _DISABLE_NOT_SHOW | _KEYMAP_EN_IN_NOSIGNAL,       //BYTE Option;
+ 942                  tKOSource,              //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 943                  MSourceProc,            //funcpProc Proc;
+ 944                  CMITVEnable,            //funcpEnable Enable;
+ 945              },
+ 946          #endif
+ 947              
+ 948              // Short Cut menu\Brightness(_MI_SC_BRIGHTNESS)
+ 949              {
+ 950                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 951                  tKOShortCut,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 952                  MScBrightnessProc,      //funcpProc Proc;
+ 953                  CEnable,                //funcpEnable Enable;
+ 954              },
+ 955          
+ 956              // Short Cut menu\Volume(_MI_SC_VOLUME)
+ 957              {
+ 958                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 959                  tKOShortCutVolume,      //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 960                  MScVolumeProc,          //funcpProc Proc;
+ 961                  CEnable,                //funcpEnable Enable;
+ 962              },
+ 963            
+ 964              // Short Cut menu\Input ch number(_MI_SC_INPUT_CH_NUM)
+ 965              {
+ 966                  _EN_PUB_KEYEVENT,       //BYTE Option;
+ 967                  tKOShortInputCHMenu,    //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+ 968                  MScInputChNumProc,      //funcpProc Proc;
+ 969                  CMITVEnable,            //funcpEnable Enable;
+ 970              },
+ 971          //------------------------------------------------------------
+ 972                  #if(_FAC_OSD)
+                  //Factory menu
+                  //Factory menu/(AUTOCLOR)_MI_FAC_AUTOCOLOR
+                  {
+                      _DISABLE_NOT_SHOW,      //BYTE Option;
+                      tKOFactory,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+                      MFactoryProc,           //funcpProc Proc;
+                      CEnable,           //funcpEnable Enable;
+                  },
+                  //Factory menu/(GAIN)_MI_FAC_GAIN
+                  {
+                      _DISABLE_NOT_SHOW | _KEYMAP_EN_IN_NOSIGNAL,       //BYTE Option;
+                      tKOFactory,             //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+C51 COMPILER V7.20   OSDTABLE003                                                           10/05/2015 09:30:17 PAGE 17  
+
+                      MFactoryProc,           //funcpProc Proc;
+                      CEnable,           //funcpEnable Enable;
+                  },
+                  //Factory menu/(OFFSET)_MI_FAC_OFFSET
+                  {
+                      _DISABLE_NOT_SHOW | _KEYMAP_EN_IN_NOSIGNAL,       //BYTE Option;
+                      tKOFactory,              //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+                      MFactoryProc,            //funcpProc Proc;
+                      CEnable,           //funcpEnable Enable;
+                  },
+                  //Factory menu/(9300)_MI_FAC_9300
+                  {
+                      _DISABLE_NOT_SHOW | _KEYMAP_EN_IN_NOSIGNAL,       //BYTE Option;
+                      tKOFactory,              //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+                      MFactoryProc,            //funcpProc Proc;
+                      CEnable,           //funcpEnable Enable;
+                  },
+                  //Factory menu/(6500)_MI_FAC_6500
+                  {
+                      _DISABLE_NOT_SHOW | _KEYMAP_EN_IN_NOSIGNAL,       //BYTE Option;
+                      tKOFactory,              //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+                      MFactoryProc,            //funcpProc Proc;
+                      CEnable,           //funcpEnable Enable;
+                  },
+                  //Factory menu/(BURNIN)_MI_FAC_BURNIN
+                  {
+                      _DISABLE_NOT_SHOW | _KEYMAP_EN_IN_NOSIGNAL,       //BYTE Option;
+                      tKOFactory,              //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+                      MFactoryProc,            //funcpProc Proc;
+                      CEnable,           //funcpEnable Enable;
+                  },
+                  //Factory menu/(GAMMA)_MI_GAMMA
+                  {
+                      _DISABLE_NOT_SHOW | _KEYMAP_EN_IN_NOSIGNAL,       //BYTE Option;
+                      tKOFactory,              //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+                      MFactoryProc,            //funcpProc Proc;
+                      CEnable,           //funcpEnable Enable;
+                  },
+                  //Factory menu/(N.R)_MI_FAC_NR
+                  {
+                      _DISABLE_NOT_SHOW | _KEYMAP_EN_IN_NOSIGNAL,       //BYTE Option;
+                      tKOFactory,              //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+                      MFactoryProc,            //funcpProc Proc;
+                      CEnable,           //funcpEnable Enable;
+                  },
+                  //Factory menu/(EXIT)_MI_FAC_EXIT
+                  {
+                      _DISABLE_NOT_SHOW | _KEYMAP_EN_IN_NOSIGNAL,       //BYTE Option;
+                      tKOFactory,              //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+                      MFactoryProc,            //funcpProc Proc;
+                      CEnable,           //funcpEnable Enable;
+                  },
+                  //Factory menu/(9300_R) _MI_FAC_9300_R
+                  {
+                      _EN_PUB_KEYEVENT,       //BYTE Option;
+                      tKOFactorySub,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+                      MFac9300Proc,        //funcpProc Proc;
+                      CEnable,                //funcpEnable Enable;
+                  },
+                  //Factory menu/(9300_G) _MI_FAC_9300_G
+                  /*{
+                      _EN_PUB_KEYEVENT,       //BYTE Option;
+C51 COMPILER V7.20   OSDTABLE003                                                           10/05/2015 09:30:17 PAGE 18  
+
+                      tKOFactorySub,          //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+                      MFacGammaProc,          //funcpProc Proc;
+                      CEnable,                //funcpEnable Enable;
+                  },*/
+                  //Factory menu/(9300_B) _MI_FAC_9300_B
+                  {
+                      _EN_PUB_KEYEVENT,       //BYTE Option;
+                      tKOFactorySub,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+                      MFac9300Proc,        //funcpProc Proc;
+                      CEnable,                //funcpEnable Enable;
+                  },
+                  //Factory menu/(6500_R) _MI_FAC_6500_R
+                  {
+                      _EN_PUB_KEYEVENT,       //BYTE Option;
+                      tKOFactorySub,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+                      MFac6500Proc,        //funcpProc Proc;
+                      CEnable,                //funcpEnable Enable;
+                  }, 
+                      //Factory menu/(6500_G) _MI_FAC_6500_G
+                  {
+                      _EN_PUB_KEYEVENT,       //BYTE Option;
+                      tKOFactorySub,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+                      MFac6500Proc,        //funcpProc Proc;
+                      CEnable,                //funcpEnable Enable;
+                  }, 
+                  //Factory menu/(6500_B) _MI_FAC_6500_B
+                  {
+                      _EN_PUB_KEYEVENT,       //BYTE Option;
+                      tKOFactorySub,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+                      MFac6500Proc,        //funcpProc Proc;
+                      CEnable,                //funcpEnable Enable;
+                  }, 
+                  //Factory menu/(GAIN_R) _MI_FAC_GAIN_R
+                  {
+                      _EN_PUB_KEYEVENT,       //BYTE Option;
+                      tKOFactorySub,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+                      MFacGainProc,        //funcpProc Proc;
+                      CEnable,                //funcpEnable Enable;
+                  }, 
+                  //Factory menu/(GAIN_G) _MI_FAC_GAIN_G
+                  {
+                      _EN_PUB_KEYEVENT,       //BYTE Option;
+                      tKOFactorySub,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+                      MFacGainProc,        //funcpProc Proc;
+                      CEnable,                //funcpEnable Enable;
+                  }, 
+                  //Factory menu/(GAIN_B) _MI_FAC_GAIN_B
+                  {
+                      _EN_PUB_KEYEVENT,       //BYTE Option;
+                      tKOFactorySub,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+                      MFacGainProc,        //funcpProc Proc;
+                      CEnable,                //funcpEnable Enable;
+                  },
+                  //Factory menu/(OFFSET_R) _MI_FAC_OFFSET_R
+                  {
+                      _EN_PUB_KEYEVENT,       //BYTE Option;
+                      tKOFactorySub,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+                      MFacOffsetProc,        //funcpProc Proc;
+                      CEnable,                //funcpEnable Enable;
+                  },
+                  //Factory menu/(OFFSET_G) _MI_FAC_OFFSET_G
+                  {
+C51 COMPILER V7.20   OSDTABLE003                                                           10/05/2015 09:30:17 PAGE 19  
+
+                      _EN_PUB_KEYEVENT,       //BYTE Option;
+                      tKOFactorySub,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+                      MFacOffsetProc,        //funcpProc Proc;
+                      CEnable,                //funcpEnable Enable;
+                  },
+                  //Factory menu/(OFFSET_B) _MI_FAC_OFFSET_B
+                  {
+                      _EN_PUB_KEYEVENT,       //BYTE Option;
+                      tKOFactorySub,            //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+                      MFacOffsetProc,        //funcpProc Proc;
+                      CEnable,                //funcpEnable Enable;
+                  },
+              
+                  //Factory menu/(GAMMA) _MI_FAC_GAMMA_ADJ
+                  /*{
+                      _EN_PUB_KEYEVENT,       //BYTE Option;
+                      tKOFactorySub,          //SKeyToOsdEvent *KeyMsgToOsdEvnet;
+                      MFacGammaProc,          //funcpProc Proc;
+                      CEnable,                //funcpEnable Enable;
+                  },*/
+              #endif
+1130          };
+1131          //------------------------------------------------------------
+1132          
+1133          #endif  //#if(_OSD_TYPE == _OSD003)
+1134          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   ----    ----
+   CONSTANT SIZE    =   1310    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,151 @@
+C51 COMPILER V7.20   KEY_PCB2660_003_5KEY                                                  10/05/2015 09:30:08 PAGE 1   
+
+
+C51 COMPILER V7.20, COMPILATION OF MODULE KEY_PCB2660_003_5KEY
+OBJECT MODULE PLACED IN .\Output\Key_PCB2660_003_5Key.obj
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE Keys\Key_PCB2660_003_5Key.c LARGE OPTIMIZE(9,SPEED) BROWSE DEBUG OBJECTEXTE
+                    -ND PRINT(.\Output\Key_PCB2660_003_5Key.lst) OBJECT(.\Output\Key_PCB2660_003_5Key.obj)
+
+line level    source
+
+   1          #include "Core\Header\include.h"
+   2          
+   3          
+   4          #if(_KEY_TYPE == _KT_PCB2660_003_5KEY)
+   5          
+   6          //--------------------------------------------------
+   7          // Description  : Get key status
+   8          // Input Value  : None
+   9          // Output Value : Return Key status
+  10          //--------------------------------------------------
+  11          BYTE CKeyScan(void)
+  12          {
+  13   1          BYTE ucKeyState = _NONE_KEY_MASK;
+  14   1      
+  15   1      #if(_KEY_SCAN_TYPE == _KEY_SCAN_NORMAL)
+              
+                  if(!bKey_P54)   ucKeyState    = ucKeyState | _POWER_KEY_MASK;   //Power
+                  if(!bKey_P56)   ucKeyState    = ucKeyState | _DOWN_KEY_MASK;    //Down
+                  if(!bKey_P55)   ucKeyState    = ucKeyState | _UP_KEY_MASK;      //Up
+                  if(!bKey_P57)   ucKeyState    = ucKeyState | _LEFT_KEY_MASK;    //Left
+                  if(!bKey_P76)   ucKeyState    = ucKeyState | _RIGHT_KEY_MASK;   //Right
+                  if(!bKey_P34)   ucKeyState    = ucKeyState | _SOURCE_KEY_MASK;  //Source
+                  if(!bKey_P81)   ucKeyState    = ucKeyState | _MENU_KEY_MASK;    //Menu
+              
+              #else
+  26   1      
+  27   1              CGetADCValue(&pData[0]);
+  28   1          CGetADCValue(&pData[3]);
+  29   1       
+  30   1          // AD key1
+  31   1          if(_ABS(pData[0], pData[3]) < 3)
+  32   1          {
+  33   2              if     (_ABS(pData[0], bAD1_Key_7) < 3)  ucKeyState = _POWER_KEY_MASK;
+  34   2              else if(_ABS(pData[0], bAD1_Key_4) < 3)  ucKeyState = _RIGHT_KEY_MASK;
+  35   2              else if(_ABS(pData[0], bAD1_Key_2) < 3)  ucKeyState = _LEFT_KEY_MASK;
+  36   2              else if(_ABS(pData[0], bAD1_Key_3) < 3)  ucKeyState = _MENU_KEY_MASK;
+  37   2              else if(_ABS(pData[0], bAD1_Key_1) < 3)  ucKeyState = _SOURCE_KEY_MASK;
+  38   2              else if(_ABS(pData[0], bAD1_Key_5) < 3)  ucKeyState = _AV1_KEY_MASK;
+  39   2              else if(_ABS(pData[0], bAD1_Key_6) < 3)  ucKeyState = _AV2_KEY_MASK;
+  40   2          }
+  41   1                      
+  42   1      #endif
+  43   1      
+  44   1          if(ucKeyState != _NONE_KEY_MASK)
+  45   1             CKeyInitial();
+  46   1      
+  47   1          return ucKeyState;
+  48   1      }
+  49          //--------------------------------------------------
+  50          /*
+  51          void CScanAutoKey(void)
+  52          {
+  53               if(GET_POWERSTATUS())
+  54               {
+C51 COMPILER V7.20   KEY_PCB2660_003_5KEY                                                  10/05/2015 09:30:08 PAGE 2   
+
+  55                   // check 3 sec do change source ???
+  56                   #if(_TMDS_SUPPORT)
+  57                   {
+  58                       if(CheckKeyUp(_AUTO_KEY_MASK,50))
+  59                          ucKeyMessage = _AUTO_KEY_MESSAGE;
+  60                       else ucKeyMessage = _SOURCE_KEY_MESSAGE;
+  61                   }
+  62                   #else
+  63                   {
+  64                       CKeyMessageConvert(_AUTO_KEY_MASK, _AUTO_KEY_MESSAGE);
+  65                   }
+  66                   #endif
+  67               }
+  68               else
+  69               {
+  70                   if(CheckKeyDown(_AUTO_KEY_MASK | _POWER_KEY_MASK,20))
+  71                   {
+  72                       SET_POWERSWITCH();
+  73                       ucKeyMessage = _AUTO_POWER_KEY_MESSAGE;
+  74                   }
+  75               }
+  76          }
+  77          */
+  78          //--------------------------------------------------
+  79          
+  80          
+  81          void CKeyMessageProc(void)
+  82          {          
+  83   1          switch(ucKeyStateCurr)
+  84   1          {        
+  85   2                      #if(_FAC_OSD)  
+                      case _FAC_KEY_MASK:     //Factory key
+                          CKeyMessageConvert(_FAC_KEY_MASK, _FAC_KEY_MESSAGE);        
+                          break;
+                              #endif
+  90   2              
+  91   2              case _MENU_KEY_MASK:     //Menu
+  92   2                  CKeyMessageConvert(_MENU_KEY_MASK, _MENU_KEY_MESSAGE);        
+  93   2                  break;
+  94   2              
+  95   2              case _AV1_KEY_MASK:      
+  96   2                  CKeyMessageConvert(_AV1_KEY_MASK, _AV1_KEY_MESSAGE);
+  97   2                  break;
+  98   2              
+  99   2              case _AV2_KEY_MASK:  
+ 100   2                  CKeyMessageConvert(_AV2_KEY_MASK, _AV2_KEY_MESSAGE);
+ 101   2                  break;
+ 102   2      
+ 103   2              case _LEFT_KEY_MASK:     //Left
+ 104   2                  CKeyMessageConvert(_LEFT_KEY_MASK, _LEFT_KEY_MESSAGE);
+ 105   2                  break;
+ 106   2      
+ 107   2              case _RIGHT_KEY_MASK:    //Right
+ 108   2                  CKeyMessageConvert(_RIGHT_KEY_MASK, _RIGHT_KEY_MESSAGE);
+ 109   2                  break; 
+ 110   2                     
+ 111   2              case _SOURCE_KEY_MASK:
+ 112   2                  CKeyMessageConvert(_SOURCE_KEY_MASK, _SOURCE_KEY_MESSAGE);
+ 113   2                  break;
+ 114   2              
+ 115   2              default:
+ 116   2                  CLR_KEYREPEATSTART();
+C51 COMPILER V7.20   KEY_PCB2660_003_5KEY                                                  10/05/2015 09:30:08 PAGE 3   
+
+ 117   2                  CTimerCancelTimerEvent(CKeyRepeatEnableTimerEvent);
+ 118   2                  break;
+ 119   2          }
+ 120   1      } 
+ 121          //--------------------------------------------------
+ 122                        
+ 123          #endif      //#if(_KEY_TYPE == _KT_PCB2660_003)
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    375    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----       1
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

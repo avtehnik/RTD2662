@@ -1,0 +1,454 @@
+C51 COMPILER V7.20   RTDACCESS                                                             10/05/2015 09:30:22 PAGE 1   
+
+
+C51 COMPILER V7.20, COMPILATION OF MODULE RTDACCESS
+OBJECT MODULE PLACED IN .\Output\RTDAccess.obj
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE Core\code\mcu\RTDAccess.c LARGE OPTIMIZE(9,SPEED) BROWSE DEBUG OBJECTEXTEND
+                    - PRINT(.\Output\RTDAccess.lst) OBJECT(.\Output\RTDAccess.obj)
+
+line level    source
+
+   1          /*=============================================
+   2            * Copyright (c)      Realtek Semiconductor Corporation, 2005
+   3            * All rights reserved.
+   4            * ============================================ */
+   5          
+   6          #define __RTDACCESS__
+   7          
+   8          #include "Core\Header\Include.h"
+   9          
+  10          //----------------------------------------------------------------------------------------------------
+  11          // Scaler communication basic function
+  12          //----------------------------------------------------------------------------------------------------
+  13          void CScalerSendAddr(BYTE ucAddr, bit bAutoInc)
+  14          {
+  15   1          if(bAutoInc)
+  16   1              *(&MCU_SCA_INF_CTRL_FFF3) = 0x20;
+  17   1          else
+  18   1              *(&MCU_SCA_INF_CTRL_FFF3) = 0x00;
+  19   1      
+  20   1          *(&MCU_SCA_INF_ADDR_FFF4) = ucAddr;
+  21   1      }
+  22          //--------------------------------------------------
+  23          // Description  : Write a data array into registers of scaler
+  24          // Input Value  : ucAddr    --> Start address of register
+  25          //                ucLength  --> Numbers of data we want to write
+  26          //                pArray    --> Pointer of the writing data array
+  27          //                bAutoInc  --> Address auto increasing select
+  28          // Output Value : None
+  29          //--------------------------------------------------
+  30          void CScalerWrite(BYTE ucAddr, WORD usLength, BYTE *pArray, bit bAutoInc)
+  31          {
+  32   1          CScalerSendAddr(ucAddr, bAutoInc);
+  33   1      
+  34   1          if(usLength > 0)
+  35   1          {
+  36   2      
+  37   2              do
+  38   2              {
+  39   3                  *(&MCU_SCA_INF_DATA_FFF5) = *pArray++;
+  40   3      
+  41   3              }while(--usLength);
+  42   2          }
+  43   1      
+  44   1      
+  45   1      }
+  46          
+  47          //--------------------------------------------------
+  48          // Description  : Read data from registers of scaler and put it into an reading data array
+  49          // Input Value  : ucAddr    --> Start address of register
+  50          //                ucLength  --> Numbers of data we want to read
+  51          //                pArray    --> Pointer of the reading data array
+  52          //                bAutoInc  --> Address auto increasing select
+  53          // Output Value : None
+  54          //--------------------------------------------------
+C51 COMPILER V7.20   RTDACCESS                                                             10/05/2015 09:30:22 PAGE 2   
+
+  55          void CScalerRead(BYTE ucAddr, BYTE ucLength, BYTE *pArray, bit bAutoInc)
+  56          {
+  57   1          CScalerSendAddr(ucAddr, bAutoInc);
+  58   1      
+  59   1          if(ucLength > 0)
+  60   1          {
+  61   2              do
+  62   2              {
+  63   3                  *pArray++ = *(&MCU_SCA_INF_DATA_FFF5);
+  64   3      
+  65   3              }while(--ucLength);
+  66   2      
+  67   2          }
+  68   1      }
+  69          
+  70          /**
+  71          * CScalerWriteAmount
+  72          * Write a data array into register of scaler
+  73          * @param <ucAddress> {Start address of register}
+  74          * @param <ucCol> {The colume of blank}
+  75          * @param <ucLength> {Number of data}
+  76          * @param <ucValue> {The data wroten}
+  77          * @param <bAutoInc> {Address auto increase or not}
+  78          * @return {none}
+  79          *
+  80          */
+  81          void CScalerWriteAmount(BYTE ucAddr, WORD usLength, BYTE ucValue, bit bAutoInc)
+  82          {
+  83   1          CScalerSendAddr(ucAddr, bAutoInc);
+  84   1      
+  85   1          if(usLength > 0)
+  86   1          {
+  87   2              do
+  88   2              {
+  89   3                  *(&MCU_SCA_INF_DATA_FFF5) = ucValue;
+  90   3      
+  91   3              }while(--usLength);
+  92   2          }
+  93   1      
+  94   1      
+  95   1      }
+  96          
+  97          
+  98          //--------------------------------------------------
+  99          // Description  : Set the value into selected register
+ 100          // Input Value  : ucAddr    --> Address of register
+ 101          //                ucValue   --> Value we want to set
+ 102          // Output Value : None
+ 103          //--------------------------------------------------
+ 104          void CScalerSetByte(BYTE ucAddr, BYTE ucValue)
+ 105          {
+ 106   1          CScalerWrite(ucAddr, 1, &ucValue, _AUTOINC);
+ 107   1      }
+ 108          
+ 109          //--------------------------------------------------
+ 110          // Description  : Set the value into selected register in data port
+ 111          // Input Value  : ucAddr    --> Access Port Address of register
+ 112          //                ucValue1  --> Data Port Value we want to set
+ 113          //                ucValue2  --> Data Value we want to set
+ 114          // Output Value : None
+ 115          //--------------------------------------------------
+ 116          void CScalerSetDataPortByte(BYTE ucAddr, BYTE ucValue1, BYTE ucValue2)
+C51 COMPILER V7.20   RTDACCESS                                                             10/05/2015 09:30:22 PAGE 3   
+
+ 117          {
+ 118   1          if((ucAddr == _SU_ACCESS_PORT_33) || (ucAddr == _HW_ACCESS_PORT_60) 
+ 119   1          || (ucAddr == _CB_ACCESS_PORT_64) || (ucAddr == _PC_ACCESS_PORT_9A))
+ 120   1          {
+ 121   2              CScalerSetByte(ucAddr, 0x80);
+ 122   2              ucValue1 = ucValue1 | 0x80;
+ 123   2          }
+ 124   1          CScalerWrite(ucAddr, 1, &ucValue1, _AUTOINC);
+ 125   1          CScalerWrite(ucAddr + 1, 1, &ucValue2, _AUTOINC);
+ 126   1          CScalerSetByte(ucAddr, 0x00);
+ 127   1      }
+ 128          
+ 129          /**
+ 130          * CScalerSetBit
+ 131          * Set bit of register
+ 132          * @param <ucAddr> {register address}
+ 133          * @param <ucAnd> {data &}
+ 134          * @param <ucOr> {data |}
+ 135          * @return {none}
+ 136          *
+ 137          */
+ 138          void CScalerSetBit(BYTE ucAddr, BYTE ucAnd, BYTE ucOr)
+ 139          {
+ 140   1          BYTE value;
+ 141   1      
+ 142   1          CScalerRead(ucAddr, 1, &value, _AUTOINC);
+ 143   1          value   = (value & ucAnd) | ucOr;
+ 144   1          CScalerWrite(ucAddr, 1, &value, _AUTOINC);
+ 145   1      }
+ 146          
+ 147          
+ 148          //--------------------------------------------------
+ 149          // Description  : Set some bits of selected register in data port
+ 150          // Input Value  : ucAddr    --> Access Port Address of register
+ 151          //                ucValue   --> Data Port Value we want to set
+ 152          //                ucAnd     --> & operation
+ 153          //                ucOr      --> | operation
+ 154          // Output Value : None
+ 155          //--------------------------------------------------
+ 156          void CScalerSetDataPortBit(BYTE ucAddr, BYTE ucValue, BYTE ucAnd, BYTE ucOr)
+ 157          {
+ 158   1          BYTE value;
+ 159   1      
+ 160   1          if((ucAddr == _SU_ACCESS_PORT_33) || (ucAddr == _HW_ACCESS_PORT_60) 
+ 161   1          || (ucAddr == _CB_ACCESS_PORT_64) || (ucAddr == _PC_ACCESS_PORT_9A))
+ 162   1          {
+ 163   2              CScalerSetByte(ucAddr, 0x80);
+ 164   2              ucValue = ucValue | 0x80;
+ 165   2          }
+ 166   1      
+ 167   1          CScalerWrite(ucAddr, 1, &ucValue, _AUTOINC);
+ 168   1          CScalerRead(ucAddr + 1, 1, &value, _AUTOINC);
+ 169   1      
+ 170   1          value   = (value & ucAnd) | ucOr;
+ 171   1          if((ucAddr == _SU_ACCESS_PORT_33) || (ucAddr == _HW_ACCESS_PORT_60) 
+ 172   1          || (ucAddr == _CB_ACCESS_PORT_64) || (ucAddr == _PC_ACCESS_PORT_9A))
+ 173   1          {
+ 174   2              CScalerSetByte(ucAddr, 0x80);
+ 175   2              ucValue = ucValue | 0x80;
+ 176   2          }
+ 177   1      
+ 178   1          CScalerWrite(ucAddr, 1, &ucValue, _AUTOINC);
+C51 COMPILER V7.20   RTDACCESS                                                             10/05/2015 09:30:22 PAGE 4   
+
+ 179   1          CScalerWrite(ucAddr + 1, 1, &value, _AUTOINC);
+ 180   1          CScalerSetByte(ucAddr, 0x00);
+ 181   1      }
+ 182          
+ 183          //--------------------------------------------------
+ 184          // Description  : Get bits from selected register
+ 185          // Input Value  : ucAddr    --> Address of register
+ 186          //                ucAnd     --> & operation
+ 187          // Output Value : Value after & operation
+ 188          //--------------------------------------------------
+ 189          BYTE CScalerGetBit(BYTE ucAddr, BYTE ucAnd)
+ 190          {
+ 191   1          BYTE value;
+ 192   1      
+ 193   1          CScalerRead(ucAddr, 1, &value, _AUTOINC);
+ 194   1          return (value & ucAnd);
+ 195   1      }
+ 196          
+ 197          /**
+ 198          * CScalerCodeW
+ 199          * Write a table to scaler
+ 200          * @param <pArray> {Selected table which contains numbers, address auto increasing information, address of 
+             -registers and values}
+ 201          * @return {none}
+ 202          *
+ 203          */
+ 204          void CScalerCodeW(BYTE *pArray)
+ 205          {
+ 206   1          BYTE length;
+ 207   1      
+ 208   1      #if(_MCU_TYPE == _REALTEK_RTD3580D_EMCU)
+ 209   1      
+ 210   1          do
+ 211   1          {
+ 212   2              if((*pArray & 0xfc) == 0)
+ 213   2                  return;
+ 214   2      
+ 215   2              length  = *pArray - 3;
+ 216   2      
+ 217   2              if((*(pArray + 1)) == _BURST)
+ 218   2              {
+ 219   3                  *(&MCU_SCA_INF_CTRL_FFF3) = 0x20;
+ 220   3                  *(&MCU_SCA_INF_ADDR_FFF4) = *(pArray + 2);
+ 221   3      
+ 222   3                  pArray += 3;
+ 223   3                  
+ 224   3                  do
+ 225   3                  {
+ 226   4                      *(&MCU_SCA_INF_DATA_FFF5) = *pArray;
+ 227   4      
+ 228   4                  }while(--length);
+ 229   3      
+ 230   3                  pArray++;
+ 231   3              }
+ 232   2              else if((*(pArray + 1) == _AUTOINC) || (*(pArray + 1) == _NON_AUTOINC))
+ 233   2              {
+ 234   3                  
+ 235   3                  if(*(pArray + 1) == _NON_AUTOINC)
+ 236   3                      *(&MCU_SCA_INF_CTRL_FFF3) = 0x20;
+ 237   3                  else
+ 238   3                      *(&MCU_SCA_INF_CTRL_FFF3) = 0x00;
+ 239   3      
+C51 COMPILER V7.20   RTDACCESS                                                             10/05/2015 09:30:22 PAGE 5   
+
+ 240   3                  *(&MCU_SCA_INF_ADDR_FFF4) = *(pArray + 2);
+ 241   3      
+ 242   3                  pArray += 3;
+ 243   3      
+ 244   3                  do
+ 245   3                  {
+ 246   4                      *(&MCU_SCA_INF_DATA_FFF5) = *pArray++;
+ 247   4      
+ 248   4                  }while(--length);
+ 249   3      
+ 250   3              }
+ 251   2      
+ 252   2          }while(_TRUE);
+ 253   1      
+ 254   1      #else
+                              
+                  do
+                  {
+                      if((*pArray & 0xfc) == 0)
+                          return;
+              
+                      length  = *pArray - 3;
+              
+                      if((*(pArray + 1)) == _BURST)
+                      {
+                          CScalerSendAddr(*(pArray + 2), _WRITE, _NON_AUTOINC);
+              
+                          pArray += 3;
+              
+                          do
+                          {
+                              CScalerSendByte(*pArray);
+              
+                          }while(--length);
+              
+                          pArray++;
+                      }
+                      else if((*(pArray + 1) == _AUTOINC) || (*(pArray + 1) == _NON_AUTOINC))
+                      {
+                          CScalerSendAddr(*(pArray + 2), _WRITE, *(pArray + 1));
+              
+                          pArray += 3;
+              
+                          do
+                          {
+                              CScalerSendByte(*pArray++);
+              
+                          }while(--length);
+              
+                      }
+              
+                      CScalerSendWriteStop();
+              
+                  }while(_TRUE);
+              
+              #endif          
+ 296   1      }
+ 297          
+ 298          #if(_HARDWARE_LOAD_FONT == _ON)
+ 299          //--------------------------------------------------
+ 300          // Description  : Load OSD font into OSD SRAM
+ 301          // Input Value  : pArray    --> Font table
+C51 COMPILER V7.20   RTDACCESS                                                             10/05/2015 09:30:22 PAGE 6   
+
+ 302          //                usOffset  --> Offset of font base start address
+ 303          // Output Value : None
+ 304          //--------------------------------------------------
+ 305          void CScalerLoadHardwareVLCFont(BYTE *pArray, WORD usOffset)
+ 306          {
+ 307   1          WORD num;
+ 308   1      
+ 309   1          pData[0] = 0xc0;
+ 310   1          pData[1] = 0x05;
+ 311   1          CScalerWrite(_OSD_ADDR_MSB_90, 2, pData, _AUTOINC);
+ 312   1          CScalerWrite(_OSD_DATA_PORT_92, 8, pArray, _NON_AUTOINC);
+ 313   1          
+ 314   1      
+ 315   1          num = ((WORD)*(pArray + 8) << 8) | *(pArray + 9);
+ 316   1      
+ 317   1          usOffset = usOffset * 9;
+ 318   1          usOffset += GET_OSD_MAP_FONTBASEADDRESS();//_OSD_FONT_START_POSITION;
+ 319   1      
+ 320   1          pData[0] = 0x80;
+ 321   1          pData[1] = 0x07;
+ 322   1          pData[2] = 0x01;
+ 323   1          CScalerWrite(_OSD_ADDR_MSB_90, 3, pData, _AUTOINC);    
+ 324   1      
+ 325   1          pData[0] = (HIBYTE(usOffset) & 0x000f) | 0xd0;
+ 326   1          pData[1] = LOBYTE(usOffset);
+ 327   1          CScalerWrite(_OSD_ADDR_MSB_90, 2, pData, _AUTOINC);    
+ 328   1      
+ 329   1          
+ 330   1          pArray += 10;
+ 331   1      
+ 332   1              CScalerSendAddr(_OSD_DATA_PORT_92, _NON_AUTOINC);
+ 333   1      
+ 334   1          for(usOffset=0;usOffset<num;usOffset++)
+ 335   1          {
+ 336   2              *(&MCU_SCA_INF_DATA_FFF5) = *pArray++;
+ 337   2          }
+ 338   1      
+ 339   1          pData[0] = 0x80;
+ 340   1          pData[1] = 0x07;
+ 341   1          pData[2] = 0x00;
+ 342   1          CScalerWrite(_OSD_ADDR_MSB_90, 3, pData, _AUTOINC);      
+ 343   1      }
+ 344          #endif
+ 345          
+ 346          BYTE CScalerGetVLD(void)
+ 347          {
+ 348   1              BYTE zerocnt = 0;
+ 349   1      
+ 350   1          while(!CScalerGetBitVLD())   zerocnt  += 1;
+ 351   1      
+ 352   1          if(zerocnt == 0)    return *(pData);
+ 353   1      
+ 354   1          switch(zerocnt)
+ 355   1          {
+ 356   2              case 1:
+ 357   2                  return (CScalerGetBitVLD() ? *(pData + 1) : *(pData + 2));
+ 358   2      
+ 359   2              case 2:
+ 360   2                  return (CScalerGetBitVLD() ? *(pData + 3) : *(pData + 4));
+ 361   2      
+ 362   2              case 3:
+ 363   2                  return (CScalerGetBitVLD() ? *(pData + 5) : *(pData + 6));
+C51 COMPILER V7.20   RTDACCESS                                                             10/05/2015 09:30:22 PAGE 7   
+
+ 364   2      
+ 365   2              case 4:
+ 366   2                  if (CScalerGetBitVLD())
+ 367   2                  {
+ 368   3                      return (CScalerGetBitVLD() ? *(pData + 7) : *(pData + 8));
+ 369   3                  }
+ 370   2                  else
+ 371   2                  {
+ 372   3                      if (CScalerGetBitVLD())
+ 373   3                      {
+ 374   4                          return (CScalerGetBitVLD() ? *(pData + 9) : *(pData + 10));
+ 375   4                      }
+ 376   3                      else
+ 377   3                      {
+ 378   4                          return (CScalerGetBitVLD() ? *(pData + 11) : *(pData + 12));
+ 379   4                      }
+ 380   3                  }
+ 381   2      
+ 382   2              default:
+ 383   2                  if (CScalerGetBitVLD())
+ 384   2                  {
+ 385   3                      return (CScalerGetBitVLD() ? *(pData + 13) : *(pData + 14));
+ 386   3                  }
+ 387   2                  else
+ 388   2                  {
+ 389   3                      CScalerGetBitVLD();
+ 390   3      
+ 391   3                      return *(pData + 15);
+ 392   3                  }
+ 393   2          }
+ 394   1      }
+ 395          
+ 396          bit CScalerGetBitVLD(void)
+ 397          {
+ 398   1          ucVLDTemp = ((ucVLDCnt & 0x07) == 0) ? *(pvldarray++) : (ucVLDTemp << 1);
+ 399   1      
+ 400   1          ucVLDCnt += 1;
+ 401   1      
+ 402   1          return (bit)(ucVLDTemp & 0x80);
+ 403   1      }
+ 404          
+ 405          //--------------------------------------------------
+ 406          // Description  : Page select for scalar(Only for CR[A1]~CR[DF])
+ 407          // Input Value  : None
+ 408          // Output Value : None
+ 409          //--------------------------------------------------
+ 410          void CScalerPageSelect(BYTE page)
+ 411          {
+ 412   1              CScalerSetByte(_PAGE_SELECT_9F, (page & 0x0F)); 
+ 413   1      }
+ 414          
+ 415          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1101    ----
+   CONSTANT SIZE    =    359    ----
+   XDATA SIZE       =   ----      28
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =      1    ----
+   BIT SIZE         =   ----       4
+C51 COMPILER V7.20   RTDACCESS                                                             10/05/2015 09:30:22 PAGE 8   
+
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

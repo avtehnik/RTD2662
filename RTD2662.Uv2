@@ -1,0 +1,559 @@
+### uVision2 Project, (C) Keil Software
+### Do not modify !
+
+Target (RTD2662), 0x0000 // Tools: 'MCS-51'
+
+Group (Code_B0)
+Group (Header)
+Group (Panel)
+Group (PCB)
+Group (Key_B0)
+Group (Func_B0)
+Group (OSD001_B1)
+Group (OSD002_B1)
+Group (OSD003_B1)
+Group (OSD007_B1)
+Group (TV_B0)
+Group (Lib)
+Group (Gmifunc_B1)
+Group (Code_Common)
+
+File 1,1,<.\Core\code\mcu\Timer.c><Timer.c> 0x0 
+File 1,1,<.\Core\code\Auto.c><Auto.c> 0x0 
+File 1,1,<.\Core\code\FrameSync.c><FrameSync.c> 0x0 
+File 1,1,<.\Core\code\Main.c><Main.c> 0x0 
+File 1,1,<.\Core\code\Mode.c><Mode.c> 0x0 
+File 1,1,<.\Core\code\Struct.c><Struct.c> 0x0 
+File 1,1,<.\Core\code\Sync.c><Sync.c> 0x0 
+File 1,1,<.\Core\code\Adjust.c><Adjust.c> 0x0 
+File 1,1,<.\Core\code\Adjust_customer.c><Adjust_customer.c> 0x0 
+File 1,1,<.\Core\code\mcu\Uart.c><Uart.c> 0x0 
+File 1,1,<.\Core\code\ext_device\video.c><video.c> 0x0 
+File 1,1,<.\Core\code\ext_device\eeprom.c><eeprom.c> 0x0 
+File 1,1,<.\Core\code\Memory.C><Memory.C> 0x0 
+File 1,1,<.\Core\code\rtd2662\YPbPr.c><YPbPr.c> 0x0 
+File 1,1,<.\Core\code\rtd2662\Power.c><Power.c> 0x0 
+File 1,1,<.\Core\code\rtd2662\Scaler.c><Scaler.c> 0x0 
+File 1,1,<.\Core\code\rtd2662\Source.c><Source.c> 0x0 
+File 1,1,<.\Core\code\rtd2662\Misc.c><Misc.c> 0x0 
+File 1,1,<.\Core\code\rtd2662\Hdmi.C><Hdmi.C> 0x0 
+File 2,5,<.\Core\header\YPbPr.h><YPbPr.h> 0x0 
+File 2,5,<.\Core\header\Auto.h><Auto.h> 0x0 
+File 2,5,<.\Core\header\closecaption.h><closecaption.h> 0x0 
+File 2,5,<.\Core\header\Ddc.h><Ddc.h> 0x0 
+File 2,5,<.\Core\header\Eeprom.h><Eeprom.h> 0x0 
+File 2,5,<.\Core\header\EepromDefault.h><EepromDefault.h> 0x0 
+File 2,5,<.\Core\header\EepromDefaultCustomer.h><EepromDefaultCustomer.h> 0x0 
+File 2,5,<.\Core\header\FrameSync.h><FrameSync.h> 0x0 
+File 2,5,<.\Core\header\Global.h><Global.h> 0x0 
+File 2,5,<.\Core\header\I2c.h><I2c.h> 0x0 
+File 2,5,<.\Core\header\Include.h><Include.h> 0x0 
+File 2,5,<.\Core\header\Main.h><Main.h> 0x0 
+File 2,5,<.\Core\header\MainDef.h><MainDef.h> 0x0 
+File 2,5,<.\Core\header\Mcu.h><Mcu.h> 0x0 
+File 2,5,<.\Core\header\Misc.h><Misc.h> 0x0 
+File 2,5,<.\Core\header\Mode.h><Mode.h> 0x0 
+File 2,5,<.\Core\header\ModeTable.h><ModeTable.h> 0x0 
+File 2,5,<.\Core\header\Power.h><Power.h> 0x0 
+File 2,5,<.\Core\header\RTDAccess.h><RTDAccess.h> 0x0 
+File 2,5,<.\Core\header\Scaler.h><Scaler.h> 0x0 
+File 2,5,<.\Core\header\ScalerDef.h><ScalerDef.h> 0x0 
+File 2,5,<.\Core\header\Struct.h><Struct.h> 0x0 
+File 2,5,<.\Core\header\Sync.h><Sync.h> 0x0 
+File 2,5,<.\Core\header\SystemTable.h><SystemTable.h> 0x0 
+File 2,5,<.\Core\header\Timer.h><Timer.h> 0x0 
+File 2,5,<.\Core\header\Uart.h><Uart.h> 0x0 
+File 2,5,<.\Core\header\vbi.h><vbi.h> 0x0 
+File 2,5,<.\Core\header\vchip.h><vchip.h> 0x0 
+File 2,5,<.\Core\header\Video.h><Video.h> 0x0 
+File 2,5,<.\Core\header\Adjust.h><Adjust.h> 0x0 
+File 2,5,<.\Core\header\Adjust_customer.h><Adjust_customer.h> 0x0 
+File 2,5,<.\Core\header\Source.h><Source.h> 0x0 
+File 2,5,<.\Core\header\Hdmi.H><Hdmi.H> 0x0 
+File 2,5,<.\Core\header\HdmiModeTable.H><HdmiModeTable.H> 0x0 
+File 2,5,<.\Core\header\Memory.H><Memory.H> 0x0 
+File 2,5,<.\Lib\GmiFunc.h><GmiFunc.h> 0x0 
+File 2,5,<.\Lib\VideoDec.H><VideoDec.H> 0x0 
+File 3,5,<.\Panel\Panel.h><Panel.h> 0x0 
+File 3,5,<.\Panel\PNL_LVDS.h><PNL_LVDS.h> 0x0 
+File 3,5,<.\Panel\PNL_TTL.h><PNL_TTL.h> 0x0 
+File 4,5,<.\PCB\Pcb.h><Pcb.h> 0x0 
+File 4,5,<.\PCB\Pcb_RTD3580D_LCDTV_DEMO_PCB1.h><Pcb_RTD3580D_LCDTV_DEMO_PCB1.h> 0x0 
+File 4,5,<.\PCB\Pcb_RTD3580D_LCDTV_DEMO_PCB2.h><Pcb_RTD3580D_LCDTV_DEMO_PCB2.h> 0x0 
+File 4,5,<.\PCB\Pcb_RTD3580D_LCDTV_DEMO_PCB3.h><Pcb_RTD3580D_LCDTV_DEMO_PCB3.h> 0x0 
+File 4,5,<.\PCB\Pcb_RTD3580D_LCDTV_DEMO_PCB4.h><Pcb_RTD3580D_LCDTV_DEMO_PCB4.h> 0x0 
+File 5,1,<.\Keys\Key.c><Key.c> 0x0 
+File 5,5,<.\Keys\Key.h><Key.h> 0x0 
+File 5,1,<.\Core\code\IR_Nec.c><IR_Nec.c> 0x0 
+File 5,5,<.\Core\header\IR_Nec.h><IR_Nec.h> 0x0 
+File 5,1,<.\Keys\Key_PCB2660_001.c><Key_PCB2660_001.c> 0x0 
+File 5,5,<.\Keys\Key_PCB2660_001.h><Key_PCB2660_001.h> 0x0 
+File 5,1,<.\Keys\Key_PCB2660_002.c><Key_PCB2660_002.c> 0x0 
+File 5,5,<.\Keys\Key_PCB2660_002.h><Key_PCB2660_002.h> 0x0 
+File 5,1,<.\Keys\Key_PCB2660_003.c><Key_PCB2660_003.c> 0x0 
+File 5,5,<.\Keys\Key_PCB2660_003.H><Key_PCB2660_003.H> 0x0 
+File 5,1,<.\Keys\Key_PCB2660_003_5Key.c><Key_PCB2660_003_5Key.c> 0x0 
+File 5,5,<.\Keys\Key_PCB2660_003_5Key.h><Key_PCB2660_003_5Key.h> 0x0 
+File 5,1,<.\Keys\Key_PCB2660_007.c><Key_PCB2660_007.c> 0x0 
+File 5,5,<.\Keys\Key_PCB2660_007.H><Key_PCB2660_007.H> 0x0 
+File 6,1,<.\Func\Func.C><Func.C> 0x0 
+File 6,5,<.\Func\Func.H><Func.H> 0x0 
+File 7,1,<.\OSD\OSD001\OsdProc001.c><OsdProc001.c> 0x0 
+File 7,5,<.\OSD\OSD001\OsdProc001.h><OsdProc001.h> 0x0 
+File 7,1,<.\OSD\OSD001\OsdMenuFunc001.c><OsdMenuFunc001.c> 0x0 
+File 7,5,<.\OSD\OSD001\OsdMenuFunc001.h><OsdMenuFunc001.h> 0x0 
+File 7,1,<.\OSD\OSD001\OsdRes001.c><OsdRes001.c> 0x0 
+File 7,5,<.\OSD\OSD001\OsdRes001.h><OsdRes001.h> 0x0 
+File 7,1,<.\OSD\OSD001\OsdTable001.c><OsdTable001.c> 0x0 
+File 7,5,<.\OSD\OSD001\OsdTable001.h><OsdTable001.h> 0x0 
+File 7,5,<.\OSD\OSD001\OSDStruct001.h><OSDStruct001.h> 0x0 
+File 8,1,<.\OSD\OSD002\OsdProc002.c><OsdProc002.c> 0x0 
+File 8,5,<.\OSD\OSD002\OsdProc002.h><OsdProc002.h> 0x0 
+File 8,1,<.\OSD\OSD002\OsdMenuFunc002.c><OsdMenuFunc002.c> 0x0 
+File 8,5,<.\OSD\OSD002\OsdMenuFunc002.h><OsdMenuFunc002.h> 0x0 
+File 8,1,<.\OSD\OSD002\OsdRes002.c><OsdRes002.c> 0x0 
+File 8,5,<.\OSD\OSD002\OsdRes002.h><OsdRes002.h> 0x0 
+File 8,1,<.\OSD\OSD002\OsdTable002.c><OsdTable002.c> 0x0 
+File 8,5,<.\OSD\OSD002\OsdTable002.h><OsdTable002.h> 0x0 
+File 8,1,<.\OSD\OSD002\Osd002Func.C><Osd002Func.C> 0x0 
+File 8,5,<.\OSD\OSD002\Osd002Func.H><Osd002Func.H> 0x0 
+File 8,5,<.\OSD\OSD002\OSDStruct002.h><OSDStruct002.h> 0x0 
+File 9,1,<.\OSD\OSD003\OsdMenuFunc003.c><OsdMenuFunc003.c> 0x0 
+File 9,5,<.\OSD\OSD003\OsdMenuFunc003.h><OsdMenuFunc003.h> 0x0 
+File 9,1,<.\OSD\OSD003\OsdProc003.c><OsdProc003.c> 0x0 
+File 9,5,<.\OSD\OSD003\OsdProc003.h><OsdProc003.h> 0x0 
+File 9,1,<.\OSD\OSD003\OsdRes003.c><OsdRes003.c> 0x0 
+File 9,5,<.\OSD\OSD003\OsdRes003.h><OsdRes003.h> 0x0 
+File 9,1,<.\OSD\OSD003\OsdTable003.c><OsdTable003.c> 0x0 
+File 9,5,<.\OSD\OSD003\OsdTable003.h><OsdTable003.h> 0x0 
+File 9,5,<.\OSD\OSD003\OSDStruct003.h><OSDStruct003.h> 0x0 
+File 9,1,<.\Factory\OSD_FAC.c><OSD_FAC.c> 0x0 
+File 9,5,<.\Factory\OSD_FAC.h><OSD_FAC.h> 0x0 
+File 10,1,<.\OSD\OSD007\OsdPub007.c><OsdPub007.c> 0x0 
+File 10,5,<.\OSD\OSD007\Osdpub007.h><Osdpub007.h> 0x0 
+File 10,5,<.\OSD\OSD007\OsdVga007.h><OsdVga007.h> 0x0 
+File 10,1,<.\OSD\OSD007\OsdVga007.c><OsdVga007.c> 0x0 
+File 10,1,<.\OSD\OSD007\OsdAV007.c><OsdAV007.c> 0x0 
+File 10,5,<.\OSD\OSD007\OsdAV007.h><OsdAV007.h> 0x0 
+File 10,1,<.\OSD\OSD007\OsdTV007.c><OsdTV007.c> 0x0 
+File 10,5,<.\OSD\OSD007\OsdTV007.h><OsdTV007.h> 0x0 
+File 10,5,<.\OSD\OSD007\Font007.h><Font007.h> 0x0 
+File 10,5,<.\OSD\OSD007\Osd007.h><Osd007.h> 0x0 
+File 11,1,<.\TV\TV.c><TV.c> 0x0 
+File 11,5,<.\TV\TV.H><TV.H> 0x0 
+File 11,1,<.\TV\JS_6B1.C><JS_6B1.C> 0x0 
+File 11,5,<.\TV\JS_6B1.H><JS_6B1.H> 0x0 
+File 11,1,<.\TV\JS_6B2.C><JS_6B2.C> 0x0 
+File 11,5,<.\TV\JS_6B2.H><JS_6B2.H> 0x0 
+File 11,1,<.\TV\TDQ6F6.C><TDQ6F6.C> 0x0 
+File 11,5,<.\TV\TDQ6F6.H><TDQ6F6.H> 0x0 
+File 11,1,<.\TV\TN8337.C><TN8337.C> 0x0 
+File 11,5,<.\TV\TN8337.H><TN8337.H> 0x0 
+File 11,1,<.\TV\TNJ8355.C><TNJ8355.C> 0x0 
+File 11,5,<.\TV\TNJ8355.H><TNJ8355.H> 0x0 
+File 12,4,<.\Lib\GmiFunc.LIB><GmiFunc.LIB> 0x473A55B2 
+File 13,1,<.\OSD\gmiOSDFunc.c><gmiOSDFunc.c> 0x0 
+File 13,5,<.\OSD\gmiOSDFunc.h><gmiOSDFunc.h> 0x0 
+File 13,5,<.\Lib\TB1338.H><TB1338.H> 0x0 
+File 14,1,<.\Misc\GUartSend.c><GUartSend.c> 0x0 
+File 14,5,<.\Misc\GUartSend.h><GUartSend.h> 0x0 
+File 14,1,<.\Core\code\mcu\Int.c><Int.c> 0x0 
+File 14,1,<.\Core\code\mcu\Mcu.c><Mcu.c> 0x0 
+File 14,1,<.\Core\code\mcu\RTDAccess.c><RTDAccess.c> 0x0 
+File 14,1,<.\Core\code\mcu\I2c.c><I2c.c> 0x0 
+File 14,2,<.\Core\code\L51_BANK.A51><L51_BANK.A51> 0x0 
+File 14,2,<.\Core\code\STARTUP.A51><STARTUP.A51> 0x0 
+
+
+Options 1,0,0  // Target 'RTD2662'
+ Device (DW-8051)
+ Vendor (Synopsys)
+ Cpu (IRAM(0-0xFF) CLOCK(33000000) MODDP2)
+ FlashUt ()
+ StupF ("LIB\STARTUP.A51" ("Standard 8051 Startup Code"))
+ FlashDR ()
+ Rgf (REG320.H)
+ Mem ()
+ C ()
+ A ()
+ RL ()
+ OH ()
+ UseEnv=0
+ EnvBin (C:\Keil1\C51\BIN\)
+ EnvInc ()
+ EnvLib ()
+ EnvReg (Dallas\)
+ OrgReg (ÿDallas\)
+ TgStat=0
+ OutDir (.\Output\)
+ OutName (RTD2662)
+ GenApp=1
+ GenLib=0
+ GenHex=1
+ Debug=1
+ Browse=1
+ LstDir (.\Output\)
+ HexSel=0
+ MG32K=0
+ TGMORE=0
+ RunUsr 0 1 <Merge128K.bat>
+ RunUsr 1 0 <>
+ BrunUsr 0 0 <>
+ BrunUsr 1 0 <>
+ SVCSID <>
+ MODEL5=2
+ RTOS5=0
+ ROMSZ5=2
+ DHOLD5=0
+ XHOLD5=0
+ T51FL=8464
+ CBANKS5=0
+ XBANKS5=0
+ RCB51 { 0,192,30,0,0,255,255,0,0 }
+ RXB51 { 0,0,0,0,0,0,0,0,0 }
+ OCM51 { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+ OCR51 { 0,0,251,0,0,240,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+ IRO51 { 1,0,0,0,0,0,0,0,0 }
+ IRA51 { 0,0,0,0,0,0,1,0,0 }
+ XRA51 { 0,0,0,0,0,0,0,0,0 }
+ XRA512 { 0,0,0,0,0,0,0,0,0 }
+ C51FL=21646608
+ C51VA=0
+ C51MSC ()
+ C51DEF ()
+ C51UDF ()
+ INCC5 ()
+ AX51FL=4
+ AX51MSC ()
+ AX51SET ()
+ AX51RST ()
+ INCA5 ()
+ PropFld { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+ IncBld=1
+ AlwaysBuild=0
+ GenAsm=0
+ AsmAsm=0
+ PublicsOnly=0
+ StopCode=3
+ CustArgs ()
+ LibMods ()
+ BankNo=65535
+ LX51FL=293
+ LX51OVL ()
+ LX51MSC ()
+ LX51DWN ()
+ LX51LFI (.\BL.lin)
+ LX51ASN ()
+ LX51RES ()
+ LX51CCL ()
+ LX51UCL ()
+ LX51CSC ()
+ LX51UCS ()
+ LX51COB ()
+ LX51XDB (0XFB00-0XFEEF)
+ LX51PDB ()
+ LX51BIB ()
+ LX51DAB ()
+ LX51IDB ()
+ LX51PRC ()
+ LX51STK ()
+ LX51COS ()
+ LX51XDS ()
+ LX51BIS ()
+ LX51DAS ()
+ LX51IDS ()
+  OPTDL (S8051.DLL)()(DP51.DLL)(-p320)(S8051.DLL)()(TP51.DLL)(-p320)
+  OPTDBG 44029,-1,()()()()()()()()()() (BIN\MON51.DLL)()()()
+ FLASH1 { 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+ FLASH2 ()
+ FLASH3 ()
+EndOpt
+
+Options 1,1,0  // Group 'Code_B0'
+ PropFld { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+ IncBld=2
+ AlwaysBuild=2
+ GenAsm=2
+ AsmAsm=2
+ PublicsOnly=2
+ StopCode=11
+ CustArgs ()
+ LibMods ()
+ BankNo=1
+ C51FL=177119914
+ C51VA=0
+ C51MSC ()
+ C51DEF ()
+ C51UDF ()
+ INCC5 ()
+ AX51FL=170
+ AX51MSC ()
+ AX51SET ()
+ AX51RST ()
+ INCA5 ()
+EndOpt
+
+Options 1,3,0  // Group 'Panel'
+ PropFld { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+ IncBld=2
+ AlwaysBuild=2
+ GenAsm=2
+ AsmAsm=2
+ PublicsOnly=2
+ StopCode=11
+ CustArgs ()
+ LibMods ()
+ BankNo=1
+ C51FL=177119914
+ C51VA=0
+ C51MSC ()
+ C51DEF ()
+ C51UDF ()
+ INCC5 ()
+ AX51FL=170
+ AX51MSC ()
+ AX51SET ()
+ AX51RST ()
+ INCA5 ()
+EndOpt
+
+Options 1,5,0  // Group 'Key_B0'
+ PropFld { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+ IncBld=2
+ AlwaysBuild=2
+ GenAsm=2
+ AsmAsm=2
+ PublicsOnly=2
+ StopCode=11
+ CustArgs ()
+ LibMods ()
+ BankNo=1
+ C51FL=177119914
+ C51VA=0
+ C51MSC ()
+ C51DEF ()
+ C51UDF ()
+ INCC5 ()
+ AX51FL=170
+ AX51MSC ()
+ AX51SET ()
+ AX51RST ()
+ INCA5 ()
+EndOpt
+
+Options 1,6,0  // Group 'Func_B0'
+ PropFld { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+ IncBld=2
+ AlwaysBuild=2
+ GenAsm=2
+ AsmAsm=2
+ PublicsOnly=2
+ StopCode=11
+ CustArgs ()
+ LibMods ()
+ BankNo=1
+ C51FL=177119914
+ C51VA=0
+ C51MSC ()
+ C51DEF ()
+ C51UDF ()
+ INCC5 ()
+ AX51FL=170
+ AX51MSC ()
+ AX51SET ()
+ AX51RST ()
+ INCA5 ()
+EndOpt
+
+Options 1,7,0  // Group 'OSD001_B1'
+ PropFld { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+ IncBld=2
+ AlwaysBuild=2
+ GenAsm=2
+ AsmAsm=2
+ PublicsOnly=2
+ StopCode=11
+ CustArgs ()
+ LibMods ()
+ BankNo=2
+ C51FL=177119914
+ C51VA=0
+ C51MSC ()
+ C51DEF ()
+ C51UDF ()
+ INCC5 ()
+ AX51FL=170
+ AX51MSC ()
+ AX51SET ()
+ AX51RST ()
+ INCA5 ()
+EndOpt
+
+Options 1,8,0  // Group 'OSD002_B1'
+ PropFld { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+ IncBld=2
+ AlwaysBuild=2
+ GenAsm=2
+ AsmAsm=2
+ PublicsOnly=2
+ StopCode=11
+ CustArgs ()
+ LibMods ()
+ BankNo=2
+ C51FL=177119914
+ C51VA=0
+ C51MSC ()
+ C51DEF ()
+ C51UDF ()
+ INCC5 ()
+ AX51FL=170
+ AX51MSC ()
+ AX51SET ()
+ AX51RST ()
+ INCA5 ()
+EndOpt
+
+Options 1,9,0  // Group 'OSD003_B1'
+ PropFld { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+ IncBld=2
+ AlwaysBuild=2
+ GenAsm=2
+ AsmAsm=2
+ PublicsOnly=2
+ StopCode=11
+ CustArgs ()
+ LibMods ()
+ BankNo=2
+ C51FL=177119914
+ C51VA=0
+ C51MSC ()
+ C51DEF ()
+ C51UDF ()
+ INCC5 ()
+ AX51FL=170
+ AX51MSC ()
+ AX51SET ()
+ AX51RST ()
+ INCA5 ()
+EndOpt
+
+Options 1,10,0  // Group 'OSD007_B1'
+ PropFld { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+ IncBld=2
+ AlwaysBuild=2
+ GenAsm=2
+ AsmAsm=2
+ PublicsOnly=2
+ StopCode=11
+ CustArgs ()
+ LibMods ()
+ BankNo=2
+ C51FL=177119914
+ C51VA=0
+ C51MSC ()
+ C51DEF ()
+ C51UDF ()
+ INCC5 ()
+ AX51FL=170
+ AX51MSC ()
+ AX51SET ()
+ AX51RST ()
+ INCA5 ()
+EndOpt
+
+Options 1,11,0  // Group 'TV_B0'
+ PropFld { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+ IncBld=2
+ AlwaysBuild=2
+ GenAsm=2
+ AsmAsm=2
+ PublicsOnly=2
+ StopCode=11
+ CustArgs ()
+ LibMods ()
+ BankNo=1
+ C51FL=177119914
+ C51VA=0
+ C51MSC ()
+ C51DEF ()
+ C51UDF ()
+ INCC5 ()
+ AX51FL=170
+ AX51MSC ()
+ AX51SET ()
+ AX51RST ()
+ INCA5 ()
+EndOpt
+
+Options 1,12,0  // Group 'Lib'
+ PropFld { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+ IncBld=2
+ AlwaysBuild=2
+ GenAsm=2
+ AsmAsm=2
+ PublicsOnly=2
+ StopCode=11
+ CustArgs ()
+ LibMods ()
+ BankNo=1
+ C51FL=177119914
+ C51VA=0
+ C51MSC ()
+ C51DEF ()
+ C51UDF ()
+ INCC5 ()
+ AX51FL=170
+ AX51MSC ()
+ AX51SET ()
+ AX51RST ()
+ INCA5 ()
+EndOpt
+
+Options 1,13,0  // Group 'Gmifunc_B1'
+ PropFld { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+ IncBld=2
+ AlwaysBuild=2
+ GenAsm=2
+ AsmAsm=2
+ PublicsOnly=2
+ StopCode=11
+ CustArgs ()
+ LibMods ()
+ BankNo=2
+ C51FL=177119914
+ C51VA=0
+ C51MSC ()
+ C51DEF ()
+ C51UDF ()
+ INCC5 ()
+ AX51FL=170
+ AX51MSC ()
+ AX51SET ()
+ AX51RST ()
+ INCA5 ()
+EndOpt
+
+Options 1,14,0  // Group 'Code_Common'
+ PropFld { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+ IncBld=2
+ AlwaysBuild=2
+ GenAsm=2
+ AsmAsm=2
+ PublicsOnly=2
+ StopCode=11
+ CustArgs ()
+ LibMods ()
+ BankNo=0
+ C51FL=177119914
+ C51VA=0
+ C51MSC ()
+ C51DEF ()
+ C51UDF ()
+ INCC5 ()
+ AX51FL=170
+ AX51MSC ()
+ AX51SET ()
+ AX51RST ()
+ INCA5 ()
+EndOpt
+

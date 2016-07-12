@@ -1,0 +1,119 @@
+BANK0 {".\Output\Timer.obj"},
+BANK0 {".\Output\Auto.obj"},
+BANK0 {".\Output\FrameSync.obj"},
+BANK0 {".\Output\Main.obj"},
+BANK0 {".\Output\Mode.obj"},
+BANK0 {".\Output\Struct.obj"},
+BANK0 {".\Output\Sync.obj"},
+BANK0 {".\Output\Adjust.obj"},
+BANK0 {".\Output\Adjust_customer.obj"},
+BANK0 {".\Output\Uart.obj"},
+BANK0 {".\Output\video.obj"},
+BANK0 {".\Output\eeprom.obj"},
+BANK0 {".\Output\Memory.obj"},
+BANK0 {".\Output\YPbPr.obj"},
+BANK0 {".\Output\Power.obj"},
+BANK0 {".\Output\Scaler.obj"},
+BANK0 {".\Output\Source.obj"},
+BANK0 {".\Output\Misc.obj"},
+BANK0 {".\Output\Hdmi.obj"},
+BANK0 {".\Output\Key.obj"},
+BANK0 {".\Output\IR_Nec.obj"},
+BANK0 {".\Output\Key_PCB2660_001.obj"},
+BANK0 {".\Output\Key_PCB2660_002.obj"},
+BANK0 {".\Output\Key_PCB2660_003.obj"},
+BANK0 {".\Output\Key_PCB2660_003_5Key.obj"},
+BANK0 {".\Output\Key_PCB2660_007.obj"},
+BANK0 {".\Output\Func.obj"},
+BANK1 {".\Output\OsdProc001.obj"},
+BANK1 {".\Output\OsdMenuFunc001.obj"},
+BANK1 {".\Output\OsdRes001.obj"},
+BANK1 {".\Output\OsdTable001.obj"},
+BANK1 {".\Output\OsdProc002.obj"},
+BANK1 {".\Output\OsdMenuFunc002.obj"},
+BANK1 {".\Output\OsdRes002.obj"},
+BANK1 {".\Output\OsdTable002.obj"},
+BANK1 {".\Output\Osd002Func.obj"},
+BANK1 {".\Output\OsdMenuFunc003.obj"},
+BANK1 {".\Output\OsdProc003.obj"},
+BANK1 {".\Output\OsdRes003.obj"},
+BANK1 {".\Output\OsdTable003.obj"},
+BANK1 {".\Output\OSD_FAC.obj"},
+BANK1 {".\Output\OsdPub007.obj"},
+BANK1 {".\Output\OsdVga007.obj"},
+BANK1 {".\Output\OsdAV007.obj"},
+BANK1 {".\Output\OsdTV007.obj"},
+BANK0 {".\Output\TV.obj"},
+BANK0 {".\Output\JS_6B1.obj"},
+BANK0 {".\Output\JS_6B2.obj"},
+BANK0 {".\Output\TDQ6F6.obj"},
+BANK0 {".\Output\TN8337.obj"},
+BANK0 {".\Output\TNJ8355.obj"},
+BANK0 {".\Lib\GmiFunc.LIB"},
+BANK1 {".\Output\gmiOSDFunc.obj"},
+COMMON {".\Output\GUartSend.obj"},
+COMMON {".\Output\Int.obj"},
+COMMON {".\Output\Mcu.obj"},
+COMMON {".\Output\RTDAccess.obj"},
+COMMON {".\Output\I2c.obj"},
+COMMON {".\Output\L51_BANK.obj"},
+COMMON {".\Output\STARTUP.obj"} 
+TO ".\Output\RTD2662"
+BankArea(0x1E0C,0xFFFF) 
+PRINT(".\Output\RTD2662.m51") RAMSIZE(256)
+ 
+BANK0(?CO?MAIN(0x1E0C),
+      ?CO?MODE,
+      ?CO?EEPROM,
+      ?CO?SCALER,
+;      ?CO?YPBPR,
+      ?CO?ADJUST_CUSTOMER,
+      ?CO?VIDEO,
+      ?CO?ADJUST)
+;      ?CO?HDMI)
+
+;OSD001
+;BANK1(?CO?GMIOSDFUNC(0x1E0C),
+;      ?CO?OSDTABLE001,
+;      ?CO?OSDPROC001,
+;      ?CO?OSDRES001)
+
+;OVERLAY()
+
+
+
+;OSD002
+;BANK1(?CO?GMIOSDFUNC(0x1E0C),
+;      ?CO?OSDPROC002,
+;      ?CO?OSDMENUFUNC002,
+;      ?CO?OSDTABLE002,
+;      ?CO?OSDRES002)
+
+;OVERLAY(CDRAWCURRENTMENU ~ ?PR?OSDPROC002,
+;	CDRAWSUBMENU ~ ?PR?OSDPROC002)
+
+
+;OSD003
+BANK1(?CO?GMIOSDFUNC(0x1E0C),
+      ?CO?OSDTABLE003,
+      ?CO?OSDPROC003,
+      ?CO?OSDRES003)
+
+
+OVERLAY(ADJUSTMENUITEM ~ ?PR?OSDPROC003,
+        TEXTOUTCALCWIDTH ~ ?PR?OSDPROC003,
+	DRAW2BIT3X2ICON ~ ?PR?OSDPROC003,
+	GETSHOWINDEX ~ ?PR?OSDPROC003,
+	CSHOWTVNUMBER ~ ?PR?OSDPROC003,
+	GETSHOWCOUNT ~ ?PR?OSDPROC003, 
+	LoadCHI_T_Font ~ ?PR?OSDPROC003,
+	LoadCHI_S_Font ~ ?PR?OSDPROC003,
+	INITOSDFRAME ~ ?PR?OSDPROC003
+;	OSDSLIDER ~ ?PR?OSDPROC003,
+	)
+
+;OSD007						   
+;BANK1(?CO?GMIOSDFUNC(0x1E0C),
+;      ?CO?OSDPUB007)
+
+XDATA( 0XFB00-0XFEEF )

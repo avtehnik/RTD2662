@@ -1,0 +1,1624 @@
+C51 COMPILER V7.20   OSDPROC003                                                            10/05/2015 09:30:16 PAGE 1   
+
+
+C51 COMPILER V7.20, COMPILATION OF MODULE OSDPROC003
+OBJECT MODULE PLACED IN .\Output\OsdProc003.obj
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE OSD\OSD003\OsdProc003.c LARGE OPTIMIZE(9,SPEED) BROWSE DEBUG OBJECTEXTEND P
+                    -RINT(.\Output\OsdProc003.lst) OBJECT(.\Output\OsdProc003.obj)
+
+line level    source
+
+   1          
+   2          
+   3          #define __OSDPROC003__
+   4          
+   5          #include "Core\Header\Include.h"
+   6          
+   7          #if(_OSD_TYPE == _OSD003)
+   8          
+   9          //--------------------------------------------------
+  10          void COsdHandler(void)
+  11          {
+  12   1          bit fTest = 0;
+  13   1      
+  14   1          bOSDTimeOut = 1;
+  15   1      
+  16   1          COsdSystemFlowProc();
+  17   1          
+  18   1          COsdEventMsgProc();
+  19   1      
+  20   1          if (_PWOFF_STATE == ucCurrState)
+  21   1              return;
+  22   1      
+  23   1          CKeyOSDMsgCover();
+  24   1      
+  25   1          // 执行当前菜单的私有处理函数
+  26   1          if(CURRENT_MENU_ITEM.Proc != NULL)
+  27   1          {
+  28   2              CURRENT_MENU_ITEM.Proc();
+  29   2          }
+  30   1      
+  31   1          if ((ucKeyMessage != _NONE_KEY_MESSAGE) && bOSDTimeOut && ucOsdState != _MI_SC_INPUT_CH_NUM)
+  32   1          {            
+  33   2              if (GET_OSDTIMEOUT() < 5)
+  34   2                      CTimerCancelTimerEvent(COsdDispOsdTimerEvent);
+  35   2              else
+  36   2                  CTimerReactiveTimerEvent(SEC(GET_OSDTIMEOUT()), COsdDispOsdTimerEvent);
+  37   2          }
+  38   1      
+  39   1              DbgShowOSDState();
+  40   1      
+  41   1              #if(_VIDEO_TV_SUPPORT)
+                      #if(_SLEEP_FUNC)
+                      #if(_SHOW_TV_NO_SIGNAL)
+                  if (!ucOsdState && !bOSDOnScreen && !bTVNoSignal)
+                      #else
+                  if (!ucOsdState && !bOSDOnScreen)
+                      #endif
+                  {
+                      if((0xff != ucAutoPowerDownTime) && (0 != _GET_POWER_DOWN_TIME()))
+                         CShowTimer();
+                  }
+                      #endif
+                      #endif
+  54   1      
+C51 COMPILER V7.20   OSDPROC003                                                            10/05/2015 09:30:16 PAGE 2   
+
+  55   1          if(_NOSIGNAL_STATE == ucCurrState && GET_BURNIN_STATE()==_BURNIN_ON)
+  56   1          {
+  57   2                      BurnInRun();            
+  58   2          }
+  59   1      
+  60   1              if(fTest)
+  61   1              {
+  62   2                      CNotUse();
+  63   2              }
+  64   1      
+  65   1          if (bDrawMute)
+  66   1          {
+  67   2              bDrawMute = 0;
+  68   2              if (GET_AUDIO_MUTE()) // Mute on 
+  69   2                 CDrawMuteState();
+  70   2          }
+  71   1      
+  72   1          COsdEventMsgProc();
+  73   1      }
+  74          
+  75          //--------------------------------------------------
+  76          void CKeyOSDMsgCover(void)
+  77          {
+  78   1          // Key Message -> Osd Message
+  79   1          if(ucCurrState == _ACTIVE_STATE)
+  80   1          {
+  81   2              CCoverKeyMsgToOsdEvent(CURRENT_MENU_ITEM.KeyMsgToOsdEvnet,CURRENT_MENU_ITEM.Option & _EN_PUB_KEYEV
+             -ENT);
+  82   2          }
+  83   1          else
+  84   1          {   
+  85   2              if(CURRENT_MENU_ITEM.Option & _KEYMAP_EN_IN_NOSIGNAL)
+  86   2                      {
+  87   3                      CCoverKeyMsgToOsdEvent(CURRENT_MENU_ITEM.KeyMsgToOsdEvnet,CURRENT_MENU_ITEM.Option & _EN_PUB_KEYE
+             -VENT);
+  88   3                      }
+  89   2                      else
+  90   2                      {
+  91   3                  CCoverKeyMsgToOsdEvent(tKONoSignal, 0x00);
+  92   3              }
+  93   2              }
+  94   1      }
+  95          //--------------------------------------------------
+  96          
+  97          void DbgShowOSDState(void)
+  98          {
+  99   1      /*
+ 100   1          static BYTE ucMenuItemIndexBak = 0;
+ 101   1      
+ 102   1              if(ucMenuItemIndexBak != ucOsdState)
+ 103   1              {
+ 104   1                      ucMenuItemIndexBak = ucOsdState;
+ 105   1                      CUartPrintf("Osd State:",ucOsdState);
+ 106   1              }
+ 107   1      
+ 108   1          // debug info
+ 109   1          if(ucKeyMessage != _NONE_KEY_MESSAGE)
+ 110   1                      CUartPrintf("Osd Event:",ucOsdEventMsg);
+ 111   1      */
+ 112   1      }
+ 113          //--------------------------------------------------
+ 114          void COsdSystemFlowProc(void)
+C51 COMPILER V7.20   OSDPROC003                                                            10/05/2015 09:30:16 PAGE 3   
+
+ 115          {
+ 116   1          switch(ucCurrState)
+ 117   1          {         
+ 118   2              case _PWOFF_STATE:
+ 119   2                  break;
+ 120   2                  
+ 121   2              case _INITIAL_STATE:
+ 122   2                  break;
+ 123   2                  
+ 124   2              case _SEARCH_STATE:
+ 125   2                  break;
+ 126   2                  
+ 127   2              case _ACTIVE_STATE:
+ 128   2                  if(GET_OSD_READYFORDISPLAY() == _TRUE)
+ 129   2                  {
+ 130   3                      CPowerLedOn();
+ 131   3      
+ 132   3                      if (!bSourceVideo())
+ 133   3                                      #if(_CHANGE_SOURCE_METHOD == _CHANGE_SOURCE_METHOD_0)
+ 134   3                      if (ucOsdState < _MI_SOURCE_VGA || ucOsdState > _MI_SOURCE_TV)
+ 135   3                                      #endif
+ 136   3                          COsdDispOsdTimerEvent();
+ 137   3      
+ 138   3                      CLR_OSD_READYFORDISPLAY();
+ 139   3                      CAdjustBackgroundColor(0x00, 0x00, 0x00);
+ 140   3                      
+ 141   3                                      #if(_VIDEO_TV_SUPPORT)
+                              ucNoSigCount = 0;
+                                              #if(_IF_PLL_DE_CHIP == _IF_PLL_DE_1338)
+                              if (_GET_INPUT_SOURCE() != _SOURCE_VIDEO_TV)
+                                              #endif
+                                              #endif
+ 147   3                      CSetVolume();
+ 148   3                  }
+ 149   2                                  
+ 150   2                              #if(_VIDEO_TV_SUPPORT)
+                                      #if(_IF_PLL_DE_CHIP == _IF_PLL_DE_1338)
+                          CAudioCtrl(); 
+                                      #endif
+                              
+                                      #if(_SHOW_TV_NO_SIGNAL)
+                          CCheckTVSignal();
+                                      #endif
+                                      #endif  // #if(_VIDEO_TV_SUPPORT)
+ 159   2                  break;
+ 160   2                  
+ 161   2              case _NOSUPPORT_STATE:
+ 162   2                      CMuteOn();
+ 163   2                  if(GET_OSD_READYFORDISPLAY() == _TRUE)
+ 164   2                  {
+ 165   3                      CLR_OSD_READYFORDISPLAY();
+ 166   3                      CAdjustBackgroundColor(0xFF, 0x00, 0x00);
+ 167   3                      if (GET_FIRST_SHOW_NOTE())
+ 168   3                         ucOsdEventMsg = _DO_SHOW_NOTE;
+ 169   3                      
+ 170   3                      CTimerReactiveTimerEvent(SEC(1), CModeNoSupportEvent);
+ 171   3                  }
+ 172   2                  
+ 173   2                  break;
+ 174   2                  
+ 175   2              case _NOSIGNAL_STATE:
+ 176   2                      CMuteOn();
+C51 COMPILER V7.20   OSDPROC003                                                            10/05/2015 09:30:16 PAGE 4   
+
+ 177   2                              #if(_CHANGE_SOURCE_METHOD == _CHANGE_SOURCE_METHOD_0)
+ 178   2                  if (ucOsdState >= _MI_SOURCE_VGA && ucOsdState <= _MI_SOURCE_TV)
+ 179   2                  {
+ 180   3                      CTimerCancelTimerEvent(CModeNoSignalEvent);
+ 181   3                      CTimerCancelTimerEvent(CModePowerSavingEvent);
+ 182   3                      SET_OSD_READYFORDISPLAY();
+ 183   3                      return;
+ 184   3                  }
+ 185   2                              #endif
+ 186   2      
+ 187   2                  if(GET_OSD_READYFORDISPLAY() == _TRUE)
+ 188   2                  {    
+ 189   3                      CLR_OSD_READYFORDISPLAY(); 
+ 190   3          
+ 191   3                      if (bSourceVideo())
+ 192   3                         CAdjustBackgroundColor(0x00, 0x00, (_GET_INPUT_SOURCE() == _SOURCE_VIDEO_TV) ? ((_GET_B
+             -LUE_BACKGROUND()) ? 0xFF : 0x00) : 0x00);
+ 193   3      
+ 194   3                      if (GET_FIRST_SHOW_NOTE())
+ 195   3                      {
+ 196   4                          ucOsdEventMsg = _DO_SHOW_NOTE;
+ 197   4                          CPowerPanelOn();
+ 198   4                          CPowerLightPowerOn();
+ 199   4                      }
+ 200   3      
+ 201   3                              if (_GET_INPUT_SOURCE() == _SOURCE_YPBPR) 
+ 202   3                              {
+ 203   4                                      CTimerReactiveTimerEvent(SEC(1), CModeNoSignalEvent);
+ 204   4                                      break;
+ 205   4                              }
+ 206   3          
+ 207   3                                  #if (_HDMI_SUPPORT == _ON)
+ 208   3                              if (_GET_INPUT_SOURCE() == _SOURCE_HDMI) 
+ 209   3                              {
+ 210   4                                      CTimerReactiveTimerEvent(SEC(5), CModeNoSignalEvent);
+ 211   4                                      CTimerReactiveTimerEvent(SEC(20), CModePowerSavingEvent);
+ 212   4                                      break;
+ 213   4                              }               
+ 214   3                                  #endif      // #if (_HDMI_SUPPORT == _ON)
+ 215   3      
+ 216   3                              // here comes for VGA, DVI input only
+ 217   3                              #if(_TMDS_SUPPORT == _ON)
+ 218   3                              if (_GET_INPUT_SOURCE() == _SOURCE_DVI) 
+ 219   3                              {
+ 220   4                          if (bDVICONNECT)
+ 221   4                                              CTimerReactiveTimerEvent(SEC(1), CModeNoCableEvent);
+ 222   4                          else
+ 223   4                                      CTimerReactiveTimerEvent(SEC(1), CModeNoSignalEvent);
+ 224   4                              }               
+ 225   3                              #endif  // #if(_TMDS_SUPPORT == _ON)
+ 226   3      
+ 227   3                              if (_GET_INPUT_SOURCE() == _SOURCE_VGA) 
+ 228   3                              {
+ 229   4                                      if (bVGACONNECT)
+ 230   4                                              CTimerReactiveTimerEvent(SEC(1), CModeNoCableEvent);
+ 231   4                                      else       
+ 232   4                                              CTimerReactiveTimerEvent(SEC(1), CModeNoSignalEvent);
+ 233   4                      }
+ 234   3      
+ 235   3                      if (bSourceVideo())
+ 236   3                                      CTimerReactiveTimerEvent(SEC(1), CModeNoSignalEvent);
+ 237   3      
+C51 COMPILER V7.20   OSDPROC003                                                            10/05/2015 09:30:16 PAGE 5   
+
+ 238   3                              CTimerReactiveTimerEvent(SEC(20), CModePowerSavingEvent);   
+ 239   3                  }
+ 240   2                  
+ 241   2                  break;
+ 242   2                  
+ 243   2              case _SLEEP_STATE:
+ 244   2                  break;
+ 245   2                  
+ 246   2              default:
+ 247   2                  break;
+ 248   2          }
+ 249   1      }
+ 250          
+ 251          //==========================================================================
+ 252          //                          ChangeSourceState
+ 253          //==========================================================================
+ 254          void ChangeSourceState(void)
+ 255          {
+ 256   1          TUNER_PWR_OFF();
+ 257   1          CMuteOn();
+ 258   1      
+ 259   1              #if(_VIDEO_TV_SUPPORT)
+                  if (_GET_INPUT_SOURCE() == _SOURCE_VIDEO_TV)
+                      CAdjustBackgroundColor(0x00, 0x00, (_GET_BLUE_BACKGROUND()) ? 0xFF : 0x00);
+                  else
+                      #endif
+ 264   1                      CAdjustBackgroundColor(0x00, 0x00, 0x00);
+ 265   1      
+ 266   1              CScalerSetBit(_VDISP_CTRL_28, 0xff, 0x20);
+ 267   1          CScalerSetBit(_VDISP_CTRL_28, ~(_BIT3), _BIT5);
+ 268   1          CInitInputSource();
+ 269   1          
+ 270   1              #if(_VIDEO_TV_SUPPORT)
+                      #if(_FM_DEVICE)  
+                  bFM = 0; // Close FM
+                      #endif
+                      #endif
+ 275   1      
+ 276   1              // close OSD first to avoid dirty screen.
+ 277   1              COsdFxDisableOsd();
+ 278   1      
+ 279   1              switch(_GET_INPUT_SOURCE())
+ 280   1              {
+ 281   2                      case _SOURCE_VGA:
+ 282   2                      case _SOURCE_YPBPR:
+ 283   2                              CScalerSetBit(_IPH_ACT_WID_H_16, ~_BIT5, 0x00);
+ 284   2                              CVideoOutputDisable();
+ 285   2                              break;
+ 286   2      
+ 287   2                      #if( (_TMDS_SUPPORT == _ON) || (_HDMI_SUPPORT == _ON) )                 
+ 288   2                      case _SOURCE_DVI:
+ 289   2              case _SOURCE_HDMI:
+ 290   2                              CVideoOutputDisable();
+ 291   2                              break;
+ 292   2                      #endif
+ 293   2                          
+ 294   2                      #if(_VIDEO_TV_SUPPORT)
+                              case _SOURCE_VIDEO_TV:
+                          CInitTV();
+                              #endif
+ 298   2      
+ 299   2                      case _SOURCE_VIDEO_AV:
+C51 COMPILER V7.20   OSDPROC003                                                            10/05/2015 09:30:16 PAGE 6   
+
+ 300   2                      case _SOURCE_VIDEO_SV:
+ 301   2                              CVideoOutputEnable();
+ 302   2                              break;
+ 303   2              }
+ 304   1      }
+ 305          
+ 306          //-----------------------------------------------------------
+ 307          void COsdEventMsgProc(void)
+ 308          {                  
+ 309   1          if(ucOsdEventMsg > _OE_USER_CMD)
+ 310   1          {    
+ 311   2               ucOsdEventMsg = _NONE_MSG;
+ 312   2               return;
+ 313   2          }
+ 314   1      
+ 315   1          switch(ucOsdEventMsg)
+ 316   1          {
+ 317   2              case _SHOW_NOSIGNAL_MSG:
+ 318   2              case _SHOW_NOCABLE_MSG:
+ 319   2              case _SHOW_NOSUPPORT_MSG:
+ 320   2                  ucOsdState = 0;
+ 321   2      
+ 322   2                  if(GET_BURNIN_STATE() == _BURNIN_ON)
+ 323   2                  {                           
+ 324   3                                      CTimerCancelTimerEvent(CModePowerSavingEvent);                          
+ 325   3                                      InitBurnIn();
+ 326   3                  }
+ 327   2                  else
+ 328   2                  {            
+ 329   3                                      #if(_CHINESE_FONT_TYPE == _CHINESE_2_FONT)
+ 330   3                      LoadCHIFont(_LF_OTHER);
+ 331   3                                      #endif
+ 332   3                              CShowNoSignal();
+ 333   3                      CTimerReactiveTimerEvent(SEC(20), COsdDispOsdTimerEvent);
+ 334   3                      }               
+ 335   2                  break;
+ 336   2                  
+ 337   2              case _SAVE_EE_MODEUSERDATA_MSG:
+ 338   2                  CEepromSaveModeData(stModeInfo.ModeCurr);
+ 339   2                  break;
+ 340   2                  
+ 341   2              case _SAVE_EE_SYSTEMDATA_MSG:
+ 342   2                  CEepromSaveSystemData();
+ 343   2                  break;
+ 344   2                  
+ 345   2              case _SAVE_EE_OSDUSERDATA_MSG:
+ 346   2                  CEepromSaveOsdUserData();
+ 347   2                  break;
+ 348   2                  
+ 349   2              case _SAVE_EE_ADCDATA_MSG:
+ 350   2                  CEepromSaveAdcData();
+ 351   2                  break;
+ 352   2                  
+ 353   2              case _SAVE_EE_COLORPROC0_MSG:
+ 354   2                  CEepromSaveBriConData();
+ 355   2                  break;
+ 356   2                  
+ 357   2              case _SAVE_EE_COLORPROC1_MSG:
+ 358   2                  CEepromSaveColorTempData();
+ 359   2                  break;
+ 360   2      
+ 361   2              case _SAVE_EE_AUDIO_DATA_MSG:
+C51 COMPILER V7.20   OSDPROC003                                                            10/05/2015 09:30:16 PAGE 7   
+
+ 362   2                  CEepromSaveAudioData();
+ 363   2                  break;
+ 364   2      
+ 365   2              case _SAVE_EE_HUE_SAT_DATA_MSG:
+ 366   2                  CEepromSaveHueSatData();
+ 367   2                  break;
+ 368   2      
+ 369   2              case _SAVE_EE_TV_DATA_MSG:
+ 370   2                  CEepromSaveTvData();
+ 371   2                  break;
+ 372   2                 
+ 373   2              case _CHANGE_SOURCE_MSG:
+ 374   2                  ChangeSourceState();
+ 375   2                      CEepromSaveSystemData();
+ 376   2                  ucTVSyncFailCount = 250;
+ 377   2                  CLR_CLEAR_OSD_EN();
+ 378   2                  CModeResetMode();
+ 379   2                      CLR_SOURCE_AUTOCHANGE();
+ 380   2                  CShowNote();
+ 381   2                  SET_FIRST_SHOW_NOTE();
+ 382   2                  break;
+ 383   2                  
+ 384   2              case _DO_AUTO_CONFIG:
+ 385   2                      if(_GET_INPUT_SOURCE() == _SOURCE_VGA)
+ 386   2                      {
+ 387   3                                      CShowAutoAdjust();
+ 388   3                      }
+ 389   2                      break;
+ 390   2                      
+ 391   2              case _DO_SHOW_NOTE:
+ 392   2                  CLR_FIRST_SHOW_NOTE();
+ 393   2                  CShowNote();
+ 394   2                  break;
+ 395   2      
+ 396   2      
+ 397   2              default:
+ 398   2                  break;
+ 399   2          }
+ 400   1          
+ 401   1          ucOsdEventMsg = _NONE_MSG;
+ 402   1      }
+ 403          
+ 404          //----------------------------------------------------------------------------------------------------
+ 405          void COsdDispFirstTimeLoadFont(void)
+ 406          {       
+ 407   1          COsdFxDisableOsd();
+ 408   1          COsdColorPalette(tPALETTE_0);
+ 409   1          
+ 410   1          SetOsdMap(tUserMenuOsdMap);
+ 411   1          
+ 412   1          // Load global font 
+ 413   1          // insert code to here 
+ 414   1      #if(_CHINESE_FONT_TYPE == _CHINESE_1_FONT)
+                  COsdLoad1BitFont(FntGlobal,0x00,0x6E,tGlobalCharWidth);
+              #else
+ 417   1          COsdLoad1BitFont(FntGlobal,0x00,0x5F,tGlobalCharWidth);
+ 418   1      #endif
+ 419   1          CScalerLoadHardwareVLCFont(FntMainIcon,0x80 * 2);
+ 420   1          
+ 421   1              //Load Languege Font
+ 422   1              LoadLanguageFont();
+ 423   1      
+C51 COMPILER V7.20   OSDPROC003                                                            10/05/2015 09:30:16 PAGE 8   
+
+ 424   1      }
+ 425          
+ 426          //-----------------------------------------------------------
+ 427          void COsdLoad1BitFontWidth12(BYTE *pFont,WORD usOffset,BYTE ucFntCount)
+ 428          {
+ 429   1           BYTE i;
+ 430   1      
+ 431   1           CScalerLoadHardwareVLCFont(pFont, usOffset);
+ 432   1      
+ 433   1           if(usOffset > 0x100)               return;
+ 434   1      
+ 435   1           if(usOffset + ucFntCount > 0x100)
+ 436   1              ucFntCount = 0x100 - usOffset; 
+ 437   1      
+ 438   1      
+ 439   1           for(i=0;i<ucFntCount;i++)
+ 440   1           {
+ 441   2               SetCharWdith(usOffset,12);
+ 442   2               usOffset ++;
+ 443   2           }
+ 444   1      }
+ 445          
+ 446          #if(_CHINESE_FONT_TYPE == _CHINESE_2_FONT)
+ 447          //---------------------------------------------------------------------------
+ 448          void LoadCHI_S_Font(BYTE ucPage)
+ 449          {
+ 450   1              BYTE *pFont;
+ 451   1              COsdLoad1BitFontWidth12(FntPublic_CHI_S,0x80,0x20);     
+ 452   1              switch(ucPage)
+ 453   1              {
+ 454   2      
+ 455   2                      case _LF_COLOR_PAGE:            pFont = FntColorPage_S;         break;
+ 456   2                      case _LF_ADJUST_PAGE:           pFont = FntAdjustPage_S;        break;
+ 457   2                      case _LF_TV_PAGE:                       pFont = FntTVPage_S;            break;
+ 458   2                      case _LF_OSD_PAGE:                      pFont = FntOSDPage_S;           break;
+ 459   2                      case _LF_FUNC_PAGE:                     pFont = FntFuncPage_S;          break;
+ 460   2                      case _LF_SOUND_PAGE:            pFont = FntSoundPage_S;         break;
+ 461   2                      case _LF_OTHER:                         pFont = FntOther_CHI_S;         break;
+ 462   2              }
+ 463   1      
+ 464   1              COsdLoad1BitFontWidth12(pFont,0xA0,0x2F);       
+ 465   1      }
+ 466          
+ 467          //-----------------------------------------------------------
+ 468          void LoadCHI_T_Font(BYTE ucPage)
+ 469          {
+ 470   1              BYTE *pFont;
+ 471   1              COsdLoad1BitFontWidth12(FntPublic_CHI_T,0x80,0x20);     
+ 472   1              
+ 473   1              switch(ucPage)
+ 474   1              {
+ 475   2      
+ 476   2                      case _LF_COLOR_PAGE:            pFont = FntColorPage_T;         break;
+ 477   2                      case _LF_ADJUST_PAGE:           pFont = FntAdjustPage_T;        break;
+ 478   2                      case _LF_TV_PAGE:                       pFont = FntTVPage_T;            break;
+ 479   2                      case _LF_OSD_PAGE:                      pFont = FntOSDPage_T;           break;
+ 480   2                      case _LF_FUNC_PAGE:                     pFont = FntFuncPage_T;          break;
+ 481   2                      case _LF_SOUND_PAGE:            pFont = FntSoundPage_T;         break;
+ 482   2                      case _LF_OTHER:                         pFont = FntOther_CHI_T;         break;
+ 483   2              }
+ 484   1      
+ 485   1              COsdLoad1BitFontWidth12(pFont,0xA0,0x22);
+C51 COMPILER V7.20   OSDPROC003                                                            10/05/2015 09:30:16 PAGE 9   
+
+ 486   1      }
+ 487          
+ 488          //-----------------------------------------------------------
+ 489          void LoadCHIFont(BYTE ucPage)
+ 490          {
+ 491   1              if(GET_LANGUAGE() == LNG_CHI_S)
+ 492   1              {
+ 493   2                      LoadCHI_S_Font(ucPage);
+ 494   2              }
+ 495   1              else if(GET_LANGUAGE() == LNG_CHI_T)
+ 496   1              {
+ 497   2                      LoadCHI_T_Font(ucPage);
+ 498   2              }
+ 499   1      }
+ 500          #endif
+ 501          
+ 502          #if((_CHINESE_FONT_TYPE == _CHINESE_1_FONT && !_LOGO_ENABLE) || _CHINESE_FONT_TYPE != _CHINESE_1_FONT)
+ 503          //----------------------------------------------------------
+ 504          void LoadLanguageFont(void)
+ 505          {
+ 506   1          // load language font
+ 507   1      
+ 508   1              switch(GET_LANGUAGE())
+ 509   1              {
+ 510   2              #if(LNG_JAP_EN)
+                              case LNG_JAP:
+                          COsdLoad1BitFont(FntJap,0x80,0x57,tFntJapCharWidth);
+                          break;
+                  #endif
+ 515   2          #if(LNG_KOR_EN)
+                      case LNG_KOR:
+                          COsdLoad1BitFont(FntKor,0x80,0x68,tFntKorCharWidth);
+                          break;
+                  #endif
+ 520   2          #if(LNG_RUS_EN)
+ 521   2                      case LNG_RUS:
+ 522   2                              COsdLoad1BitFont(FntRus,0x80,0x21,tFntRusCharWidth);
+ 523   2                  break;
+ 524   2          #endif
+ 525   2      #if(_CHINESE_FONT_TYPE == _CHINESE_1_FONT)
+                  #if(LNG_CHI_S_EN)
+                              case LNG_CHI_S:
+                                      COsdLoad1BitFontWidth12(tFntChiGlobal,0x80,0x34);
+                                      COsdLoad1BitFontWidth12(tFntChiS,0xC0,0x1D);
+                          break;
+                  #endif
+                  #if(LNG_CHI_T_EN)
+                              case LNG_CHI_T:
+                                      COsdLoad1BitFontWidth12(tFntChiGlobal,0x80,0x34);
+                                      COsdLoad1BitFontWidth12(tFntChiT,0xC0,0x1D);
+                          break;
+                  #endif
+              #endif
+ 539   2              }
+ 540   1      }  
+ 541          #endif
+ 542          
+ 543          //-----------------------------------------------------------
+ 544          void COsdDispOsdTimerEvent(void)
+ 545          {
+ 546   1          COsdFxDisableOsd();
+ 547   1          ucOsdState = _MI_MENU_NONE;
+C51 COMPILER V7.20   OSDPROC003                                                            10/05/2015 09:30:16 PAGE 10  
+
+ 548   1              
+ 549   1              #if(_VIDEO_TV_SUPPORT)
+                      #if(_SLEEP_FUNC)
+                  bOSDOnScreen = 0;
+                      #endif
+                       
+                      #if(_SLEEP_FUNC)
+                  if(_ACTIVE_STATE == ucCurrState && (0xff == ucAutoPowerDownTime) || (0 == _GET_POWER_DOWN_TIME()))
+                      #endif 
+                      #else
+ 558   1          if(_ACTIVE_STATE == ucCurrState)
+ 559   1              #endif 
+ 560   1          {
+ 561   2               bDrawMute = 1;
+ 562   2          }
+ 563   1      }
+ 564          
+ 565          //-----------------------------------------------------------
+ 566          BYTE CFoundKeyMsgToOsdEvent(SKeyToOsdEvent *tMsgTable)
+ 567          {
+ 568   1           BYTE i;
+ 569   1      
+ 570   1           if(ucKeyMessage == _NONE_KEY_MESSAGE)
+ 571   1           {
+ 572   2                //ucOsdEventMsg = _NONE_MSG;
+ 573   2                return 0;
+ 574   2           }
+ 575   1                              
+ 576   1           i = 0;
+ 577   1           while(1)
+ 578   1           {
+ 579   2               if(tMsgTable[i].KeyMessage == _NONE_KEY_MESSAGE)
+ 580   2               {
+ 581   3                    //ucOsdEventMsg = _NONE_MSG;
+ 582   3                    // End flag
+ 583   3                    return 1;
+ 584   3               }
+ 585   2               if(ucKeyMessage == tMsgTable[i].KeyMessage)
+ 586   2               {
+ 587   3                    ucOsdEventMsg = tMsgTable[i].OsdEvent;
+ 588   3                    return 0;
+ 589   3               }
+ 590   2      
+ 591   2               i++;
+ 592   2           }
+ 593   1           return 1;
+ 594   1      }                                        
+ 595          //---------------------------------------------------------------------------
+ 596          
+ 597          void CShortCutKeyMsg(void)
+ 598          {
+ 599   1          if (ucOsdEventMsg >= _OE_CHANGE_SOURCE)
+ 600   1          {
+ 601   2              if (!CTVEnable() && ucOsdEventMsg >= _OE_SC_CH_DEC) // Only for TV
+ 602   2                  ucOsdEventMsg = _NONE_MSG;
+ 603   2              else
+ 604   2                  COsdDispOsdTimerEvent();
+ 605   2          }
+ 606   1      }
+ 607          
+ 608          //---------------------------------------------------------------------------
+ 609          void CCoverKeyMsgToOsdEvent(SKeyToOsdEvent *tMsgTable,BYTE bUserPublicKeyEvnet)
+C51 COMPILER V7.20   OSDPROC003                                                            10/05/2015 09:30:16 PAGE 11  
+
+ 610          {
+ 611   1           bit bFoundPublic = 1;
+ 612   1      
+ 613   1           if(tMsgTable != NULL)
+ 614   1               bFoundPublic = CFoundKeyMsgToOsdEvent(tMsgTable);
+ 615   1      
+ 616   1           if(bFoundPublic && bUserPublicKeyEvnet)
+ 617   1           {
+ 618   2               CFoundKeyMsgToOsdEvent(tKOPublic);
+ 619   2               CShortCutKeyMsg();
+ 620   2           }
+ 621   1      }
+ 622          //---------------------------------------------------------------------------
+ 623          void InitOsdFrame(void)
+ 624          {
+ 625   1          COsdFxDisableOsd();
+ 626   1      
+ 627   1      #if(_LOGO_ENABLE)
+                  if (bLoadLogoFont)
+                  {       
+                      SetOsdMap(tUserMenuOsdMap);
+                      
+                      // Load global font 
+                      // insert code to here 
+                      COsdLoad1BitFont(FntGlobal,0x00,0x5F,tGlobalCharWidth);
+                      CScalerLoadHardwareVLCFont(FntMainIcon,0x80 * 2);
+                      
+                      //Load Languege Font
+                      LoadLanguageFont();
+                      bLoadLogoFont = 0;
+                  }
+              #endif
+ 642   1      
+ 643   1          SetOsdMap(tUserMenuOsdMap);
+ 644   1          COsdFxCodeWrite(ucCloseAllWindow);
+ 645   1      
+ 646   1              CScalerSetBit(_OVERLAY_CTRL_6C, 0x23, ((stOsdUserData.OsdBlending & 0x07) << 2));
+ 647   1          
+ 648   1          // Init osd
+ 649   1          // insert code to here
+ 650   1          OSDClear(ROW(0), HEIGHT(18), COL(0), WIDTH(46), 0x8C, BYTE_ATTRIB);
+ 651   1          OSDClear(ROW(0), HEIGHT(18), COL(0), WIDTH(46), 0x00, BYTE_DISPLAY);
+ 652   1              OSDClear(ROW(0), HEIGHT(18), COL(0), WIDTH(46), 0x40, BYTE_COLOR);
+ 653   1      }     
+ 654          
+ 655          
+ 656          
+ 657          //---------------------------------------------------------------------------
+ 658          void CShowNoSignal(void)
+ 659          {
+ 660   1              BYTE *pStr;
+ 661   1              
+ 662   1              InitOsdFrame();
+ 663   1          SetOSDDouble((GET_OSD_SIZE() ? 0x03 : 0x00)  | OSD_WINDOWCHAR_BLENDING);   
+ 664   1              
+ 665   1              // Draw Top Line
+ 666   1              OSDLine(ROW(1), COL(1), LENGTH(25), 0xA6, THE_BYTE0);
+ 667   1              OSDLine(ROW(1), COL(1), LENGTH(25), 0xA4, THE_BYTE1);
+ 668   1              OSDLine(ROW(1), COL(1), LENGTH(25), 0x11, THE_BYTE2);
+ 669   1      
+ 670   1              // Draw Bottom Line
+ 671   1              OSDLine(ROW(5), COL(1), LENGTH(25), 0xA6, THE_BYTE0);
+C51 COMPILER V7.20   OSDPROC003                                                            10/05/2015 09:30:16 PAGE 12  
+
+ 672   1              OSDLine(ROW(5), COL(1), LENGTH(25), 0xA4, THE_BYTE1);
+ 673   1              OSDLine(ROW(5), COL(1), LENGTH(25), 0x11, THE_BYTE2);
+ 674   1      
+ 675   1              OSDLine(ROW(3), COL(1), LENGTH(45), 0x10, BYTE_COLOR);
+ 676   1      
+ 677   1              // Draw Window
+ 678   1              COsdFxDrawWindow(0,0,                                                           //WORD usXStart,WORD usYStart,  
+ 679   1                                              _DIALOG_WIDTH,_DIALOG_HEIGHT,           //WORD usXEnd,WORD usYEnd,  
+ 680   1                                              tMainWindowStyle);                                      //BYTE *pStyle)
+ 681   1               
+ 682   1          CSetOSDPosition(_DIALOG_WIDTH, _DIALOG_HEIGHT, 50, 50);
+ 683   1      
+ 684   1              // Text out
+ 685   1              if(ucCurrState == _NOSIGNAL_STATE || _GET_INPUT_SOURCE() == _SOURCE_VIDEO_TV)
+ 686   1                      pStr = sNoSignal[GET_LANGUAGE()];
+ 687   1                      
+ 688   1              else if(ucCurrState == _NOSUPPORT_STATE)
+ 689   1                      pStr = sNotSupport[GET_LANGUAGE()];
+ 690   1      
+ 691   1              CCenterTextout(pStr,ROW(3),1,25);
+ 692   1              
+ 693   1              COsdFxEnableOsd();
+ 694   1      
+ 695   1      }
+ 696          //---------------------------------------------------------------------------
+ 697          void CShowAutoAdjust(void)
+ 698          {
+ 699   1              InitOsdFrame();
+ 700   1          SetOSDDouble((GET_OSD_SIZE() ? 0x03 : 0x00)  | OSD_WINDOWCHAR_BLENDING);   
+ 701   1              
+ 702   1              // Draw nosignal & set osd position
+ 703   1      
+ 704   1              // Draw Top Line
+ 705   1              OSDLine(ROW(1), COL(1), LENGTH(25), 0xA6, THE_BYTE0);
+ 706   1              OSDLine(ROW(1), COL(1), LENGTH(25), 0xA4, THE_BYTE1);
+ 707   1              OSDLine(ROW(1), COL(1), LENGTH(25), 0x11, THE_BYTE2);
+ 708   1      
+ 709   1              // Draw Bottom Line
+ 710   1              OSDLine(ROW(5), COL(1), LENGTH(25), 0xA6, THE_BYTE0);
+ 711   1              OSDLine(ROW(5), COL(1), LENGTH(25), 0xA4, THE_BYTE1);
+ 712   1              OSDLine(ROW(5), COL(1), LENGTH(25), 0x11, THE_BYTE2);
+ 713   1      
+ 714   1              OSDLine(ROW(3), COL(1), LENGTH(45), 0x10, BYTE_COLOR);
+ 715   1      
+ 716   1              // Draw Window
+ 717   1              COsdFxDrawWindow(0,0,                                                           //WORD usXStart,WORD usYStart,  
+ 718   1                                              _DIALOG_WIDTH,_DIALOG_HEIGHT,           //WORD usXEnd,WORD usYEnd,  
+ 719   1                                              tMainWindowStyle);                                      //BYTE *pStyle)
+ 720   1      
+ 721   1          CSetOSDPosition(_DIALOG_WIDTH, _DIALOG_HEIGHT, 50, 50);
+ 722   1      #if(_CHINESE_FONT_TYPE == _CHINESE_2_FONT)      
+ 723   1              LoadCHIFont(_LF_ADJUST_PAGE);
+ 724   1      #endif
+ 725   1              CCenterTextout(sAutoConfig[GET_LANGUAGE()],ROW(3),1,25);
+ 726   1              
+ 727   1              COsdFxEnableOsd();
+ 728   1      
+ 729   1              CAutoDoAutoConfig();
+ 730   1      
+ 731   1              COsdFxDisableOsd();     
+ 732   1      }
+ 733          //---------------------------------------------------------------------------
+C51 COMPILER V7.20   OSDPROC003                                                            10/05/2015 09:30:16 PAGE 13  
+
+ 734          #define _NOTE_WIDTH                                             (11 * 12 + 4)   
+ 735          #define _NOTE_HEIGHT                                    (4 * 18)
+ 736          
+ 737          void CShowNote(void)
+ 738          {
+ 739   1              BYTE code *pStr; 
+ 740   1          
+ 741   1          ucOsdState = _MI_MENU_NONE;
+ 742   1          InitOsdFrame();
+ 743   1          SetOSDDouble(GET_OSD_SIZE() ? 0x03 : 0x00);   
+ 744   1          
+ 745   1              // Draw Top Line
+ 746   1              OSDLine(ROW(1), COL(1), LENGTH(8), 0xA6, THE_BYTE0);
+ 747   1              OSDLine(ROW(1), COL(1), LENGTH(8), 0xA4, THE_BYTE1);
+ 748   1              OSDLine(ROW(1), COL(1), LENGTH(8), 0x11, THE_BYTE2);
+ 749   1      
+ 750   1              // Draw Bottom Line
+ 751   1              OSDLine(ROW(3), COL(1), LENGTH(8), 0xA6, THE_BYTE0);
+ 752   1              OSDLine(ROW(3), COL(1), LENGTH(8), 0xA4, THE_BYTE1);
+ 753   1              OSDLine(ROW(3), COL(1), LENGTH(8), 0x11, THE_BYTE2);
+ 754   1      
+ 755   1              OSDLine(ROW(2), COL(1), LENGTH(45), 0x10, BYTE_COLOR);
+ 756   1      
+ 757   1              // TextOut
+ 758   1              switch(_GET_INPUT_SOURCE())
+ 759   1              {
+ 760   2                      case _SOURCE_VGA:                       pStr = sVGA;            break;
+ 761   2                      case _SOURCE_DVI:                       pStr = sDVI;            break;
+ 762   2                      case _SOURCE_HDMI:                      pStr = sHDMI;           break;
+ 763   2              case _SOURCE_YPBPR:         pStr = sYPBPR;      break;
+ 764   2                      case _SOURCE_VIDEO_SV:          pStr = sSVideo;         break;
+ 765   2                      case _SOURCE_VIDEO_AV:          pStr = sAV;                     break;
+ 766   2                      case _SOURCE_VIDEO_TV:          pStr = sTV;                     break;
+ 767   2              }
+ 768   1              
+ 769   1              CCenterTextout(pStr,ROW(2),1,8);
+ 770   1      
+ 771   1              // Draw Window
+ 772   1              COsdFxDrawWindow(0,8,                                                           //WORD usXStart,WORD usYStart,  
+ 773   1                                              _NOTE_WIDTH,_NOTE_HEIGHT,                   //WORD usXEnd,WORD usYEnd,  
+ 774   1                                              tMainWindowStyle);                                      //BYTE *pStyle)
+ 775   1               
+ 776   1          if (GET_OSD_SIZE())
+ 777   1              OSDPosition(_OSD_DOUBLE_WIDTH(_NOTE_WIDTH), _OSD_DOUBLE_HEIGHT(_NOTE_HEIGHT), 0, 0, 0x03);
+ 778   1          else
+ 779   1              OSDPosition(_NOTE_WIDTH, _NOTE_HEIGHT, 5, 5, 0x03);
+ 780   1              
+ 781   1          COsdFxEnableOsd();
+ 782   1          CPowerPanelOn();  
+ 783   1      
+ 784   1          CTimerReactiveTimerEvent(SEC(5), COsdDispOsdTimerEvent);
+ 785   1          bOSDTimeOut = 0;
+ 786   1      #if(_SLEEP_FUNC)
+                  bOSDOnScreen = 1;
+              #endif
+ 789   1      }
+ 790          //---------------------------------------------------------------------------
+ 791          
+ 792          
+ 793          
+ 794          #if(_VIDEO_TV_SUPPORT)
+              //---------------------------------------------------------------------------
+C51 COMPILER V7.20   OSDPROC003                                                            10/05/2015 09:30:16 PAGE 14  
+
+              void CShowTVNumber(BYTE ucNumber, BYTE ucOption)
+              { 
+                  BYTE PosX = 0;
+              
+                  ucOsdState     = _MI_MENU_NONE;
+                  bChangeChannel = 0;
+                  COsdFxDisableOsd();
+              
+              #if(_LOGO_ENABLE)
+                  if (bLoadLogoFont)
+                  {       
+                      SetOsdMap(tUserMenuOsdMap);
+                      
+                      // Load global font 
+                      // insert code to here 
+                      COsdLoad1BitFont(FntGlobal,0x00,0x5F,tGlobalCharWidth);
+                      CScalerLoadHardwareVLCFont(FntMainIcon,0x80 * 2);
+                      
+                      //Load Languege Font
+                      LoadLanguageFont();
+                      bLoadLogoFont = 0;
+                  }
+              #endif
+              
+                  SetOSDDouble(0x03);
+                  SetOsdMap(tMsgOsdMap);
+                                       
+                  // Init OSD Ram
+                  OSDClear(0, 8, 0, 20, 0x8C, BYTE_ATTRIB);
+                  OSDClear(0, 8, 0, 20, 0x00, BYTE_DISPLAY);
+                  OSDClear(0, 8, 0, 20, 0xF0, BYTE_COLOR);
+                  
+                  COsdFxCodeWrite(ucCloseAllWindow);
+              
+                  OSDPosition(_MAINMENU_WIDTH,_MAINMENU_HEIGHT,64,1,0x03);
+                                      
+                  if (ucOption & _SHOW_CH_TV_NUMBER) 
+                      CShowNumber(0, 0, ucNumber);
+              
+                  if (_SHOW_CH_TV_TYPE & ucOption)
+                  {
+                      BYTE *pStr;
+              
+                      switch(ucTVType)
+                      {
+                              case _TV_NTSC_M:                pStr = sNTSC_M;                 break;
+                              case _TV_NTSC_4_BG:             pStr = sNTSC_4_BG;              break;
+                              case _TV_NTSC_4_DK:             pStr = sNTSC_4_DK;              break;
+                              case _TV_NTSC_4_I:              pStr = sNTSC_4_I;               break;
+                              case _TV_PAL_M:             pStr = sPAL_M;                      break;
+                              case _TV_PAL_BG:                pStr = sPAL_BG;                 break;
+                              case _TV_PAL_I:                 pStr = sPAL_I;                  break;
+                              case _TV_PAL_DK:                pStr = sPAL_DK;                 break;
+                              case _TV_PAL_N:                 pStr = sPAL_N;                  break;
+                              case _TV_SECAM_BG:              pStr = sSECAM_BG;               break;
+                              case _TV_SECAM_DK:              pStr = sSECAM_DK;               break;
+                              case _TV_SECAM_L:               pStr = sSECAM_L;                break;
+                              case _TV_SECAM_LL:              pStr = sSECAM_L;                break;
+                      }
+              
+                      CTextOutEx(pStr, 0, 1);  
+                  }
+C51 COMPILER V7.20   OSDPROC003                                                            10/05/2015 09:30:16 PAGE 15  
+
+              
+                  COsdFxEnableOsd();
+                  CTimerReactiveTimerEvent(SEC(5), COsdDispOsdTimerEvent);
+                  bOSDTimeOut  = 0;
+              
+                      #if(_SLEEP_FUNC)
+                  bOSDOnScreen = 1;
+                      #endif
+              }
+              #endif // #if(_VIDEO_TV_SUPPORT)
+ 868          
+ 869          
+ 870          
+ 871          //---------------------------------------------------------------------------
+ 872          void Draw2bit3x2Icon(BYTE *tIcon,BYTE x,BYTE y)
+ 873          {
+ 874   1           Gotoxy(x,y,ALL_BYTE);
+ 875   1      
+ 876   1           pData[0] = tIcon[0]; 
+ 877   1           pData[1] = tIcon[1];
+ 878   1           pData[2] = tIcon[2];
+ 879   1           
+ 880   1           pData[3] = tIcon[0];
+ 881   1           pData[4] = tIcon[1] + 1;
+ 882   1           pData[5] = tIcon[2];
+ 883   1      
+ 884   1           pData[6] = tIcon[0];
+ 885   1           pData[7] = tIcon[1] + 2;
+ 886   1           pData[8] = tIcon[2];     
+ 887   1           
+ 888   1           CScalerWrite(_OSD_DATA_PORT_92, 9, pData, _NON_AUTOINC);
+ 889   1      
+ 890   1           Gotoxy(x,y + 1,ALL_BYTE);
+ 891   1      
+ 892   1           pData[0] = tIcon[0]; 
+ 893   1           pData[1] = tIcon[1] + 3;
+ 894   1           pData[2] = tIcon[2];
+ 895   1           
+ 896   1           pData[3] = tIcon[0];
+ 897   1           pData[4] = tIcon[1] + 4;
+ 898   1           pData[5] = tIcon[2];
+ 899   1      
+ 900   1           pData[6] = tIcon[0];
+ 901   1           pData[7] = tIcon[1] + 5;
+ 902   1           pData[8] = tIcon[2];
+ 903   1           
+ 904   1           CScalerWrite(_OSD_DATA_PORT_92, 9, pData, _NON_AUTOINC);
+ 905   1      }
+ 906          
+ 907          //---------------------------------------------------------------------------
+ 908          BYTE AdjustMenuItem(BYTE ucBeginItem,BYTE ucEndItem,BYTE ucMode)
+ 909          {
+ 910   1           BYTE i;
+ 911   1           BYTE ucCount;
+ 912   1           BYTE ucNewItem;
+ 913   1      
+ 914   1           CLR_KEYREPEATENABLE();
+ 915   1      
+ 916   1           //如果菜单只有一项,直接返回
+ 917   1           ucCount = ucEndItem - ucBeginItem;
+ 918   1           if(ucCount < 1)
+ 919   1           {
+C51 COMPILER V7.20   OSDPROC003                                                            10/05/2015 09:30:16 PAGE 16  
+
+ 920   2                return ucOsdState;
+ 921   2           }
+ 922   1      
+ 923   1           // 计算下一项菜单，或是上一菜单
+ 924   1           i = 0;
+ 925   1      
+ 926   1           ucNewItem = ucOsdState;
+ 927   1      
+ 928   1           while(i < ucCount)
+ 929   1           {
+ 930   2      
+ 931   2               ucNewItem = ValueInRangeChange(ucBeginItem, ucEndItem, ucNewItem, ucMode | _LOOP);
+ 932   2      
+ 933   2               if(g_tMenuItem[ucNewItem].Enable())
+ 934   2               {
+ 935   3                   break;
+ 936   3               }
+ 937   2      
+ 938   2               i++;
+ 939   2           }
+ 940   1      
+ 941   1           return ucNewItem;
+ 942   1      }
+ 943          //----------------------------------------------------------------------------------------------------
+ 944          BYTE GetShowIndex(BYTE ucMenuItem,BYTE ucBeginItem,BYTE ucEndItem)
+ 945          {
+ 946   1           BYTE Index;
+ 947   1      
+ 948   1           bit fEnable;
+ 949   1           bit fDisableNoShow;
+ 950   1      
+ 951   1           Index = 0;
+ 952   1      
+ 953   1           while(ucBeginItem <= ucEndItem)
+ 954   1           {
+ 955   2              fEnable = g_tMenuItem[ucBeginItem].Enable();
+ 956   2                      if((g_tMenuItem[ucBeginItem].Option & _DISABLE_NOT_SHOW) != _DISABLE_NOT_SHOW)
+ 957   2                              fDisableNoShow = 0;
+ 958   2                      else
+ 959   2                              fDisableNoShow = 1;
+ 960   2      
+ 961   2                              
+ 962   2              if(ucBeginItem == ucMenuItem)
+ 963   2              {
+ 964   3                      if(fEnable)             
+ 965   3                      {
+ 966   4                              return Index;
+ 967   4                      }
+ 968   3                      else
+ 969   3                      {
+ 970   4                                      if(fDisableNoShow)
+ 971   4                                              return _NOT_SHOW;
+ 972   4                                      else
+ 973   4                                              return Index;
+ 974   4                      }
+ 975   3              }
+ 976   2      
+ 977   2              if(ucBeginItem > ucMenuItem)
+ 978   2                      return _NOT_SHOW;
+ 979   2                      
+ 980   2              if(!fDisableNoShow)
+ 981   2              {       
+C51 COMPILER V7.20   OSDPROC003                                                            10/05/2015 09:30:16 PAGE 17  
+
+ 982   3                      Index++;
+ 983   3              }
+ 984   2              else
+ 985   2              {
+ 986   3                      if(fEnable)
+ 987   3                      {
+ 988   4                      Index++;
+ 989   4                  }
+ 990   3                      }
+ 991   2              ucBeginItem++;
+ 992   2           }
+ 993   1      
+ 994   1           return _NOT_SHOW;     
+ 995   1      }
+ 996          //----------------------------------------------------------------------------------------------------
+ 997          BYTE GetShowCount(BYTE ucBeginItem,BYTE ucEndItem)
+ 998          {
+ 999   1           BYTE ucCount;
+1000   1      
+1001   1           bit fEnable;
+1002   1           bit fDisableNoShow;
+1003   1      
+1004   1      
+1005   1           ucCount = 0;
+1006   1      
+1007   1           while(ucBeginItem <= ucEndItem)
+1008   1           {
+1009   2              fEnable = g_tMenuItem[ucBeginItem].Enable();
+1010   2              
+1011   2                      if((g_tMenuItem[ucBeginItem].Option & _DISABLE_NOT_SHOW) != _DISABLE_NOT_SHOW)
+1012   2                              fDisableNoShow = 0;
+1013   2                      else
+1014   2                              fDisableNoShow = 1;
+1015   2                      
+1016   2              if(!fDisableNoShow)
+1017   2              {       
+1018   3                      ucCount++;
+1019   3              }
+1020   2              else
+1021   2              {
+1022   3                      if(fEnable)
+1023   3                      {
+1024   4                      ucCount++;
+1025   4                  }
+1026   3                      }
+1027   2              ucBeginItem++;
+1028   2           }
+1029   1      
+1030   1           return ucCount;     
+1031   1      }
+1032          //----------------------------------------------------------------------------------------------------
+1033          void TextOutCalcWidth(BYTE *pStr,BYTE row,BYTE col,BYTE ucMaxLength,BYTE ucDisplayPixcel)
+1034          {
+1035   1           BYTE ucPixLen = CTextOutBase(pStr, col, row);
+1036   1           BYTE i = StrLen(pStr);
+1037   1      
+1038   1           ucMaxLength -= 1;
+1039   1      
+1040   1           CScalerSendAddr(_OSD_DATA_PORT_92, _NON_AUTOINC);
+1041   1      
+1042   1           for(;i<ucMaxLength;i++)
+1043   1           {
+C51 COMPILER V7.20   OSDPROC003                                                            10/05/2015 09:30:16 PAGE 18  
+
+1044   2               *(&MCU_SCA_INF_DATA_FFF5) = (0x80 | 4);
+1045   2               ucPixLen += 4;
+1046   2           }
+1047   1           
+1048   1           // 计算 Blank 宽度
+1049   1           ucPixLen = ucDisplayPixcel - ucPixLen;
+1050   1      
+1051   1           //设置 Blank                                                       
+1052   1           Gotoxy(col + ucMaxLength,row,ALL_BYTE);
+1053   1      
+1054   1           pData[0] = 0x00;
+1055   1           pData[1] = ucPixLen;
+1056   1           CScalerWrite(_OSD_DATA_PORT_92, 2, pData, _NON_AUTOINC);
+1057   1      }
+1058          //---------------------------------------------------------------------------
+1059          
+1060          
+1061          void CSetMuteState(void)
+1062          {
+1063   1          if (GET_AUDIO_MUTE()) // Mute on 
+1064   1              CLR_AUDIO_MUTE();
+1065   1          else
+1066   1              SET_AUDIO_MUTE();
+1067   1      
+1068   1          CDrawMuteState();
+1069   1      
+1070   1      #if(_VIDEO_TV_SUPPORT)
+               #if(_IF_PLL_DE_CHIP == _IF_PLL_DE_1338)
+                  if ((_GET_INPUT_SOURCE() == _SOURCE_VIDEO_TV && gmi_CModeLocked()) || _GET_INPUT_SOURCE() != _SOURCE_V
+             -IDEO_TV)
+               #endif
+              #endif
+1075   1             CSetVolume();
+1076   1          ucOsdEventMsg = _SAVE_EE_AUDIO_DATA_MSG;
+1077   1      }
+1078          
+1079          //-----------------------------------------------------------------------
+1080          void CDrawMuteState(void)
+1081          {           
+1082   1          ucOsdState     = _MI_MENU_NONE;
+1083   1      #if(_VIDEO_TV_SUPPORT)
+                  bChangeChannel = 0;
+              #endif
+1086   1          COsdFxDisableOsd();
+1087   1      #if(_LOGO_ENABLE)
+                  if (bLoadLogoFont)
+                  {       
+                      SetOsdMap(tUserMenuOsdMap);
+                      
+                      // Load global font 
+                      // insert code to here 
+                      COsdLoad1BitFont(FntGlobal,0x00,0x5F,tGlobalCharWidth);
+                      CScalerLoadHardwareVLCFont(FntMainIcon,0x80 * 2);
+                      
+                      //Load Languege Font
+                      LoadLanguageFont();
+                      bLoadLogoFont = 0;
+                  }
+              #endif
+1102   1      
+1103   1          SetOSDDouble(0x03);
+1104   1          SetOsdMap(tMsgOsdMap);
+C51 COMPILER V7.20   OSDPROC003                                                            10/05/2015 09:30:16 PAGE 19  
+
+1105   1                               
+1106   1          // Init OSD Ram
+1107   1          OSDClear(0, 8, 0, 10, 0x8C, BYTE_ATTRIB);
+1108   1          OSDClear(0, 8, 0, 10, 0x00, BYTE_DISPLAY);
+1109   1          OSDClear(0, 8, 0, 10, 0xF0, BYTE_COLOR);
+1110   1          
+1111   1          COsdFxCodeWrite(ucCloseAllWindow); 
+1112   1       
+1113   1          OSDPosition(6 * 12, 4 * 18, 44, 0, 0x03);
+1114   1          if (GET_AUDIO_MUTE()) // Mute on 
+1115   1             COsdLoad1BitFont(FntMute, 0x7A, 6, tFntVolumeCharWidth);
+1116   1          else
+1117   1             COsdLoad1BitFont(FntVolume, 0x7A, 6, tFntVolumeCharWidth);  
+1118   1                                                    
+1119   1          // Display Volume/Mute icon
+1120   1          Gotoxy(0, 1, BYTE_DISPLAY);
+1121   1          OutputChar(0x7A);
+1122   1          OutputChar(0x7B);
+1123   1          OutputChar(0x7C);
+1124   1          Gotoxy(0, 2, BYTE_DISPLAY);
+1125   1          OutputChar(0x7D);
+1126   1          OutputChar(0x7E);
+1127   1          OutputChar(0x7F);
+1128   1          COsdFxDrawWindow(0,16,                               //WORD usXStart,WORD usYStart,  
+1129   1                              54,52,       //WORD usXEnd,WORD usYEnd,  
+1130   1                              tMainWindowStyle);                  //BYTE *pStyle)
+1131   1      
+1132   1          COsdFxEnableOsd();
+1133   1          bOSDTimeOut  = 0;
+1134   1       //   ucAudioState = 1;
+1135   1          if (GET_AUDIO_MUTE()) // Mute on  
+1136   1          {
+1137   2              CTimerCancelTimerEvent(COsdDispOsdTimerEvent);
+1138   2          }
+1139   1          else             
+1140   1          {
+1141   2             CTimerReactiveTimerEvent(SEC(5), COsdDispOsdTimerEvent);
+1142   2          } 
+1143   1      
+1144   1          bOSDTimeOut  = 0;
+1145   1          bOSDOnScreen = 1;
+1146   1      }
+1147          
+1148          //-----------------------------------------------------------------------
+1149          #if(_VIDEO_TV_SUPPORT)
+              #if(_SHOW_TV_NO_SIGNAL)
+                 
+              #if(_LOGO_ENABLE)
+              #define _H_POS_MAX         ((DWORD)((Panel[ucPanelSelect]->DHWidth - _LOGO_WIDTH)/4 - 12))
+              #define _V_POS_MAX         ((DWORD)((Panel[ucPanelSelect]->DVHeight - _LOGO_HEIGHT)/4 - 6))
+              #define _H_DOUBLE_POS_MAX  ((DWORD)((Panel[ucPanelSelect]->DHWidth - _OSD_DOUBLE_WIDTH(_LOGO_WIDTH))/4 - 1
+             -2))
+              #define _V_DOUBLE_POS_MAX  ((DWORD)((Panel[ucPanelSelect]->DVHeight - _OSD_DOUBLE_HEIGHT(_LOGO_HEIGHT))/4 
+             -- 6))
+              #else
+              #define _H_POS_MAX         ((DWORD)((Panel[ucPanelSelect]->DHWidth - _DIALOG_WIDTH)/4 - 12))
+              #define _V_POS_MAX         ((DWORD)((Panel[ucPanelSelect]->DVHeight - _DIALOG_HEIGHT)/4 - 6))
+              #define _H_DOUBLE_POS_MAX  ((DWORD)((Panel[ucPanelSelect]->DHWidth - _OSD_DOUBLE_WIDTH(_DIALOG_WIDTH))/4 -
+             - 12))
+              #define _V_DOUBLE_POS_MAX  ((DWORD)((Panel[ucPanelSelect]->DVHeight - _OSD_DOUBLE_HEIGHT(_DIALOG_HEIGHT))/
+             -4 - 6))
+              #endif
+C51 COMPILER V7.20   OSDPROC003                                                            10/05/2015 09:30:16 PAGE 20  
+
+              
+              void OSDMove(WORD usOsdActWidth, WORD usOsdActHeight, WORD ucHPos, WORD ucVPos, BYTE ucPar)
+              {              
+                  usOsdActWidth  = _OSD_HPOSITION_OFFSET + 
+                                  (DWORD)(Panel[ucPanelSelect]->DHStartPos / 4) + ucHPos;
+              
+                  usOsdActHeight = _OSD_VPOSITION_OFFSET + 
+                                  (DWORD)(Panel[ucPanelSelect]->DVStartPos / 4) + ucVPos;
+              
+              
+                  CScalerSetBit(_OSD_SCRAMBLE_93, 0xf8, 0x02);
+              
+                  pData[0] = CScalerGetBit(_OVERLAY_CTRL_6C, _BIT0);
+              
+                  pData[0] = (pData[0] == 0x00) ? 0xc0 : 0xe0;
+                  pData[1] = 0x00;
+                  CScalerWrite(_OSD_ADDR_MSB_90, 2, pData, _AUTOINC);
+              
+                      pData[0] = usOsdActHeight >> 1;
+                      pData[1] = (UINT8) (usOsdActWidth >> 2);
+                      pData[2] = ((UINT8) (usOsdActWidth & 0x0003) << 6) |    ((usOsdActHeight & 0x01) << 5) | ucPar;
+                      CScalerWrite(_OSD_DATA_PORT_92, 3, pData, _NON_AUTOINC);
+               
+                  CTimerWaitForEvent(_EVENT_DEN_STOP);
+                  CTimerWaitForEvent(_EVENT_DEN_STOP);
+                  CScalerSetBit(_OSD_SCRAMBLE_93, 0xf8, 0x05);
+              }
+              
+              //-----------------------------------------------------------------------
+              #define _ON_SCREEN_STATE    1
+              #define _MOVE_STATE         2
+              void CCheckTVSignal(void)
+              {
+                  static WORD ucPosX  = 0;
+                  static WORD ucPosY  = 0;
+                  static BYTE ucDir   = 0;
+              
+                  if (_GET_INPUT_SOURCE() != _SOURCE_VIDEO_TV || bOSDOnScreen == 1 || ucOsdState != _MI_MENU_NONE)
+                      return;
+              
+                  if (ucLogoMoveCount > 250)
+                      ucLogoMoveCount = 0;
+                  else
+                      return; 
+              
+                  if (bTVNoSignal)
+                  {         
+                      switch(ucSignalOSDState)
+                      {
+                      case 0:
+                          ucNoSigCount++;
+                          if (ucNoSigCount > 15)
+                          {
+              #if(_CHINESE_FONT_TYPE == _CHINESE_2_FONT)
+                              LoadCHIFont(_LF_OTHER);
+              #endif
+              #if(_LOGO_ENABLE)
+                              CDrawLogo((GET_OSD_SIZE()) ? 0x03 : 0x00);
+              #else
+                              CShowNoSignal();
+              #endif
+                              CTimerCancelTimerEvent(COsdDispOsdTimerEvent);
+C51 COMPILER V7.20   OSDPROC003                                                            10/05/2015 09:30:16 PAGE 21  
+
+                              ucSignalOSDState = _ON_SCREEN_STATE;
+                          }
+                          break;
+              
+                      case _ON_SCREEN_STATE:
+                          if (GET_OSD_SIZE())
+                          {
+                              ucPosX = _H_DOUBLE_POS_MAX/2;
+                              ucPosY = _V_DOUBLE_POS_MAX/2;
+                          }
+                          else
+                          {
+                              ucPosX = _H_POS_MAX/2;
+                              ucPosY = _V_POS_MAX/2;
+                          }
+                          ucDir  = _BIT1;
+                          ucDir  |= _BIT5;
+                          ucSignalOSDState = _MOVE_STATE;
+                          break;
+              
+                      case _MOVE_STATE:
+                          if (GET_OSD_SIZE())
+                          {
+                              if (ucPosX >= _H_DOUBLE_POS_MAX)   ucDir = (ucDir & 0xf0) | _BIT0; // --
+                              if (ucPosY >= _V_DOUBLE_POS_MAX)   ucDir = (ucDir & 0x0f) | _BIT4; // --
+                          }
+                          else
+                          {
+                              if (ucPosX >= _H_POS_MAX)   ucDir = (ucDir & 0xf0) | _BIT0; // --
+                              if (ucPosY >= _V_POS_MAX)   ucDir = (ucDir & 0x0f) | _BIT4; // --
+                          }
+                          if (ucPosX == 0)            ucDir = (ucDir & 0xf0) | _BIT1; // ++           
+                          if (ucPosY == 0)            ucDir = (ucDir & 0x0f) | _BIT5; // ++
+                          
+                          if (ucDir & _BIT0)          ucPosX--;
+                          if (ucDir & _BIT1)          ucPosX++;
+                          if (ucPosY < 2)             ucPosY = 2;
+                          if (ucDir & _BIT4)          ucPosY-=2;
+                          if (ucDir & _BIT5)          ucPosY+=2;
+              
+              #if(_LOGO_ENABLE)               
+                          if (GET_OSD_SIZE())
+                              OSDMove(_OSD_DOUBLE_WIDTH(_LOGO_WIDTH), _OSD_DOUBLE_HEIGHT(_LOGO_HEIGHT), ucPosX, ucPosY, 
+             -0x03);
+                          else
+                              OSDMove(_LOGO_WIDTH, _LOGO_HEIGHT, ucPosX, ucPosY, 0x03);
+              #else
+                          if (GET_OSD_SIZE())
+                              OSDMove(_OSD_DOUBLE_WIDTH(_DIALOG_WIDTH), _OSD_DOUBLE_HEIGHT(_DIALOG_HEIGHT), ucPosX, ucPo
+             -sY, 0x03);
+                          else
+                              OSDMove(_DIALOG_WIDTH, _DIALOG_HEIGHT, ucPosX, ucPosY, 0x03);
+              #endif            
+                              break;
+                      }
+                  }
+                  else
+                  {
+                      if (ucSignalOSDState)
+                      {
+                          ucNoSigCount = 0;
+                          COsdFxDisableOsd();
+C51 COMPILER V7.20   OSDPROC003                                                            10/05/2015 09:30:16 PAGE 22  
+
+                      }
+                  }
+              }
+              #endif // #if(_SHOW_TV_NO_SIGNAL)
+              #endif // #if(_VIDEO_TV_SUPPORT)
+1290          
+1291          //----------------------------------------------------------------------------------------------------
+1292          #if(_LOGO_ENABLE)
+              BYTE code tLogoOsdMap[] =
+              { 
+                  6,         // Row Count
+                  LOBYTE(0x300),HIBYTE(0x300),
+                  21,   // Row 0 char count
+                  21,   // Row 1 char count
+                  21,   // Row 2 char count
+                  21,   // Row 3 char count
+                  21,   // Row 4 char count
+                  21,   // Row 5 char count
+              };
+              
+              void CDrawLogo(BYTE ucDouble)
+              {
+                  BYTE x;
+                  BYTE y;
+                  BYTE ucFont = 0x00;
+                      
+                  COsdFxDisableOsd();
+              
+                  SetOsdMap(tLogoOsdMap);
+                  COsdColorPalette(tPALETTE_0);
+                  COsdFxCodeWrite(ucCloseAllWindow);
+                  COsdLoad1BitFontWidth12(FntLogo, 0x00, 0x72);
+                  // Dot 0
+                  COsdLoad1BitFontWidth12(FntLogoDotUpSide0, 0x72, 0x03);
+                  CScalerLoadHardwareVLCFont(FntLogoDotDownSide0_2Bit,0x80 * 2);
+                  // Dot 1
+                  CScalerLoadHardwareVLCFont(FntLogoDot1_2Bit,0x83 * 2);
+                  // Dot 2
+                  CScalerLoadHardwareVLCFont(FntLogoDot2_2Bit,0x89 * 2);
+                  // Dot 3
+                  COsdLoad1BitFontWidth12(FntLogoDot3, 0x75, 0x04);
+              
+                      CScalerSetBit(_OVERLAY_CTRL_6C, 0x23, ((0x00) << 2));
+                  
+                  bLoadLogoFont = 1;
+              
+                  // Init osd
+                  // insert code to here
+                  OSDClear(ROW(0), HEIGHT(6), COL(0), WIDTH(21), 0x8C, BYTE_ATTRIB);
+                  OSDClear(ROW(0), HEIGHT(6), COL(0), WIDTH(21), 0x00, BYTE_DISPLAY);
+                      OSDClear(ROW(0), HEIGHT(6), COL(0), WIDTH(21), 0xA0, BYTE_COLOR);
+                  SetOSDDouble(ucDouble);   
+                      
+                  if (ucDouble)
+                      OSDPosition(_OSD_DOUBLE_WIDTH(_LOGO_WIDTH), _OSD_DOUBLE_HEIGHT(_LOGO_HEIGHT), 50, 50, 0x03);
+                  else
+                      OSDPosition(_LOGO_WIDTH, _LOGO_HEIGHT, 50, 50, 0x03);
+              
+                  // 1BIT font
+                  for(y = 0; y < 6; y++)
+                  {
+                      for(x = 0; x < 19; x++)
+C51 COMPILER V7.20   OSDPROC003                                                            10/05/2015 09:30:16 PAGE 23  
+
+                      {  
+                          Gotoxy(x, y, BYTE_DISPLAY);
+                          OutputChar(ucFont);
+                          ucFont++;
+                      }
+                  }
+                      OSDClear(ROW(0), HEIGHT(1), COL(16), WIDTH(3), 0xC0, BYTE_COLOR);
+                  Gotoxy(16, 0, BYTE_DISPLAY);
+                  OutputChar(0x72);
+                  OutputChar(0x73);
+                  OutputChar(0x74);
+              
+                  // 2bit font 0
+                      OSDLine(ROW(1), COL(16), LENGTH(3), 0xF8, THE_BYTE0);
+                      OSDLine(ROW(1), COL(16), LENGTH(3), 0x02, BYTE_COLOR);
+                  Gotoxy(16, 1, BYTE_DISPLAY);
+                  OutputChar(0x80);
+                  OutputChar(0x81);
+                  OutputChar(0x82);
+              
+                  // 2bit font 1
+                      OSDClear(ROW(4), HEIGHT(2), COL(6), WIDTH(3), 0xB0, THE_BYTE0);
+                      OSDClear(ROW(4), HEIGHT(2), COL(6), WIDTH(3), 0x1A, BYTE_COLOR);
+                  Gotoxy(6, 4, BYTE_DISPLAY);
+                  OutputChar(0x83);
+                  OutputChar(0x84);
+                  OutputChar(0x85);
+                  Gotoxy(6, 5, BYTE_DISPLAY);
+                  OutputChar(0x86);
+                  OutputChar(0x87);
+                  OutputChar(0x88);
+                            
+                  // 2bit font 2
+                      OSDClear(ROW(4), HEIGHT(2), COL(15), WIDTH(4), 0xB0, THE_BYTE0);
+                      OSDClear(ROW(4), HEIGHT(2), COL(15), WIDTH(4), 0x1A, BYTE_COLOR);
+                  Gotoxy(15, 4, BYTE_DISPLAY);
+                  OutputChar(0x89);
+                  OutputChar(0x8A);
+                  OutputChar(0x8B);
+                  OutputChar(0x8C);
+                  Gotoxy(15, 5, BYTE_DISPLAY);
+                  OutputChar(0x8D);
+                  OutputChar(0x8E);
+                  OutputChar(0x8F);
+                  OutputChar(0x90);
+                              
+              
+                  // 1bit font 3
+                      OSDClear(ROW(4), HEIGHT(2), COL(19), WIDTH(2), 0xB0, BYTE_COLOR); 
+                  Gotoxy(19, 4, BYTE_DISPLAY);
+                  OutputChar(0x75);
+                  OutputChar(0x76);
+                  Gotoxy(19, 5, BYTE_DISPLAY);
+                  OutputChar(0x77);
+                  OutputChar(0x78);
+                      
+                      COsdFxEnableOsd();
+              }
+              
+              //----------------------------------------------------------------------------------------------------
+              void CPattenChange(void)
+              {
+C51 COMPILER V7.20   OSDPROC003                                                            10/05/2015 09:30:16 PAGE 24  
+
+                      BYTE ucPatten[9];
+                  BYTE ucTemp;
+              
+                  // 0x0A
+                  ucPatten[0] = tPALETTE_0[30];//0x33;
+                  ucPatten[1] = tPALETTE_0[31];//0x6A;
+                  ucPatten[2] = tPALETTE_0[32];//0xA5;
+                  // 0x0B
+                  ucPatten[3] = tPALETTE_0[33];//0x94;
+                  ucPatten[4] = tPALETTE_0[34];//0xBD;
+                  ucPatten[5] = tPALETTE_0[35];//0x35;
+                  // 0x0C
+                  ucPatten[6] = tPALETTE_0[36];//0xF3;
+                  ucPatten[7] = tPALETTE_0[37];//0x94;
+                  ucPatten[8] = tPALETTE_0[38];//0x28;
+              
+                  for(ucTemp = 0; ucTemp < 9; ucTemp++)
+                  {
+                      ucPatten[ucTemp] -= 0x28;
+                  }
+              
+                  while(ucPatten[6] != 0xFF)
+                  {
+                      CScalerSetByte(_OVERLAY_LUT_ADDR_6E, 0x80 | 0x1E);
+                      CScalerWrite(_COLOR_LUT_PORT_6F, 3, &ucPatten, _NON_AUTOINC);
+                      CScalerSetByte(_OVERLAY_LUT_ADDR_6E, 0x00);
+                      CTimerDelayXms(30);
+              
+                      for(ucTemp = 0; ucTemp < 9; ucTemp++)
+                      {
+                          ucPatten[ucTemp]++;
+                      }
+                  }
+              
+                  while(ucPatten[8])
+                  {
+                      CScalerSetByte(_OVERLAY_LUT_ADDR_6E, 0x80 | 0x1E);
+                      CScalerWrite(_COLOR_LUT_PORT_6F, 3, &ucPatten, _NON_AUTOINC);
+                      CScalerSetByte(_OVERLAY_LUT_ADDR_6E, 0x00);
+                      CTimerDelayXms(30);
+              
+                      for(ucTemp = 0; ucTemp < 9; ucTemp++)
+                      {
+                          ucPatten[ucTemp]--;
+                      }
+                  }
+              }
+                 
+              #endif
+1458          
+1459          
+1460          
+1461          //----------------------------------------------------------------------------------------------------
+1462          void CNotUse(void)
+1463          {
+1464   1      /*
+1465   1              CAdjustMZHueSat(0);
+1466   1              CEepromSaveHueSatData();
+1467   1              CKeyScanReadyTimerEvent();
+1468   1              CKeyRepeatEnableTimerEvent();
+1469   1              CAutoDoAutoConfig();
+1470   1      
+C51 COMPILER V7.20   OSDPROC003                                                            10/05/2015 09:30:16 PAGE 25  
+
+1471   1              CAutoDoWhiteBalance();
+1472   1              CEepromSaveOsdUserData();
+1473   1              CEepromSaveBriConData();
+1474   1              CEepromSaveColorTempData();
+1475   1              CEepromSaveTvData();
+1476   1              CScalerWriteAmount(0,0,0,0);
+1477   1      
+1478   1              SetOsdMap(0);
+1479   1              SetOSDRamAddress();
+1480   1              DirectWOSDRam(0, 0, 0, 0);
+1481   1              SetRowCmds();
+1482   1              Gotoxy(0, 0, 0);
+1483   1              OutputChar(0);
+1484   1      
+1485   1              COsdFxCloseWindow(0);
+1486   1              ValueInRangeChange(0, 0, 0, 0);
+1487   1              Textout(0);
+1488   1              StrLen(0);
+1489   1              OSDPosition(0, 0, 0, 0, 0);
+1490   1              OSDClear(0, 0, 0, 0, 0,0);
+1491   1              COsdFxCodeWrite(0);
+1492   1              COsdFxGetAdcClockRange(0);
+1493   1              InitBurnIn();
+1494   1              BurnInRun();
+1495   1          CKeyScanReady();
+1496   1      
+1497   1          CSetPWM(0, 0);
+1498   1          OSDSlider(0, 0, 0, 0, 0,0);
+1499   1      
+1500   1              COsdCtrlGetHPosition();
+1501   1              COsdCtrlGetVPosition();
+1502   1              COsdCtrlGetClock();
+1503   1          CDoReset();
+1504   1      
+1505   1          AdjustMenuItem(0,0,0);
+1506   1      
+1507   1              CEnable();
+1508   1              CVideoEnable();
+1509   1              CVgaEnable();
+1510   1              CDviEnable();
+1511   1              CTVEnable();
+1512   1         
+1513   1              CHDMIEnable();
+1514   1          Draw2bit3x2Icon(0,0,0);
+1515   1                    */
+1516   1          EnterSystemMenu(); 
+1517   1          //CSetTVSignalWidth();
+1518   1          bChangeSource();
+1519   1          CAdjustMZHueSat(0);
+1520   1      //    ChangeSourceHandler();
+1521   1          CTextOutRightAlign(0,0,0);
+1522   1              COsdCtrlGetPhase();
+1523   1          GetNextLanguage(0);
+1524   1              GetPrevLanguage(0);
+1525   1      #if(_VIDEO_TV_SUPPORT)
+                  #if(_FM_DEVICE)
+                  CChangeFM();
+                  #else
+              //    CFMInit();
+                  #endif
+                  CShowTimer();
+                  CSaveChannelSoundType(stTvInfo.CurChn, 0);
+C51 COMPILER V7.20   OSDPROC003                                                            10/05/2015 09:30:16 PAGE 26  
+
+                  gmi_CReadIfPllDM();
+              #endif
+1535   1          CCenterTextout(" ",ROW(1),COL(0),0);
+1536   1          COsdLoad1BitFont(0, 0x00, 123, 0);
+1537   1      }
+1538          //--------------------------------------------------
+1539          
+1540          #endif                  //#if(_OSD_TYPE == _OSD003)
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   3663    ----
+   CONSTANT SIZE    =      4    ----
+   XDATA SIZE       =      3      52
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      2       6
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,942 @@
+C51 COMPILER V7.20   OSDTABLE002                                                           10/05/2015 09:30:12 PAGE 1   
+
+
+C51 COMPILER V7.20, COMPILATION OF MODULE OSDTABLE002
+OBJECT MODULE PLACED IN .\Output\OsdTable002.obj
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE OSD\OSD002\OsdTable002.c LARGE OPTIMIZE(9,SPEED) BROWSE DEBUG OBJECTEXTEND 
+                    -PRINT(.\Output\OsdTable002.lst) OBJECT(.\Output\OsdTable002.obj)
+
+line level    source
+
+   1          
+   2          
+   3          #define __OSDTABLE002__
+   4          
+   5          
+   6          #include "Core\Header\Include.h"
+   7          
+   8          
+   9          #if(_OSD_TYPE == _OSD002)
+              
+              //------------------------------------------------------------
+              
+              
+              
+              
+              // Menu item's define
+              
+              
+              //------------------------------------------------------------
+              code SMenuItem tMenuNoneItem[] =
+              {
+                  {   // Active
+                      _EN_PUB_PROCFUNC,                                               // BYTE Option;
+                      tKOMenuNone,                                                            // SKeyToOsdEvent *KeyMsgToOsdEvnet;       // ¿ÉÒÔÎªNULL
+                      _P_MAIN_MENU,                                                           // SMenu *SubMenu,                         // ¿ÉÒÔÎªNULL
+                      NULL,                                                                   // void (*Proc)(void);                     // ¿ÉÒÔÎªNULL
+                      CEnable,                                                                // bit (*Enable)(void);                    // ²»ÄÜÎªNULL,ÒòÎªµ÷ÓÃµÄµØ·½¶à.È
+             -ç¹ûÎª¿ÕÒªÔö¼ÓºÜ¶à¶îÍâµÄ
+                      CDrawNull,                                                              // void (*Draw)(BYTE ucDrawID);            // ²»ÄÜÎªNULL,Ô­ÒòÍ¬ÉÏ
+                      NULL,                                                                   // funcpMenuRun MenuRun
+                  },
+              };
+              //------------------------------------------------------------
+              
+              code SMenuItem tMenuExitItem[] =
+              {
+                  {   // Active
+                      _EN_PUB_PROCFUNC,                                               // BYTE Option;
+                      tKOMenuNone,                                                            // SKeyToOsdEvent *KeyMsgToOsdEvnet;       // ¿ÉÒÔÎªNULL
+                      _P_MAIN_MENU,                                                           // SMenu *SubMenu,                         // ¿ÉÒÔÎªNULL
+                      NULL,                                                                   // void (*Proc)(void);                     // ¿ÉÒÔÎªNULL
+                      CEnable,                                                                // bit (*Enable)(void);                    // ²»ÄÜÎªNULL,ÒòÎªµ÷ÓÃµÄµØ·½¶à.È
+             -ç¹ûÎª¿ÕÒªÔö¼ÓºÜ¶à¶îÍâµÄ
+                      CDrawNull,                                                              // void (*Draw)(BYTE ucDrawID);            // ²»ÄÜÎªNULL,Ô­ÒòÍ¬ÉÏ
+                      NULL,                                                                   // funcpMenuRun MenuRun
+                  },
+              };
+              //------------------------------------------------------------
+              
+              code SMenuItem tMainMenuItem[] =
+              {
+                  {   // _MI_COLOR
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option
+                      tKOMainMenu,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+C51 COMPILER V7.20   OSDTABLE002                                                           10/05/2015 09:30:12 PAGE 2   
+
+             -LL
+                      _P_COLOR_MENU,                              // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CEnable,                                    // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawCOLOR,                               // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMICOLORRun,                                // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+                  {   // _MI_ADJUST
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option
+                      tKOMainMenu,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+                      _P_ADJUST_MENU,                             // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CMIVGAEnable,                                   // funcpEnable Enable                      // ²»ÄÜÎªNULL,Ò
+             -òÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawADJUST,                              // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMIADJUSTRun,                               // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+                  {   // _MI_OSD
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option
+                      tKOMainMenu,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+                      _P_OSD_MENU,                                // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CEnable,                                    // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawOSD,                                 // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMIOSDRun,                                  // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+                  {   // _MI_TV
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option
+                      tKOMainMenu,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+                      _P_TV_MENU,                                 // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CMITVEnable,                                    // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawTV,                                  // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMITVRun,                                   // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+                  {   // _MI_FUNCTION
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option
+                      tKOMainMenu,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+                      _P_FUNC_MENU,                               // int SubMenuID                           // ¿ÉÒÔÎªNU
+C51 COMPILER V7.20   OSDTABLE002                                                           10/05/2015 09:30:12 PAGE 3   
+
+             -LL
+                      NULL,                                           // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNULL
+                      CEnable,                                    // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawFUNCTION,                            // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMIFUNCTIONRun,                             // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+                  {   // _MI_EXIT
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option
+                      tKOMainMenu,                                                    // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNUL
+             -L
+                      _P_MENU_EXIT,                                       // int SubMenuID                           // 
+             -¿ÉÒÔÎªNULL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CEnable,                                    // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawEXIT,                                // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMIEXITRun,                                 // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+              };
+              //------------------------------------------------------------
+              code SMenuItem tColorMenuItem[] =
+              {
+                  {   // _MI_BRIGHTNESS
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option
+                      tKOMenuItem,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CEnable,                                    // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawBrightness,                          // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMIBrightnessRun,                           // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+                  {   // _MI_CONTRAST
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        //BYTE Option
+                      tKOMenuItem,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CEnable,                                    // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawContrast,                            // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMIContrastRun,                             // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+                  {   // _MI_HUE
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        //BYTE Option
+                      tKOMenuItem,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+C51 COMPILER V7.20   OSDTABLE002                                                           10/05/2015 09:30:12 PAGE 4   
+
+                      NULL,                                       // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CMIVedioEnable,                             // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawHue,                                 // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMIHueRun,                                  // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+                  {   // _MI_SATURATION
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        //BYTE Option
+                      tKOMenuItem,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CMIVedioEnable,                             // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawSaturation,                          // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMISaturationRun,                           // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+                  {   // _MI_COLORTEMP
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        //BYTE Option
+                      tKOMenuItem,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CMIVGAEnable,                               // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawColorTemp,                           // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMIColorTempRun,                            // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+                  {   // _MI_COLORRETURN
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        //BYTE Option
+                      tKOMenuItem,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CEnable,                                    // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawColorReturn,                         // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMIColorReturnRun,                          // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+              };
+              //------------------------------------------------------------
+              code SMenuItem tAdjustMenuItem[] =
+              {
+                  {   // _MI_AUTOCONFIG
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option
+C51 COMPILER V7.20   OSDTABLE002                                                           10/05/2015 09:30:12 PAGE 5   
+
+                      tKOMenuItem,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CMIVGAEnable,                               // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawAutoConfig,                          // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMIAutoConfigRun,                           // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+                  {   // _MI_HPOSITION
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option
+                      tKOMenuItem,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CMIVGAEnable,                               // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawHPosition,                           // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMIHPositionRun,                            // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+                  {   // _MI_VPOSITION
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option
+                      tKOMenuItem,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CMIVGAEnable,                               // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawVPosition,                           // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMIVPositionRun,                            // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+                  {   // _MI_PHASE
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option
+                      tKOMenuItem,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CMIVGAEnable,                               // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawPhase,                               // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMIPhaseRun,                                // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+                  {   // _MI_CLOCK
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option
+                      tKOMenuItem,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+C51 COMPILER V7.20   OSDTABLE002                                                           10/05/2015 09:30:12 PAGE 6   
+
+                      NULL,                                       // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CMIVGAEnable,                               // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawClock,                               // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMIClockRun,                                // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+                  {   // _MI_ADJUSTRETURN
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option
+                      tKOMenuItem,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CEnable,                                    // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawAdjustReturn,                        // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMIAdjustReturnRun,                         // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+              };
+              //------------------------------------------------------------
+              code SMenuItem tOsdMenuItem[] =
+              {
+                  {   // _MI_LANGUAGE
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option
+                      tKOMenuItem,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CEnable,                                    // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawLanguage,                            // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMILanguageRun,                             // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+                  {   // _MI_HPOSITION
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option
+                      tKOMenuItem,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CEnable,                                    // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawOSDHPosition,                           // funcpDraw Draw                          // ²»ÄÜÎ
+             -ªNULL,Ô­ÒòÍ¬ÉÏ
+                      CMIOSDHPositionRun,                            // funcpMenuRun MenuRun                    // ²»ÄÜÎ
+             -ªNULL,Ô­ÒòÍ¬ÉÏ
+                  },
+                  {   // _MI_VPOSITION
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option
+C51 COMPILER V7.20   OSDTABLE002                                                           10/05/2015 09:30:12 PAGE 7   
+
+                      tKOMenuItem,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CEnable,                                    // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawOSDVPosition,                           // funcpDraw Draw                          // ²»ÄÜÎ
+             -ªNULL,Ô­ÒòÍ¬ÉÏ
+                      CMIOSDVPositionRun,                            // funcpMenuRun MenuRun                    // ²»ÄÜÎ
+             -ªNULL,Ô­ÒòÍ¬ÉÏ
+                  },
+                  {   // _MI_TIMER
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option
+                      tKOMenuItem,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CEnable,                                    // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawTimer,                               // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMITimerRun,                                // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+                  {   // _MI_DOUBLE
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option
+                      tKOMenuItem,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CEnable,                                    // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawDouble,                              // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMIDoubleRun,                               // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+                  {   // _MI_TRANSPARENT
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option
+                      tKOMenuItem,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CEnable,                                    // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawTransparent,                         // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMITransparentRun,                          // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+                  {   // _MI_OSDRETURN
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option
+                      tKOMenuItem,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+C51 COMPILER V7.20   OSDTABLE002                                                           10/05/2015 09:30:12 PAGE 8   
+
+                      NULL,                                       // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CEnable,                                    // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawOsdReturn,                           // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMIOsdReturnRun,                            // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+                  
+              };
+              //------------------------------------------------------------
+              code SMenuItem tTVMenuItem[] =
+              {
+                  {   // _MI_SYSTEM
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option
+                      tKOMenuItem,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CMITVFMEnable,                              // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawSystem,                              // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMISystemRun,                               // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+                  {   // _MI_CHANNEL
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option
+                      tKOMenuItem,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CMITVEnable,                                // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawChannel,                             // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMIChannelRun,                              // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+                  {   // _MI_AUTOSEARCH
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option
+                      tKOMenuItem,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CMITVEnable,                                // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawAutoSearch,                          // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMIAutoSearchRun,                           // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+                  {   // _MI_MANUALSEARCH
+C51 COMPILER V7.20   OSDTABLE002                                                           10/05/2015 09:30:12 PAGE 9   
+
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option
+                      tKOMenuItem,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CMITVFMEnable,                              // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawManualSearch,                        // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMIManualSearchRun,                         // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+                  {   // _MI_TUNING
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option
+                      tKOMenuItem,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CMITVEnable,                                // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawTuning,                              // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMITuningRun,                               // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+                  {   // _MI_SKIP
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option
+                      tKOMenuItem,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CMITVEnable,                                // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawSkip,                                // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMISkipRun,                                 // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+              #if(_SLEEP_FUNC)
+                  {   // _MI_AUTOPOWERDOWN
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option
+                      tKOMenuItem,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CMITVFMEnable,                              // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawAutoPowerDown,                       // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMIAutoPowerDownRun,                        // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+              #endif
+                  {   // _MI_BLUESCREEN
+C51 COMPILER V7.20   OSDTABLE002                                                           10/05/2015 09:30:12 PAGE 10  
+
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option
+                      tKOMenuItem,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CMITVFMEnable,                              // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawBlueScreen,                          // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMIBlueScreenRun,                           // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+                  {   // _MI_TVRETURN
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option
+                      tKOMenuItem,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CEnable,                                    // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawTVReturn,                            // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMITVReturnRun,                             // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+              };
+              //------------------------------------------------------------
+              code SMenuItem tFuncMenuItem[] =
+              {
+                  {   // _MI_RESET
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option
+                      tKOMenuItem,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CEnable,                                    // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawReset,                               // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMIResetRun,                                // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+              #if(_DISPLAY_RATIO)
+                  {   // _MI_DISPLAYRATIO
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option
+                      tKOMenuItem,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CEnable,                                    // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawDisplayRatio,                        // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMIDisplayRatioRun,                         // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+C51 COMPILER V7.20   OSDTABLE002                                                           10/05/2015 09:30:12 PAGE 11  
+
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+              #endif
+                  {   // _MI_VOLUME
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option
+                      tKOMenuItem,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CEnable,                                    // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawVolume,                              // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMIVolumeRun,                               // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+                  {   // _MI_MUTE
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option
+                      tKOMenuItem,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CEnable,                                    // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawMute,                                // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMIMuteRun,                                 // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  }, 
+              #if (_SOUND_PROCESSOR)
+                  {   // _MI_BALANCE
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option
+                      tKOMenuItem,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CEnable,                                    // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawBalance,                             // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMIBalanceRun,                              // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+                  {   // _MI_BASS
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option
+                      tKOMenuItem,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CEnable,                                    // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawBass,                                // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMIBassRun,                                 // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+C51 COMPILER V7.20   OSDTABLE002                                                           10/05/2015 09:30:12 PAGE 12  
+
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+                  {   // _MI_TREBLE
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option
+                      tKOMenuItem,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CEnable,                                    // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawTreble,                              // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMITrebleRun,                               // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+                 #if(AUDIO_TYPE != _AUDIO_SC7313)
+                  {   // _MI_SRS
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option
+                      tKOMenuItem,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CEnable,                                    // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawSRS,                                 // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMISRSRun,                                  // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+                  {   // _MI_BBE
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option
+                      tKOMenuItem,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CEnable,                                    // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawBBE,                                 // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMIBBERun,                                  // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+                 #endif
+              #endif
+              #if(_FM_DEVICE)
+                  {   // _MI_FM
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option
+                      tKOMenuItem,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CEnable,                                    // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawFM,                                  // funcpDraw Draw                          // ²»ÄÜÎªNU
+C51 COMPILER V7.20   OSDTABLE002                                                           10/05/2015 09:30:12 PAGE 13  
+
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMIFMRun,                                   // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+              #endif
+                  {   // _MI_FUNCRETURN
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option
+                      tKOMenuItem,                                // SKeyToOsdEvent *KeyMsgToOsdEvnet        // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // int SubMenuID                           // ¿ÉÒÔÎªNU
+             -LL
+                      NULL,                                       // funcpProc Proc                          // ¿ÉÒÔÎªNU
+             -LL
+                      CEnable,                                    // funcpEnable Enable                      // ²»ÄÜÎªNU
+             -LL,ÒòÎªµ÷ÓÃµÄµØ·½¶à
+                      CMIDrawFuncReturn,                          // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMIFuncReturnRun,                           // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+              };
+              //------------------------------------------------------------
+              
+              
+              code SMenuItem tShortMenuItem[] =
+              {
+                  {   // _MI_SMBRIGHT,
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option;
+                      tKOShortBriMenu,                                                        // SKeyToOsdEvent *KeyMsgToOsdEvnet;       // ¿ÉÒÔÎªNULL
+                      0,                                                                              // SMenu *SubMenu,                         // ¿ÉÒÔÎªNULL
+                      NULL,                                                                   // void (*Proc)(void);                     // ¿ÉÒÔÎªNULL
+                      CEnable,                                                                // bit (*Enable)(void);                    // ²»ÄÜÎªNULL,ÒòÎªµ÷ÓÃµÄµØ·½¶à.È
+             -ç¹ûÎª¿ÕÒªÔö¼ÓºÜ¶à¶îÍâµÄ
+                      CMIDrawSMBright,                            // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMISMBrightRun,                             // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+                  {   // _MI_SMVOLUME,
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option;
+                      tKOShortVolMenu,                                                        // SKeyToOsdEvent *KeyMsgToOsdEvnet;       // ¿ÉÒÔÎªNULL
+                      0,                                                                              // SMenu *SubMenu,                         // ¿ÉÒÔÎªNULL
+                      NULL,                                                                   // void (*Proc)(void);                     // ¿ÉÒÔÎªNULL
+                      CEnable,                                                                // bit (*Enable)(void);                    // ²»ÄÜÎªNULL,ÒòÎªµ÷ÓÃµÄµØ·½¶à.È
+             -ç¹ûÎª¿ÕÒªÔö¼ÓºÜ¶à¶îÍâµÄ
+                      CMIDrawSMVolume,                            // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMISMVolumeRun,                             // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+                  {   // _MI_SMMUTE,
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option;
+                      tKOShortMute,                                                           // SKeyToOsdEvent *KeyMsgToOsdEvnet;       // ¿ÉÒÔÎªNULL
+                      0,                                                                              // SMenu *SubMenu,                         // ¿ÉÒÔÎªNULL
+                      NULL,                                                                   // void (*Proc)(void);                     // ¿ÉÒÔÎªNULL
+                      CEnable,                                                                // bit (*Enable)(void);                    // ²»ÄÜÎªNULL,ÒòÎªµ÷ÓÃµÄµØ·½¶à.È
+             -ç¹ûÎª¿ÕÒªÔö¼ÓºÜ¶à¶îÍâµÄ
+                      CMIDrawSMMute,                              // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMISMMuteRun,                               // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+C51 COMPILER V7.20   OSDTABLE002                                                           10/05/2015 09:30:12 PAGE 14  
+
+                  {   // _MI_SMINPUT_CH,
+                      _EN_PUB_KEYEVENT | _EN_PUB_PROCFUNC,        // BYTE Option;
+                      tKOShortInputCHMenu,                                            // SKeyToOsdEvent *KeyMsgToOsdEvnet;       // ¿ÉÒÔÎªNULL
+                      0,                                                                              // SMenu *SubMenu,                         // ¿ÉÒÔÎªNULL
+                      NULL,                                                                   // void (*Proc)(void);                     // ¿ÉÒÔÎªNULL
+                      CMITVEnable,                                                            // bit (*Enable)(void);                    // ²»ÄÜÎªNULL,ÒòÎªµ÷ÓÃµÄµØ·½¶
+             -à.Èç¹ûÎª¿ÕÒªÔö¼ÓºÜ¶à¶îÍâµÄ
+                      CMIDrawSMInputCh,                           // funcpDraw Draw                          // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                      CMISMInputChRun,                            // funcpMenuRun MenuRun                    // ²»ÄÜÎªNU
+             -LL,Ô­ÒòÍ¬ÉÏ
+                  },
+              };
+              //------------------------------------------------------------
+              
+              code SMenu g_tMenu[] = 
+              {
+                      {       //_P_MENU_NONE
+                          NULL,                                                       //TMenuItem *ParentMenu;
+                          0,                                                          //BYTE ParentMenuItemIndex;
+                          sizeof(tMenuNoneItem)/sizeof(SMenuItem),                    //BYTE MenuItemCount;
+                          tMenuNoneItem,                                              //TMenuItem *Menu;
+                          CDrawNull,                                                          //void (*Draw)(BYTE ucDrawID);
+                      },
+                      {       //_P_MENU_EXIT
+                          _P_MENU_EXIT,                                               //TMenuItem *ParentMenu;
+                          0,                                                          //BYTE ParentMenuItemIndex;
+                          sizeof(tMenuExitItem)/sizeof(SMenuItem),                    //BYTE MenuItemCount;
+                          tMenuExitItem,                                              //TMenuItem *Menu;
+                          CCloseOSD,                                                  //void (*Draw)(BYTE ucDrawID);
+                      },
+                      // Ö÷²Ëµ¥
+                      {       //_P_MAIN_MENU
+                          _P_MENU_NONE,                                               //TMenuItem *ParentMenu;
+                          0,                                                          //BYTE ParentMenuItemIndex;
+                          sizeof(tMainMenuItem)/sizeof(SMenuItem),                    //BYTE MenuItemCount;
+                          tMainMenuItem,                                              //TMenuItem *Menu;
+                          CPDrawMainMenu,                                              //void (*Draw)(BYTE ucDrawID);
+                      },
+                      // ×Ó²Ëµ¥
+                      {       //_P_COLOR_MENU
+                          _P_MAIN_MENU,                                               //TMenuItem *ParentMenu;
+                          _MI_COLOR,                                                  //BYTE ParentMenuItemIndex;
+                          sizeof(tColorMenuItem)/sizeof(SMenuItem),                   //BYTE MenuItemCount;
+                          tColorMenuItem,                                             //TMenuItem *Menu;
+                          CPDrawColorMenu,                                            //void (*Draw)(BYTE ucDrawID);
+                      },
+                  {   //_P_ADJUST_MENU
+                      _P_MAIN_MENU,                                               //TMenuItem *ParentMenu;
+                      _MI_ADJUST,                                                 //BYTE ParentMenuItemIndex;
+                      sizeof(tAdjustMenuItem)/sizeof(SMenuItem),                  //BYTE MenuItemCount;
+                      tAdjustMenuItem,                                            //TMenuItem *Menu;
+                      CPDrawAdjustMenu,                                           //void (*Draw)(BYTE ucDrawID);
+                  },
+                  {   //_P_OSD_MENU
+                      _P_MAIN_MENU,                                               //TMenuItem *ParentMenu;
+                      _MI_OSD,                                                    //BYTE ParentMenuItemIndex;
+                      sizeof(tOsdMenuItem)/sizeof(SMenuItem),                     //BYTE MenuItemCount;
+                      tOsdMenuItem,                                               //TMenuItem *Menu;
+                      CPDrawOsdMenu,                                              //void (*Draw)(BYTE ucDrawID);
+                  },
+                  {   //_P_TV_MENU
+C51 COMPILER V7.20   OSDTABLE002                                                           10/05/2015 09:30:12 PAGE 15  
+
+                      _P_MAIN_MENU,                                               //TMenuItem *ParentMenu;
+                      _MI_TV,                                                     //BYTE ParentMenuItemIndex;
+                      sizeof(tTVMenuItem)/sizeof(SMenuItem),                      //BYTE MenuItemCount;
+                      tTVMenuItem,                                                //TMenuItem *Menu;
+                      CPDrawTVMenu,                                               //void (*Draw)(BYTE ucDrawID);
+                  },
+                  {   //_P_FUNC_MENU
+                      _P_MAIN_MENU,                                               //TMenuItem *ParentMenu;
+                      _MI_FUNCTION,                                               //BYTE ParentMenuItemIndex;
+                      sizeof(tFuncMenuItem)/sizeof(SMenuItem),                    //BYTE MenuItemCount;
+                      tFuncMenuItem,                                              //TMenuItem *Menu;
+                      CPDrawFuncMenu,                                             //void (*Draw)(BYTE ucDrawID);
+                  }, 
+              
+                  //¿ì½Ý²Ëµ¥
+                  {   //_P_SHORT_MENU   
+                          _P_MENU_NONE,                                               //TMenuItem *ParentMenu;
+                          0,                                                          //BYTE ParentMenuItemIndex;
+                      sizeof(tShortMenuItem)/sizeof(SMenuItem),                   //BYTE MenuItemCount;
+                      tShortMenuItem,                                             //TMenuItem *Menu;
+                      CPDrawShowMenu,                                             //void (*Draw)(BYTE ucDrawID);
+                  }, 
+                      
+              };
+              //------------------------------------------------------------
+              
+              
+              
+              #endif  //#if(_OSD_TYPE == _OSD002)
+ 607          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   ----    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

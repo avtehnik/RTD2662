@@ -1,0 +1,784 @@
+C51 COMPILER V7.20   VIDEO                                                                 10/05/2015 09:30:05 PAGE 1   
+
+
+C51 COMPILER V7.20, COMPILATION OF MODULE VIDEO
+OBJECT MODULE PLACED IN .\Output\video.obj
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE Core\code\ext_device\video.c LARGE OPTIMIZE(9,SPEED) BROWSE DEBUG OBJECTEXT
+                    -END PRINT(.\Output\video.lst) OBJECT(.\Output\video.obj)
+
+line level    source
+
+   1          //----------------------------------------------------------------------------------------------------
+   2          // ID Code      : Video.c No.0002
+   3          // Update Note  :
+   4          //
+   5          //----------------------------------------------------------------------------------------------------
+   6          
+   7          #define __VIDEO__
+   8          
+   9          #include "Core\Header\Include.h"
+  10          
+  11          #if(_VIDEO_SUPPORT == _ON)
+  12          
+  13          BYTE ucSearchCount = 0;
+  14          
+  15          /**
+  16           * CVideoInitial
+  17           * initial video source
+  18           * set saturation,hue,backlight,sharpness, only called by CVideoIsExist
+  19           * @param <none>
+  20           * @return {none}
+  21           *
+  22          */
+  23          //================================================================================================
+  24          /////////////////////////////////////////////////
+  25          void CVideoInitial(void)
+  26          {       
+  27   1              CScalerSetBit(_SYNC_CTRL_49, ~(_BIT1 | _BIT0), _BIT0);          // Measure HS/VS source select Video8/Video16
+  28   1              CScalerCodeW(VideoInit);
+  29   1              CScalerCodeW(VideoAdcInit);
+  30   1      
+  31   1          gmi_CInitialVDC();
+  32   1          CScalerPageSelect(_PAGE8); 
+  33   1          CScalerSetBit(_P8_VIDEO_CTRL1_A1, ~_BIT0, 0x00);  
+  34   1          CScalerSetBit(_P8_INOUT_CTRL_A4, ~(_BIT1|_BIT4|_BIT5), _BIT4|_BIT5); // Force Only 4:2:2 Format Output
+             - for 3580 !!  
+  35   1              CScalerPageSelect(_PAGE9);              
+  36   1          CScalerSetBit(_P9_HLOOP_MAXSTATE_C1, ~(_BIT2 | _BIT1 | _BIT0), 0x03);
+  37   1      
+  38   1          CInitInputSource();
+  39   1          CVideoSoftReset();    
+  40   1      }
+  41          
+  42          
+  43          //--------------------------------------------------
+  44          void CVideoSetVDCConBriCustomer(void)
+  45          {
+  46   1              CVideoSetContrast(GET_CONTRAST());
+  47   1              #if(_VIDEO_AUTO_WHITE_BLANCE == _ENABLE)
+  48   1              CVideoSetVDCBrightness(GET_VDC_OFFSET());
+  49   1              #else
+                      CVideoSetVDCBrightness(0x88);
+                      #endif  
+  52   1      }
+  53          
+C51 COMPILER V7.20   VIDEO                                                                 10/05/2015 09:30:05 PAGE 2   
+
+  54          //--------------------------------------------------
+  55          void CSetVideoParameter(void)
+  56          {
+  57   1          CScalerPageSelect(_PAGE6);
+  58   1          CScalerSetByte(_P6_SPATIAL_CTRL_DB, 0x02);
+  59   1          //CScalerSetBit(_P6_DCTI_1ST_GAIN_D8, ~(_BIT7), 0);
+  60   1          
+  61   1          CScalerPageSelect(_PAGE7);
+  62   1          CScalerSetBit(_P7_DLTI_DCTI_ENABLE_A1, ~(_BIT6), 0);
+  63   1      
+  64   1          switch (ucVideoType)
+  65   1              {
+  66   2                      case ZNTSC:
+  67   2                              CScalerCodeW(RTD2610_NTSC_M_ini);
+  68   2                              break;
+  69   2      
+  70   2                      case ZPAL_I:
+  71   2                              CScalerCodeW(RTD2610_PAL_I_ini);
+  72   2                              break;
+  73   2      
+  74   2                      case ZPAL_M:
+  75   2                              CScalerCodeW(RTD2610_PAL_M_ini);
+  76   2                              break;
+  77   2      
+  78   2                      case ZPAL_N:
+  79   2                              CScalerCodeW(RTD2610_PAL_CN_ini);
+  80   2                              break;
+  81   2      
+  82   2                      case ZNTSC_443:
+  83   2                              CScalerCodeW(RTD2610_NTSC_443_ini);
+  84   2                              break;
+  85   2      
+  86   2                      case ZSECAM:
+  87   2                              CScalerCodeW(RTD2610_SECAM_ini);
+  88   2                              break;
+  89   2      
+  90   2                      case ZPAL_60:
+  91   2                              CScalerCodeW(RTD2610_PAL_60_ini);
+  92   2                              break;
+  93   2      
+  94   2                      case ZNTSC_50:
+  95   2                              //CScalerCodeW(RTD2610_NTSC_50_ini);
+  96   2                              break;
+  97   2              }
+  98   1      
+  99   1      
+ 100   1          CScalerPageSelect(_PAGE8);          
+ 101   1              CScalerRead(_P8_VIDEO_CTRL1_A1, 1, pData, _NON_AUTOINC);
+ 102   1              if(pData[0] & _BIT5)//_GET_INPUT_SOURCE() == _SOURCE_VIDEO_SV)
+ 103   1              {
+ 104   2                      CScalerPageSelect(_PAGE8);              
+ 105   2                      CScalerSetByte(_P8_YCSEP_CTRL_E0, 0x03);        // YC Seperate Control:1D                       
+ 106   2              }
+ 107   1          CScalerPageSelect(_PAGE8);
+ 108   1          CScalerSetBit(0xA7, ~(_BIT3|_BIT2|_BIT1|_BIT0), _BIT0);
+ 109   1           /*
+ 110   1              if((ucVideoType == ZSECAM )&&(_SOURCE_VIDEO_SV == _GET_INPUT_SOURCE()))
+ 111   1                      CScalerSetBit(_P8_OUTPUT_CTRL_A7, 0xf0, 0x08);  //set bit0-3 as 0x8
+ 112   1              else
+ 113   1                      CScalerSetBit(_P8_OUTPUT_CTRL_A7, 0xf0, 0x00);  //set bit0-3 as 0x0     
+ 114   1                  */
+ 115   1              if (ucVideoType == ZNTSC_50)
+C51 COMPILER V7.20   VIDEO                                                                 10/05/2015 09:30:05 PAGE 3   
+
+ 116   1                      CScalerSetBit(_P8_YCSEP_CTRL_E0, 0xF8, 0x03);           
+ 117   1          CScalerPageSelect(_PAGE9);
+ 118   1              if (ucVideoType == ZPAL_60)     // willy added for pal 60 only
+ 119   1                      CScalerSetBit(_P9_VS_TC_E7, 0xbf, 0x40);        
+ 120   1              else
+ 121   1                      CScalerSetBit(_P9_VS_TC_E7, 0xbf, 0x00);        
+ 122   1      }
+ 123          
+ 124          //--------------------------------------------------
+ 125          // Description  : Disable 2610 output
+ 126          // Input Value  : None
+ 127          // Output Value : None
+ 128          //--------------------------------------------------
+ 129          void CVideoOutputDisable(void)
+ 130          {
+ 131   1              CScalerPageSelect(_PAGE0);              
+ 132   1              CScalerSetBit(_P0_VADC_SWITCH_AF, ~(_BIT2|_BIT1), 0x00);
+ 133   1      }
+ 134          
+ 135          //--------------------------------------------------
+ 136          // Description  : Eisable 2610 output
+ 137          // Input Value  : None
+ 138          // Output Value : None
+ 139          //--------------------------------------------------
+ 140          void CVideoOutputEnable(void)
+ 141          {
+ 142   1      }
+ 143          
+ 144          //--------------------------------------------------
+ 145          // Description  : Soft Reset 2610
+ 146          // Input Value  : None
+ 147          // Output Value : None
+ 148          //--------------------------------------------------
+ 149          void CVideoSoftReset(void)
+ 150          {
+ 151   1              CScalerPageSelect(_PAGE8);
+ 152   1              CScalerSetByte(_P8_SOFT_RESET_CF, 0x01); 
+ 153   1              CTimerDelayXms(10);    
+ 154   1              CScalerSetByte(_P8_SOFT_RESET_CF, 0x00);
+ 155   1      }
+ 156          
+ 157          //--------------------------------------------------
+ 158          // Description  : Set  2610 Saturation
+ 159          // Input Value  : saturationNone
+ 160          // Output Value : None
+ 161          //--------------------------------------------------
+ 162          void CVideoSetVDCSaturation(BYTE ucValue)
+ 163          {       
+ 164   1              CScalerPageSelect(_PAGE8);
+ 165   1              #if(1)
+ 166   1              CScalerSetByte(_P8_SATURATION1_AA, ucValue);      
+ 167   1              #else
+              
+                      BYTE moderesult;
+                      WORD temp;
+                      
+                      CScalerRead(_P8_MODE_DET_STATUS_D3, 1, &moderesult, _NON_AUTOINC);
+                  CTimerDelayXms(20);
+                      moderesult &=0x07;      
+                      //for PAL sat/1.414
+                      temp =((WORD)(ucValue*100));    
+                      if(ucVideoType >= ZPAL_M &&  ucVideoType <= ZPAL_I)
+C51 COMPILER V7.20   VIDEO                                                                 10/05/2015 09:30:05 PAGE 4   
+
+                      {               
+                              ucValue=(temp/141);
+                      }       
+                      CScalerSetByte(_P8_SATURATION1_AA,ucValue);       
+              
+              #endif
+ 184   1      }
+ 185          
+ 186          //--------------------------------------------------
+ 187          // Description  : Set  2610 Contrast
+ 188          // Input Value  : ucValue
+ 189          // Output Value : None
+ 190          //--------------------------------------------------
+ 191          void CVideoSetVDCContrast(BYTE ucValue)
+ 192          {
+ 193   1              CScalerPageSelect(_PAGE8);
+ 194   1              CScalerSetByte(_P8_CONTRAST1_A8,ucValue);         
+ 195   1      }
+ 196          
+ 197          //--------------------------------------------------
+ 198          // Description  : Set  2610 Brightness
+ 199          // Input Value  : ucValue
+ 200          // Output Value : None
+ 201          //--------------------------------------------------
+ 202          void CVideoSetVDCBrightness(BYTE ucValue)
+ 203          {
+ 204   1              CScalerPageSelect(_PAGE8);
+ 205   1              CScalerSetByte(_P8_BRIGHTNESS1_A9,ucValue);       
+ 206   1      }
+ 207          
+ 208          //--------------------------------------------------
+ 209          #if(_VIDEO_TV_SUPPORT)
+              void CSetTvColor(BYTE ucColorMode)
+              {
+                      if(_GET_INPUT_SOURCE() != _SOURCE_VIDEO_TV)
+                     return;
+              
+                  switch(ucColorMode)
+                  {
+                  case _TV_NTSC_M:
+                  case _TV_NTSC_4_BG:
+                  case _TV_NTSC_4_DK:
+                  case _TV_NTSC_4_I:
+                      ucColorMode = 0x00;
+                      break;
+              
+                  case _TV_PAL_M:
+                      ucColorMode = 0x01;
+                      break;
+              
+                  case _TV_PAL_BG:
+                  case _TV_PAL_I:
+                  case _TV_PAL_DK:
+                      ucColorMode = 0x06;
+                      break;
+              
+                  case _TV_PAL_N:
+                      ucColorMode = 0x03;
+                      break;
+              
+                  case _TV_SECAM_BG:
+                  case _TV_SECAM_DK:
+C51 COMPILER V7.20   VIDEO                                                                 10/05/2015 09:30:05 PAGE 5   
+
+                  case _TV_SECAM_L:
+                  case _TV_SECAM_LL:
+                      ucColorMode = 0x07;
+                      break;
+                  }
+              
+                  CScalerPageSelect(_PAGE8);   // TV disable auto mode
+                  CScalerSetByte(0xD2, ucColorMode); 
+              }
+              #endif // #if(_VIDEO_TV_SUPPORT)
+ 250          
+ 251          //--------------------------------------------------
+ 252          // Description  : Display video set color process
+ 253          // Input Value  : None
+ 254          // Output Value : None
+ 255          //--------------------------------------------------
+ 256          void CSetVideoColor(void)
+ 257          {
+ 258   1              // Setup color conversion
+ 259   1              CModeSetupColorConversion();
+ 260   1          CEepromLoadColorTempData();
+ 261   1          CEepromLoadBriConData();
+ 262   1          CEepromLoadHueSatData();
+ 263   1      
+ 264   1          //adjust customer color mode
+ 265   1              #if(_AdjustCustomerColorMode == _ENABLE)
+                      CAdjustCustomerColorMode();
+                      #endif
+ 268   1          CAdjustContrast();
+ 269   1          CAdjustBrightness();
+ 270   1          CAdjustBacklight();
+ 271   1              CAdjustPeakingCoding();
+ 272   1              CVideoSetSaturation(GET_SATURATION());
+ 273   1              CVideoSetVDCConBriCustomer();
+ 274   1              stSystemData.Sharpness &= 0xF0;
+ 275   1              CAdjustSharpnessForScaleUp();
+ 276   1      
+ 277   1          CPowerADCAPLLOff();
+ 278   1          CVideoSetVDCBrightness(0x88);
+ 279   1          CVideoSetVDCContrast(0x90);
+ 280   1              CAccAdjust(GET_DCC_MODE());  // set DCC mode
+ 281   1      
+ 282   1          if (0)//stDisplayInfo.DHWidth > 700)
+ 283   1          {
+ 284   2              CTimerWaitForEvent(_EVENT_DEN_STOP);
+ 285   2              CScalerPageSelect(_PAGE6);
+ 286   2              if(GET_NOISEREDUTION())
+ 287   2                              CScalerSetBit(_P6_SPATIAL_CTRL_DB, ~(_BIT2 |_BIT1), _BIT2 |_BIT1);
+ 288   2              else
+ 289   2                      CScalerSetBit(_P6_UZD_CTRL1_E4, ~(_BIT3 |_BIT2), 0x00);         //For 480i/576i SU case,close NR func.
+ 290   2          }
+ 291   1      }
+ 292          
+ 293          #if(_VIDEO_TV_SUPPORT)
+              //--------------------------------------------------
+              void CSetTVPanelParameter(void)
+              {
+              #if 0//(_PANEL_SELECT == _1280_1024)
+                      if(ucVideoType > ZPAL_60)
+                  {   // 50Hz
+                      CScalerSetBit(_FS_DELAY_FINE_TUNING_43, ~_BIT1, 0x00);
+                      CScalerSetByte(_IVS2DVS_DELAY_LINES_40, 0x00);
+C51 COMPILER V7.20   VIDEO                                                                 10/05/2015 09:30:05 PAGE 6   
+
+                      CScalerSetByte(_IV_DV_DELAY_CLK_ODD_41, 0x3C);
+                              CScalerSetByte(_IV_DV_DELAY_CLK_EVEN_42, 0x21);
+              
+                      CScalerPageSelect(_PAGE1);
+                      CScalerSetBit(_P1_EVEN_FIXED_LAST_LINE_CTRL_CA, ~_BIT0, _BIT0);
+                      CScalerSetBit(_P1_DCLK_FINE_TUNE_OFFSET_MSB_C4, 0xf0, 0x08);
+                      CScalerSetByte(_P1_DCLK_FINE_TUNE_OFFSET_LSB_C5, 0x17);
+                      CScalerSetBit(_P1_DCLK_SPREAD_SPECTRUM_C6, ~_BIT2, _BIT2);
+                  }
+                      else 
+                  {   // 60Hz
+                      CScalerSetBit(_FS_DELAY_FINE_TUNING_43, ~_BIT1, 0x00);
+                      CScalerSetByte(_IVS2DVS_DELAY_LINES_40, 0x00);
+                      CScalerSetByte(_IV_DV_DELAY_CLK_ODD_41, 0x27);
+                              CScalerSetByte(_IV_DV_DELAY_CLK_EVEN_42, 0x0D);
+              
+                      CScalerPageSelect(_PAGE1);
+                      CScalerSetBit(_P1_EVEN_FIXED_LAST_LINE_CTRL_CA, ~_BIT0, _BIT0);
+                      CScalerSetBit(_P1_DCLK_FINE_TUNE_OFFSET_MSB_C4, 0xf0, 0x07);
+                      CScalerSetByte(_P1_DCLK_FINE_TUNE_OFFSET_LSB_C5, 0x2D);
+                      CScalerSetBit(_P1_DCLK_SPREAD_SPECTRUM_C6, ~_BIT2, _BIT2);
+                  }
+              #else
+              
+              //    #error  Error TV Panel Parameter, add new Parameter in "void CSetTVPanelParameter(void)"
+              
+              #endif 
+              }
+              #endif
+ 331          
+ 332          /**
+ 333           * CVideoDisplaySet
+ 334           * Setup VGA display
+ 335           * set video display
+ 336           * @param <none>
+ 337           * @return {none}
+ 338           *
+ 339          */
+ 340          //--------------------------------------------------
+ 341          // Description  : Display video set process
+ 342          // Input Value  : None
+ 343          // Output Value : None
+ 344          //--------------------------------------------------
+ 345          void CVideoDisplaySet(void)
+ 346          {
+ 347   1              BYTE field;                         
+ 348   1          BYTE ucScale = 0;
+ 349   1          WORD iDHTotal;
+ 350   1               
+ 351   1        //  CPowerLightPowerOff();        
+ 352   1      
+ 353   1          CVideoOutputEnable();
+ 354   1          CScalerCodeW(tVIDEO_TABLE_SET_SCALER);
+ 355   1          //double clk input & Swap V8/V6-C-port MSB to LSB sequence into LSB to MSB
+ 356   1              CScalerSetByte(_IPH_ACT_WID_H_16, 0x8A);
+ 357   1          CSetVideoParameter();
+ 358   1              CVideoSoftReset();
+ 359   1         
+ 360   1              //if(CTimerPollingEventProc(60, CMiscModeMeasurePollingEvent))
+ 361   1              //      CModeMeasureData();
+ 362   1      
+ 363   1              #if(_VIDEO_TV_SUPPORT)
+C51 COMPILER V7.20   VIDEO                                                                 10/05/2015 09:30:05 PAGE 7   
+
+                      if(_GET_INPUT_SOURCE() == _SOURCE_VIDEO_TV)
+                  {
+              
+                      bTVSignal = _TV_NO_SIGNAL;
+                      for(field = 0; field < 10; field++)
+                      {
+                              if (gmi_CModeLocked())
+                          {
+                              bTVSignal = _TV_IS_SIGNAL;
+                              break;
+                          }
+                          CTimerDelayXms(5);
+                      }
+              
+                      CScalerPageSelect(_PAGE9);              
+                      CScalerSetByte(_P9_C_LOCK_CONF_B6, (ucVideoType == ZSECAM && bTVSignal == _TV_IS_SIGNAL) ? 0xFB : 
+             -0x6B);
+              
+                      //CSetTvColor(ucTVType);
+              
+                      // add for tv
+                      CScalerPageSelect(_PAGE8);  
+                      CScalerSetByte(0xE1, 0x65); 
+                      CScalerSetByte(0xE2, 0x00); 
+                      CScalerSetByte(0xEA, 0x08);     
+                  }
+                  else
+                      #endif
+ 391   1          {
+ 392   2              CScalerPageSelect(_PAGE8);   // Video enable auto mode
+ 393   2              CScalerSetByte(0xD2, 0x80);  
+ 394   2              //CScalerSetBit(_P8_OUTPUT_CTRL_A7, ~(_BIT0|_BIT1|_BIT2), 0x00);
+ 395   2              CScalerSetByte(0xEA, 0x00);      //CLOSE the VD C's LOW PASS of FILTER}
+ 396   2              CScalerPageSelect(_PAGE9);              
+ 397   2              CScalerSetByte(_P9_C_LOCK_CONF_B6, 0x6B);
+ 398   2          }
+ 399   1              
+ 400   1              if(ucVideoType > ZPAL_60)
+ 401   1          {
+ 402   2                      field    = _VIDEO_50HZ;
+ 403   2              iDHTotal = Panel[ucPanelSelect]->PalDHTotal;
+ 404   2          }
+ 405   1              else
+ 406   1          {
+ 407   2                      field    = _VIDEO_60HZ;
+ 408   2              iDHTotal = Panel[ucPanelSelect]->NtscDHTotal;
+ 409   2          }
+ 410   1                
+ 411   1          stModeInfo.IHTotal      = tVIDEO_TABLE_INPUT_INFO[field][0];
+ 412   1          stModeInfo.IHStartPos   = tVIDEO_TABLE_INPUT_INFO[field][1];
+ 413   1          stModeInfo.IHWidth      = tVIDEO_TABLE_INPUT_INFO[field][2];
+ 414   1          stModeInfo.IVStartPos   = tVIDEO_TABLE_INPUT_INFO[field][3];
+ 415   1          stModeInfo.IVHeight     = tVIDEO_TABLE_INPUT_INFO[field][4];
+ 416   1          stModeInfo.IHFreq       = 157;    // For PAL and NTSC. We can use sync processor to measure the actual
+             - value.
+ 417   1      
+ 418   1          stDisplayInfo.DHWidth   = CCalcPanelWdith();//Panel[ucPanelSelect]->DHWidth;
+ 419   1          stDisplayInfo.DVHeight  = Panel[ucPanelSelect]->DVHeight;
+ 420   1          stDisplayInfo.DVStartPos = Panel[ucPanelSelect]->DVStartPos;
+ 421   1          stDisplayInfo.DHTotal   = iDHTotal;//Panel[ucPanelSelect]->DHTotal;
+ 422   1      
+ 423   1          // Get scaling information
+C51 COMPILER V7.20   VIDEO                                                                 10/05/2015 09:30:05 PAGE 8   
+
+ 424   1          ucScale = 0;
+ 425   1          if(stModeInfo.IVHeight < stDisplayInfo.DVHeight)        ucScale |= _BIT0;    // bit 0 : V scale-up
+ 426   1          if(stModeInfo.IVHeight > stDisplayInfo.DVHeight)        ucScale |= _BIT1;    // bit 1 : V scale-down
+ 427   1          if(stModeInfo.IHWidth < stDisplayInfo.DHWidth)          ucScale |= _BIT2;    // bit 2 : H scale-up
+ 428   1          if(stModeInfo.IHWidth > stDisplayInfo.DHWidth)          ucScale |= _BIT3;    // bit 3 : H scale-down
+ 429   1                       
+ 430   1              // Capture window setup
+ 431   1              CModeSetCaptureWindow(ucScale);         //!set capture size
+ 432   1              CModeSetScaling(ucScale);         
+ 433   1              CScalerSetBit(_IPH_ACT_WID_H_16, ~_BIT7, 0x00);//Video8 C-port MSB & LSB Swap(Normal)
+ 434   1      
+ 435   1              CModeSetDisplay(ucScale);
+ 436   1              // Disable SRGB
+ 437   1              CScalerSetBit(_COLOR_CTRL_62, ~(_BIT2), 0x00);
+ 438   1      
+ 439   1          CSetVideoColor();
+ 440   1      
+ 441   1              #if(_DE_INTERLACE_SUPPORT == _ON)
+                      #if(_DE_INTERLACE_TEST_OPTION==_ENABLE) 
+                      if(!bDIstatus)
+                              CModeDeInterlaceSetting();
+                      else
+                  {
+                              CScalerSetBit(_SCALE_CTRL_32, ~(_BIT7 ), _BIT7);        //video mode compensation enable
+                              CScalerPageSelect(_PAGE6);
+                              CScalerSetBit(_P6_ENABLE_BIST_CTRL_A0, ~_BIT3, 0x00);   //Disable De-interlace Mode             
+                      }                       
+                      #else
+                      CModeDeInterlaceSetting();      
+                      #endif          
+                      #endif
+ 455   1      
+ 456   1              CAdjustInterlaceIVS2DVSDelay();
+ 457   1              
+ 458   1              pData[0] = CFrameSyncDo();
+ 459   1      
+ 460   1              if (pData[0] == 2) 
+ 461   1          {
+ 462   2              //      CModeResetMode();
+ 463   2              //      return;
+ 464   2              }
+ 465   1      
+ 466   1          
+ 467   1              #if(_VIDEO_TV_SUPPORT)
+                  if(_GET_INPUT_SOURCE() == _SOURCE_VIDEO_TV)
+                  {
+                      CSetTVPanelParameter();
+                  }
+                      #endif
+ 473   1      
+ 474   1              SET_MODESTABLE();
+ 475   1      
+ 476   1              CTimerDelayXms(100);
+ 477   1              CModeSetupEtcs(_FUNCTION_DISABLE);
+ 478   1         
+ 479   1          if (ucVideoType == ZNTSC || ucVideoType == ZNTSC_443 || ucVideoType == ZNTSC_50)
+ 480   1              gmi_CAdjustVDCHue(GET_HUE());
+ 481   1          else
+ 482   1                  gmi_CAdjustVDCHue(50);
+ 483   1                                                                
+ 484   1              if(_GET_INPUT_SOURCE() == _SOURCE_VIDEO_AV && (ucVideoType == ZNTSC_443 || ucVideoType == ZPAL_60))
+ 485   1          {
+C51 COMPILER V7.20   VIDEO                                                                 10/05/2015 09:30:05 PAGE 9   
+
+ 486   2      
+ 487   2                      CScalerPageSelect(_PAGE9);              
+ 488   2              CScalerSetBit(_P9_HLOOP_MAXSTATE_C1, ~(_BIT2 | _BIT1 | _BIT0), 0x01);
+ 489   2          }
+ 490   1                              /*
+ 491   1          CScalerPageSelect(_PAGE6);
+ 492   1          CScalerSetBit(0xC2, ~(_BIT0), 0);
+ 493   1          CScalerSetByte(0xC3, 0x7F); 
+ 494   1          CScalerSetByte(0xC4, 0x4A);
+ 495   1          CScalerSetByte(0xC5, 0xF6);
+ 496   1          CScalerSetByte(0xC6, 0x00);
+ 497   1          CScalerSetByte(0xC7, 0x80);
+ 498   1          CScalerSetByte(0xC8, 0x80);
+ 499   1          CScalerSetByte(0xC9, 0x00);
+ 500   1          CScalerSetByte(0xCA, 0x0A);
+ 501   1          CScalerSetByte(0xCB, 0x0A);
+ 502   1          CScalerSetByte(0xCC, 0x07);
+ 503   1           
+ 504   1          CScalerPageSelect(_PAGE7);
+ 505   1          CScalerSetBit(0xAA, ~(_BIT0), 0);    
+ 506   1          CScalerSetByte(0xAB, 0x7E);                  //PEAKING C0
+ 507   1          CScalerSetByte(0xAC, 0x0B);                  //PEAKING C1
+ 508   1          CScalerSetByte(0xAD, 0x36);                  //PEAKING C2
+ 509   1          CScalerSetByte(0xAE, 0x00);
+ 510   1          CScalerSetByte(0xAF, 0x80);
+ 511   1          CScalerSetByte(0xB0, 0x80);
+ 512   1          CScalerSetByte(0xB1, 0x00);
+ 513   1          CScalerSetByte(0xB2, 0x08);             //POS RANGE            //08            80
+ 514   1          CScalerSetByte(0xB3, 0x80);                 //NEG RANGE                //40
+ 515   1          CScalerSetByte(0xB4, 0x0F);                 //CORING                   //0A
+ 516   1           
+ 517   1          CScalerPageSelect(_PAGE8);
+ 518   1          CScalerSetBit(0xA7, ~(_BIT3|_BIT2|_BIT1|_BIT0), _BIT0);
+ 519   1          CScalerSetBit(0xEA, ~(_BIT3|_BIT2|_BIT1|_BIT0), _BIT3|_BIT2|_BIT1|_BIT0);
+ 520   1          CScalerSetByte(0xE2, 0x00);                 //70
+ 521   1      
+ 522   1              CScalerPageSelect(_PAGE6);
+ 523   1          if (ucVideoType == ZNTSC || ucVideoType == ZNTSC_443 || ucVideoType == ZNTSC_50)
+ 524   1              CScalerSetByte(0xD8, 0x0f);      //Close  I DOMAIN's DCTI,Open GAIN to 0xOF
+ 525   1          else
+ 526   1              CScalerSetByte(0xD8, 0x8f);      //Open  I DOMAIN's DCTI,Open GAIN to 0xOF
+ 527   1              CScalerSetByte(0xC1, 0x00);      //Close I DOMAIN's PEAKING
+ 528   1              
+ 529   1              CScalerPageSelect(_PAGE7);
+ 530   1              CScalerSetByte(0xA1, 0xC0);      //Open  D DOMAIN's DCTI, Open GAIN to 0xOF
+ 531   1              CScalerSetByte(0xA3, 0x05);      //DLTi_Gain
+ 532   1              CScalerSetByte(0xA4, 0x01);      //DLTi_Gain_Threshold   0x1e
+ 533   1              CScalerSetByte(0xA5, 0x70);      //DLTi_Options
+ 534   1              CScalerSetByte(0xA6, 0x0F);      //Open GAIN to 0xOF
+ 535   1      
+ 536   1              CScalerPageSelect(_PAGE8);
+ 537   1          if(_GET_INPUT_SOURCE() == _SOURCE_VIDEO_TV)
+ 538   1          {   
+ 539   1              CScalerSetByte(0xEA, 0x08);     
+ 540   1              CScalerSetByte(0xA8, 0x85);                             //Contrast
+ 541   1              CScalerSetByte(0xA9, 0x76);                        //Brightness
+ 542   1          }
+ 543   1          else
+ 544   1          {
+ 545   1              CScalerSetByte(0xEA, 0x00);      //CLOSE the VD C's LOW PASS of FILTER}
+ 546   1              CScalerSetByte(0xA8, 0x90);                             //Contrast
+ 547   1              CScalerSetByte(0xA9, 0x7b);                        //Brightness   0x85
+C51 COMPILER V7.20   VIDEO                                                                 10/05/2015 09:30:05 PAGE 10  
+
+ 548   1          }   
+ 549   1      */   
+ 550   1      }
+ 551          
+ 552          //--------------------------------------------------
+ 553          //
+ 554          //      void CSetVideoModeReady(void)
+ 555          //--------------------------------------------------
+ 556          void CSetVideoModeReady(void)
+ 557          {
+ 558   1          gmi_CAdjustVDCHue(50);
+ 559   1              CTimerCancelTimerEvent(CModeNoSignalEvent);
+ 560   1              CTimerCancelTimerEvent(CModeNoCableEvent);
+ 561   1              CTimerCancelTimerEvent(CModeNoSupportEvent);
+ 562   1              CTimerCancelTimerEvent(CModePowerSavingEvent);
+ 563   1              SET_READYFORDISPLAY();
+ 564   1          bShowOSDCurr = (bit)(CScalerGetBit(_OVERLAY_CTRL_6C, _BIT0));
+ 565   1          CScalerSetBit(_OVERLAY_CTRL_6C, ~_BIT0, 0x00);
+ 566   1              CVideoDisplaySet();
+ 567   1      #if(_VIDEO_TV_SUPPORT)
+                  if (_GET_INPUT_SOURCE() == _SOURCE_VIDEO_TV)
+                  {
+                      TVNoSignalCount = 0;
+                      TVSignalCount   = 0;
+                  }
+              #endif
+ 574   1          CScalerSetBit(_OVERLAY_CTRL_6C, ~_BIT0, bShowOSDCurr);         
+ 575   1          CLR_LIGHTPOWERSTATUS();
+ 576   1          ucSearchCount     = 1;
+ 577   1          ucTVSyncFailCount = 0;
+ 578   1              ucCurrState       = _ACTIVE_STATE;
+ 579   1      }
+ 580                  
+ 581          /**
+ 582           * CVideoProcess
+ 583           * The VDC input's state machine.
+ 584           * If the input source is throught VDC, it will call this function to
+ 585           * process display state. There are 4 states here.
+ 586           * @param <none>
+ 587           * @return {none}
+ 588           *
+ 589          */     
+ 590          //--------------------------------------------------
+ 591          // Description  : The VDC input's state machine.
+ 592          // If the input source is throught VDC, it will call this function to
+ 593          // process display state. There are 4 states here.
+ 594          // Input Value  : None
+ 595          // Output Value : None
+ 596          //--------------------------------------------------
+ 597          void CVideoProcess(void)
+ 598          {
+ 599   1              switch (ucCurrState) 
+ 600   1              {
+ 601   2                      case _SEARCH_STATE:     
+ 602   2                              if(gmi_CVideoModeChange())
+ 603   2                              {
+ 604   3                      CSetVideoModeReady();
+ 605   3                              } 
+ 606   2                              else 
+ 607   2                  {
+ 608   3                                      ucCurrState = _NOSIGNAL_STATE;
+ 609   3                      SET_READYFORDISPLAY();
+C51 COMPILER V7.20   VIDEO                                                                 10/05/2015 09:30:05 PAGE 11  
+
+ 610   3                  }
+ 611   2                              break;
+ 612   2      
+ 613   2                      case _ACTIVE_STATE:
+ 614   2                              if (!gmi_CVideoIsExist())
+ 615   2                              {         
+ 616   3                                      CModeResetMode();  
+ 617   3                                      break;
+ 618   3                              }
+ 619   2      #if(_VIDEO_TV_SUPPORT)
+                          bTVSigChange();
+              #endif
+ 622   2      
+ 623   2                 // CVideoFixedFHFVBug();                       
+ 624   2                              if (GET_READYFORDISPLAY() == _TRUE) 
+ 625   2                              {
+ 626   3                      CPowerPanelOn();
+ 627   3                                      CLR_READYFORDISPLAY();
+ 628   3                      SET_OSD_READYFORDISPLAY();
+ 629   3                              }    
+ 630   2      
+ 631   2                  if (ucSearchCount)
+ 632   2                      ucSearchCount++;
+ 633   2                                                                                         
+ 634   2      #if(_VIDEO_TV_SUPPORT)
+                #if (_TV_AFC)
+                          CTVAFC();
+                #endif
+              #endif               
+ 639   2                  if (ucSearchCount < 100)                          
+ 640   2                      break;
+ 641   2                        
+ 642   2                  ucSearchCount = 0;
+ 643   2                              if (GET_LIGHTPOWERSTATUS() == _OFF) 
+ 644   2                              {
+ 645   3                      CScalerSetBit(_VDISP_CTRL_28, ~(_BIT5), (_BIT3));
+ 646   3                                      CPowerLightPowerOn();
+ 647   3      
+ 648   3                      if (GET_FIRST_SHOW_NOTE())
+ 649   3                         ucOsdEventMsg = _DO_SHOW_NOTE;
+ 650   3      #if(_VIDEO_TV_SUPPORT)
+                              else if(_GET_INPUT_SOURCE() == _SOURCE_VIDEO_TV && bChangeChannel)
+                                 CShowTVNumber(stTvInfo.CurChn, _SHOW_CH_TV_NUMBER | _SHOW_CH_TV_TYPE); 
+              #endif
+ 654   3                              }
+ 655   2                      
+ 656   2                              break;
+ 657   2      
+ 658   2                      case _NOSIGNAL_STATE:
+ 659   2                              if (GET_READYFORDISPLAY()) 
+ 660   2                              {
+ 661   3                      CLR_READYFORDISPLAY();
+ 662   3                                      CModeSetFreeRun();  
+ 663   3                      SET_OSD_READYFORDISPLAY();
+ 664   3                              }    
+ 665   2      
+ 666   2                  if (gmi_CModeLocked())
+ 667   2                              {
+ 668   3                      COsdDispOsdTimerEvent();
+ 669   3                      ucTVSyncFailCount = 250;
+ 670   3                                      CModeResetMode();
+ 671   3                              }
+C51 COMPILER V7.20   VIDEO                                                                 10/05/2015 09:30:05 PAGE 12  
+
+ 672   2                              break;
+ 673   2      
+ 674   2                      case _SLEEP_STATE:
+ 675   2                  if (gmi_CModeLocked())
+ 676   2                              {      
+ 677   3                      ucTVSyncFailCount = 250;
+ 678   3                                      CModeResetMode();
+ 679   3                              }
+ 680   2                              break;
+ 681   2      
+ 682   2                      default:
+ 683   2                              break;
+ 684   2              }
+ 685   1      }
+ 686          
+ 687          //--------------------------------------------------
+ 688          #if(_VIDEO_TV_SUPPORT)
+              void bTVSigChange(void)
+              {
+                  if(_GET_INPUT_SOURCE() == _SOURCE_VIDEO_TV)
+                  {
+                      if (gmi_CModeLocked())
+                      {     
+                          if (TVNoSignalCount)    TVNoSignalCount--;
+              
+                          if ((bTVSignal == _TV_NO_SIGNAL) && (TVSignalCount < (_TV_SIGNAL_FAIL+10)))
+                          {
+                              TVSignalCount++;
+                              if (TVSignalCount > _TV_SIGNAL_FAIL)
+                              {         
+                                  TVNoSignalCount = 0;
+                                  TVSignalCount   = 0;
+                                  bTVSignal       = _TV_IS_SIGNAL;
+                                      CScalerPageSelect(_PAGE9);              
+                                  CScalerSetByte(_P9_C_LOCK_CONF_B6, (ucVideoType == ZSECAM && bTVSignal == _TV_IS_SIGNA
+             -L) ? 0xFB : 0x6B);
+                              }
+                          }
+                      }
+                      else
+                      {
+                          if (TVSignalCount)    TVSignalCount--;
+              
+                          if ((bTVSignal == _TV_IS_SIGNAL) && (TVNoSignalCount < (_TV_SIGNAL_FAIL+10)))
+                          {
+                              TVNoSignalCount++;
+                              if (TVNoSignalCount > _TV_SIGNAL_FAIL)
+                              {
+                                  TVNoSignalCount = 0;
+                                  TVSignalCount   = 0;
+                                  bTVSignal       = _TV_NO_SIGNAL;
+                                      CScalerPageSelect(_PAGE9);              
+                                  CScalerSetByte(_P9_C_LOCK_CONF_B6, (ucVideoType == ZSECAM && bTVSignal == _TV_IS_SIGNA
+             -L) ? 0xFB : 0x6B);
+                              }
+                          } 
+                      }
+                  }
+              }
+              #endif
+ 730          
+ 731          #endif  // End of #if(_VIDEO_SUPPORT == _ON)
+C51 COMPILER V7.20   VIDEO                                                                 10/05/2015 09:30:05 PAGE 13  
+
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1301    ----
+   CONSTANT SIZE    =    658    ----
+   XDATA SIZE       =      3       7
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =      4    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

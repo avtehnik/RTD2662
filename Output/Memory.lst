@@ -1,0 +1,34 @@
+C51 COMPILER V7.20   MEMORY                                                                10/05/2015 09:30:05 PAGE 1   
+
+
+C51 COMPILER V7.20, COMPILATION OF MODULE MEMORY
+OBJECT MODULE PLACED IN .\Output\Memory.obj
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE Core\code\Memory.C LARGE OPTIMIZE(9,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(
+                    -.\Output\Memory.lst) OBJECT(.\Output\Memory.obj)
+
+line level    source
+
+   1          //----------------------------------------------------------------------------------------------------
+   2          // ID Code      : RTD2528R_Memory.c No.0000
+   3          // Update Note  : 
+   4          //
+   5          //----------------------------------------------------------------------------------------------------
+   6          
+   7          #define __RTD2528R_MEMORY__
+   8          
+   9          #include  "Core\Header\Include.h"
+  10          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   ----    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

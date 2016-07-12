@@ -1,0 +1,309 @@
+C51 COMPILER V7.20   INT                                                                   10/05/2015 09:30:22 PAGE 1   
+
+
+C51 COMPILER V7.20, COMPILATION OF MODULE INT
+OBJECT MODULE PLACED IN .\Output\Int.obj
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE Core\code\mcu\Int.c LARGE OPTIMIZE(9,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT
+                    -(.\Output\Int.lst) OBJECT(.\Output\Int.obj)
+
+line level    source
+
+   1          //----------------------------------------------------------------------------------------------------
+   2          // ID Code      : Int.c No.0002
+   3          // Update Note  :
+   4          //
+   5          //----------------------------------------------------------------------------------------------------
+   6          
+   7          #include "Core\Header\Include.h"
+   8          
+   9          #if defined(CONFIG_VBI_ENABLE)
+              void VBI_GetData();
+              #else
+  12          #define VBI_GetData();
+  13          #endif
+  14          
+  15          BYTE idata ucKeyADValue;
+  16          
+  17          //--------------------------------------------------
+  18          // Timer0 Interrupt (375 us)
+  19          //--------------------------------------------------
+  20          void IntProcTimer0(void) interrupt 1
+  21          {
+  22   1      #if(0)
+                      static BYTE data ucTimer0Cnt = 0x00;
+              
+                  TR0 = _ON;
+                  TL0 = _TIMER0_COUNT_LBYTE;
+                  TH0 = _TIMER0_COUNT_HBYTE;
+              
+                  bNotifyTimer0Int = _TRUE;
+              
+                  if(--ucTimer0Cnt)
+                  {
+              
+                  }
+                  else
+                  {
+                      if(bTimer0Ctrl == _FALSE)
+                      {
+                          CTimerDecreaseTimerCnt();
+                      }
+                      ucTimer0Cnt = 10;
+                  }
+              
+              #else
+  45   1              static BYTE data ucTimer0Cnt = 0x00;
+  46   1              static BYTE data ucTimerCnt = 10;
+  47   1      
+  48   1              
+  49   1              EA = 0;
+  50   1              TR0 = _ON;
+  51   1      
+  52   1              TL0 = _TIMER0_COUNT_LBYTE;      
+  53   1              TH0 = _TIMER0_COUNT_HBYTE;
+  54   1              
+C51 COMPILER V7.20   INT                                                                   10/05/2015 09:30:22 PAGE 2   
+
+  55   1              
+  56   1              if((++ucTimer0Cnt) >= _EVENT_PERIOD) 
+  57   1              {
+  58   2                      ucTimer0Cnt = 0;
+  59   2                      bNotifyTimer0Int = _TRUE;
+  60   2                      if(ucTimerCnt)
+  61   2                              ucTimerCnt--;
+  62   2                              
+  63   2                      else if(bTimer0Ctrl == _FALSE) 
+  64   2                      {
+  65   3      
+  66   3                              CTimerDecreaseTimerCnt();
+  67   3                              ucTimerCnt = 0x0a;      //including the above 1.125ms, this will
+  68   3                                                                      //give about 5 sec delay before OSD
+  69   3                                                                      //menu/channel# got turn off
+  70   3                      }
+  71   2      
+  72   2      #if(_VIDEO_TV_SUPPORT)
+              #if(_SLEEP_FUNC)
+                          if (0xff != ucAutoPowerDownTime && 0x00 != ucAutoPowerDownTime)
+                          {
+                              ucMinuteCount++;
+                         if(ucMinuteCount == 1000)
+                             ucAutoPowerDownTime--;
+                         if (ucMinuteCount == _ONE_MINUTE_COUNT)  // 1 minute
+                             ucMinuteCount = 0;
+                     }
+              #endif
+              #endif
+  84   2                      }
+  85   1                      EA = 1;
+  86   1      #endif  
+  87   1      }
+  88          
+  89          //--------------------------------------------------
+  90          #if(_RS232_EN)
+              
+              //--------------------------------------------------
+              void UartRxData(void)
+              {
+                      if (fUartStart == 0) 
+                      {
+                              pUartData[0] = SBUF;
+                              fUartStart = 1;
+                              switch(pUartData[0])
+                              {
+                                      case UartCMD_DebugModeEnter:            // Enter debug mode
+                                      case UartCMD_DebugModeExit:             // Exit debug mode
+                                              ucUartRxCount = 4;
+                                              break;
+                                      case UartCMD_CScalerRead:                       // Read RTD2553V
+                                      case UartCMD_I2CRead:                           // Read I2C
+                                      case UartCMD_I2CWrite:                          // Write I2C
+                                              ucUartRxCount = 3;
+                                              break;
+                                      case UartCMD_CScalerWrite:              // Write RTD2553V
+                                              ucUartRxCount = 2;
+                                              break;
+                                      default:
+                                              fUartStart = 0;
+                                              break;
+                              }
+C51 COMPILER V7.20   INT                                                                   10/05/2015 09:30:22 PAGE 3   
+
+              
+                              ucUartRxIndex = 1;
+                      }
+                      else 
+                      {
+                              pUartData[ucUartRxIndex] = SBUF;
+                              ucUartRxIndex++;
+                              if (ucUartRxIndex > ucUartRxCount)
+                              {
+                                      fUartRxCmdSuccess = 1;
+                                      fUartStart = 0;
+                              }
+                      }
+              }
+              
+              //--------------------------------------------------
+              void IntProcUart(void) interrupt 4
+              {
+                      ES = 0; // disable uart interrupt.
+                      if (TI) 
+                      {
+                              TI = 0;
+                      }
+                      else if (RI) 
+                      {
+                              UartRxData();
+                              RI = 0;
+                      }
+                      ES = 1;
+              }
+              
+              
+              #endif
+ 150          //--------------------------------------------------
+ 151          
+ 152          void IntProcDdcc0(void)  interrupt 0
+ 153          {
+ 154   1          BYTE tempbuf;
+ 155   1      
+ 156   1              EA=0;
+ 157   1      
+ 158   1              IE0 = 0;
+ 159   1      
+ 160   1          //bLED1 ^= 1;
+ 161   1              //bLED2 ^= bLED1;
+ 162   1      
+ 163   1              /*MCU_I2C_IRQ_CTRL2_FF2A  &= 0xDF; //host write/read enable
+ 164   1          if(!bRunCommand)
+ 165   1          {
+ 166   1              tempbuf = MCU_I2C_STATUS_FF27;   
+ 167   1      
+ 168   1              if(tempbuf & 0x08)
+ 169   1                  MCU_I2C_DATA_OUT_FF26 = TxBUF;       
+ 170   1      
+ 171   1              if(tempbuf & 0x01) 
+ 172   1                  ucDdcciCommandNumber = 0;
+ 173   1      
+ 174   1              if(tempbuf & 0x02) 
+ 175   1                  ucDdcciCommandNumber=0;
+ 176   1                              
+ 177   1              if(tempbuf & 0x04)
+ 178   1              {
+C51 COMPILER V7.20   INT                                                                   10/05/2015 09:30:22 PAGE 4   
+
+ 179   1                  if(ucDdcciCommandNumber==0)
+ 180   1                      ucDdcciData[ucDdcciCommandNumber] = MCU_I2C_SUB_IN_FF24;
+ 181   1      
+ 182   1                  ucDdcciCommandNumber++;
+ 183   1                  ucDdcciData[ucDdcciCommandNumber] = MCU_I2C_DATA_IN_FF25;
+ 184   1                  bRunCommand=_TRUE; 
+ 185   1              }
+ 186   1      
+ 187   1              MCU_I2C_STATUS_FF27 = tempbuf & 0xc0;
+ 188   1          }*/
+ 189   1      
+ 190   1          EA=1;
+ 191   1      }
+*** WARNING C280 IN LINE 154 OF CORE\CODE\MCU\INT.C: 'tempbuf': unreferenced local variable
+ 192          
+ 193          void IntProcDdcci(void)  interrupt 2
+ 194          {
+ 195   1          BYTE tempbuf;
+ 196   1      
+ 197   1              EA=0;
+ 198   1      
+ 199   1              tempbuf = MCU_IRQ_STATUS_FF00;
+ 200   1      
+ 201   1              if (tempbuf & 0x01)                                     // DDC_IRQ_EVENT
+ 202   1              {       
+ 203   2                  MCU_IRQ_STATUS_FF00 &= ~0x01;
+ 204   2      
+ 205   2                      MCU_I2C_IRQ_CTRL2_FF2A  |= 0x20;
+ 206   2              
+ 207   2                      tempbuf = MCU_I2C_STATUS_FF27;
+ 208   2              
+ 209   2                      if(tempbuf & 0x80)                                                      // A_WR_I
+ 210   2                              MCU_I2C_STATUS_FF27 &= ~0x80;
+ 211   2                      if(tempbuf & 0x40)                                                      // D_WR_I
+ 212   2                              MCU_I2C_STATUS_FF27 &= ~0x40;
+ 213   2                      if(tempbuf & 0x20)                                                      // DDC_128VS1_I
+ 214   2                              MCU_I2C_STATUS_FF27 &= ~0x20;
+ 215   2                      if(tempbuf & 0x10)                                                      // STOP_I
+ 216   2                              MCU_I2C_STATUS_FF27 &= ~0x10;
+ 217   2              
+ 218   2                      if(tempbuf & 0x08)                                                      // D_OUT_I
+ 219   2                      {
+ 220   3                              MCU_I2C_DATA_OUT_FF26 = ucKeyADValue;
+ 221   3                              //bLED2 ^= 1;
+ 222   3                      }
+ 223   2      
+ 224   2                      if(tempbuf & 0x04)                                                      // D_IN_I
+ 225   2                      {
+ 226   3                              tempbuf = MCU_I2C_SUB_IN_FF24;
+ 227   3                              tempbuf = MCU_I2C_DATA_IN_FF25;
+ 228   3                              //bLED1 ^= 1;
+ 229   3                      }
+ 230   2              
+ 231   2                      if(tempbuf & 0x02)                                                      // SUB_I
+ 232   2                      {
+ 233   3                              MCU_I2C_STATUS_FF27 &= ~0x02;
+ 234   3      
+ 235   3                              //bLED1 ^= 1;
+ 236   3                              //bLED2 = 0;
+ 237   3                      }
+ 238   2      
+ 239   2                      if(tempbuf & 0x01)                                                      // SLV_I
+C51 COMPILER V7.20   INT                                                                   10/05/2015 09:30:22 PAGE 5   
+
+ 240   2                      {
+ 241   3                      MCU_I2C_STATUS_FF27 &= ~0x01;
+ 242   3      
+ 243   3                              //bLED1 ^= 1;
+ 244   3                              //bLED2 = 0;
+ 245   3                      }
+ 246   2      
+ 247   2                      MCU_I2C_IRQ_CTRL2_FF2A  &= ~0x20;
+ 248   2              }
+ 249   1      
+ 250   1          IE1 = 0;
+ 251   1      
+ 252   1              EA=1;
+ 253   1      }
+ 254          
+ 255          #if defined(CONFIG_VBI_ENABLE)
+              
+              void IntProc_Timer1(void) interrupt 3
+              {
+                      ET1 = 0;        // Disable Timer 1 interrupt
+                      VBI_GetData();
+                      TL1 = _TIMER1_COUNT_LBYTE;  // (for 1ms)
+                      TH1 = _TIMER1_COUNT_HBYTE;  // Load Timer1 hifh-byte  (for 1ms)
+                      TR1 = 1;    // Start Timer1
+                      ET1 = 1;        // Enable Timer 1 interrupt
+              }
+              
+              /**
+               * The VBI interrupt service routine.
+               */
+              void VBI_GetData(void) //VBI INTERRUPT handler
+              {
+                      ClearVerLineCompSts();
+              }
+              
+              #endif
+ 276          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    254    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----       1
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      2    ----
+   IDATA SIZE       =      1    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,51 @@
+C51 COMPILER V7.20   STRUCT                                                                10/05/2015 09:30:04 PAGE 1   
+
+
+C51 COMPILER V7.20, COMPILATION OF MODULE STRUCT
+OBJECT MODULE PLACED IN .\Output\Struct.obj
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE Core\code\Struct.c LARGE OPTIMIZE(9,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(
+                    -.\Output\Struct.lst) OBJECT(.\Output\Struct.obj)
+
+line level    source
+
+   1          //----------------------------------------------------------------------------------------------------
+   2          // ID Code      : Struct.c No.0000
+   3          // Update Note  :
+   4          //
+   5          //----------------------------------------------------------------------------------------------------
+   6          
+   7          #include "Core\Header\Include.h"
+   8          
+   9          
+  10          //--------------------------------------------------
+  11          // Global Variables
+  12          //--------------------------------------------------
+  13          StructModeUserDataType                  xdata   stModeUserData;
+  14          StructModeUserCenterDataType            xdata   stModeUserCenterData;
+  15          StructSystemDataType                    xdata   stSystemData;
+  16          StructICMColor                                  xdata   stICMColor;
+  17          StructOsdUserDataType                   xdata   stOsdUserData;
+  18          StructAdcDataType                       xdata   stAdcData;
+  19          StructYPbPrDataType                     xdata   stYPbPrData;
+  20          StructColorProc0DataType                xdata   stConBriData;
+  21          StructColorProc1DataType                xdata   stColorTempData;
+  22          ModeInformationType                     idata   stModeInfo;
+  23          DisplayTableType                        idata   stDisplayInfo;
+  24          StructTvDataType                                        xdata   stTvInfo;
+  25          StructAudioDataType                                     xdata   stAudioData;
+  26          StructHueSaturationDataType             xdata   stHueSatData;
+  27          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   ----    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =     87    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =     30    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

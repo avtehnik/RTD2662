@@ -1,0 +1,690 @@
+; Core\code\vbi.SRC generated from: Core\code\vbi.c
+; COMPILER INVOKED BY:
+;        C:\Keil\C51\BIN\C51.EXE Core\code\vbi.c COMPACT OPTIMIZE(9,SPEED) BROWSE SRC DEBUG OBJECTEXTEND CODE SYMBOLS PRINT(.\Output\vbi.lst) PREPRINT(.\Output\vbi.i) OBJECT(.\Output\vbi.obj)
+
+$NOMOD51
+
+NAME	VBI
+
+P0	DATA	080H
+bSOURCE_KEY	BIT	0A0H.6
+P1	DATA	090H
+P2	DATA	0A0H
+P3	DATA	0B0H
+bSCALERSDIO3	BIT	090H.6
+P4	DATA	0A5H
+T0	BIT	0B0H.4
+AC	BIT	0D0H.6
+bI2CSCL	BIT	0B0H.2
+T1	BIT	0B0H.5
+T2	BIT	090H.0
+EA	BIT	0A8H.7
+PWMCON1	DATA	0DCH
+bHot_Plug	BIT	090H.7
+bA_SWITCH2	BIT	0B0H.7
+IE	DATA	0A8H
+bIR_GPIO	BIT	0B0H.3
+bRESETB_CC	BIT	0A0H.0
+EXF2	BIT	0C8H.6
+RD	BIT	0B0H.7
+ES	BIT	0A8H.4
+IP	DATA	0B8H
+RI	BIT	098H.0
+INT0	BIT	0B0H.2
+CY	BIT	0D0H.7
+TI	BIT	098H.1
+INT1	BIT	0B0H.3
+RCAP2H	DATA	0CBH
+PS	BIT	0B8H.4
+SP	DATA	081H
+T2EX	BIT	090H.1
+OV	BIT	0D0H.2
+RCAP2L	DATA	0CAH
+C_T2	BIT	0C8H.1
+WR	BIT	0B0H.6
+bRIGHT_KEY	BIT	0A0H.5
+RCLK	BIT	0C8H.5
+TCLK	BIT	0C8H.4
+SBUF	DATA	099H
+PCON	DATA	087H
+SCON	DATA	098H
+TMOD	DATA	089H
+TCON	DATA	088H
+bAUDIO_AN_EN	BIT	080H.0
+bPOWER_KEY	BIT	0A0H.1
+bAUDIO_SEL_A	BIT	080H.1
+bVD2612_PD	BIT	0B0H.5
+bAUDIO_SEL_B	BIT	080H.2
+IE0	BIT	088H.1
+bAUDIO_SEL_C	BIT	080H.7
+IE1	BIT	088H.3
+B	DATA	0F0H
+CP_RL2	BIT	0C8H.0
+PWMP	DATA	0D9H
+ACC	DATA	0E0H
+ET0	BIT	0A8H.1
+ET1	BIT	0A8H.3
+TF0	BIT	088H.5
+ET2	BIT	0A8H.5
+TF1	BIT	088H.7
+bSCALERSCSB	BIT	090H.5
+TF2	BIT	0C8H.7
+RB8	BIT	098H.2
+TH0	DATA	08CH
+bAUDIO_PWM_A	BIT	090H.1
+EX0	BIT	0A8H.0
+IT0	BIT	088H.0
+TH1	DATA	08DH
+bSCALERSCLK	BIT	090H.4
+TB8	BIT	098H.3
+EX1	BIT	0A8H.2
+IT1	BIT	088H.2
+TH2	DATA	0CDH
+bVGACONNECT	BIT	080H.3
+P	BIT	0D0H.0
+SM0	BIT	098H.7
+TL0	DATA	08AH
+SM1	BIT	098H.6
+TL1	DATA	08BH
+bUP_KEY	BIT	0A0H.3
+SM2	BIT	098H.5
+TL2	DATA	0CCH
+bEARPHONE_DETECT	BIT	080H.6
+PT0	BIT	0B8H.1
+bBANKSWITCH	BIT	090H.0
+PT1	BIT	0B8H.3
+RS0	BIT	0D0H.3
+PT2	BIT	0B8H.5
+TR0	BIT	088H.4
+RS1	BIT	0D0H.4
+TR1	BIT	088H.6
+bA_SWITCH	BIT	0B0H.6
+TR2	BIT	0C8H.2
+PX0	BIT	0B8H.0
+bLEFT_KEY	BIT	0A0H.4
+PX1	BIT	0B8H.2
+DPH	DATA	083H
+DPL	DATA	082H
+bMENU_KEY	BIT	0A0H.7
+EXEN2	BIT	0C8H.3
+bPANELPOWER	BIT	090H.2
+REN	BIT	098H.4
+bDOWN_KEY	BIT	0A0H.2
+T2CON	DATA	0C8H
+AUDIO_PWM_A	DATA	0DBH
+bLIGHTPOWER	BIT	090H.3
+RXD	BIT	0B0H.0
+CKCON	DATA	08EH
+TXD	BIT	0B0H.1
+bIIC_SDA	BIT	0B0H.4
+F0	BIT	0D0H.5
+bI2CSDA	BIT	0B0H.4
+PSW	DATA	0D0H
+bIIC_SCL	BIT	0B0H.2
+?PR?CVbiInitial?VBI  SEGMENT CODE 
+?PR?_ParityCheck?VBI SEGMENT CODE 
+?PR?ClearVerLineCompSts?VBI              SEGMENT CODE 
+?PD?ClearVerLineCompSts?VBI              SEGMENT XDATA INPAGE OVERLAYABLE 
+?BI?ClearVerLineCompSts?VBI              SEGMENT BIT OVERLAYABLE 
+?C_INITSEG           SEGMENT CODE 
+?CO?VBI              SEGMENT CODE 
+?XD?VBI              SEGMENT XDATA 
+?BI?VBI              SEGMENT BIT 
+?PD?VBI              SEGMENT XDATA INPAGE 
+?PR?VBI              SEGMENT CODE 
+	EXTRN	CODE (_CScalerReadByte)
+	EXTRN	BIT (?_CScalerReadByte?BIT)
+	EXTRN	CODE (_I2CSendAddr)
+	EXTRN	CODE (_CI2cRead1)
+	EXTRN	XDATA (?_CI2cRead1?BYTE)
+	EXTRN	CODE (_I2CSendByte)
+	EXTRN	CODE (I2CSendStop)
+	EXTRN	CODE (?C?COPY)
+	PUBLIC	CCBuffer
+	PUBLIC	ucCC_VSyncCnt
+	PUBLIC	bCCReceiveOK
+	PUBLIC	bNotify_Timer1_VBI_Int
+	PUBLIC	bVBI_INT_Enable
+	PUBLIC	bVideoStable
+	PUBLIC	bVCRStalbe
+	PUBLIC	ucCCWriteCnt
+	PUBLIC	bYPbPrStable
+	PUBLIC	bCCDecodeStalbe
+	PUBLIC	ucCCReadCnt
+	PUBLIC	ClearVerLineCompSts
+	PUBLIC	_ParityCheck
+	PUBLIC	CVbiInitial
+
+	RSEG  ?PD?ClearVerLineCompSts?VBI
+?ClearVerLineCompSts?BYTE:
+    CC_Data?241:   DS   2
+ field_type?242:   DS   1
+  Null_Flag?243:   DS   1
+  StartCode?244:   DS   1
+ParityOK_Cnt?246:   DS   1
+ParityNG_Cnt?247:   DS   1
+      cData?248:   DS   1
+
+	RSEG  ?BI?ClearVerLineCompSts?VBI
+?ClearVerLineCompSts?BIT:
+ParityCheckCnt?249:   DBIT   1
+
+	RSEG  ?XD?VBI
+    ucCCReadCnt:   DS   1
+   ucCCWriteCnt:   DS   1
+  ucCC_VSyncCnt:   DS   1
+       CCBuffer:   DS   160
+
+	RSEG  ?BI?VBI
+bCCDecodeStalbe:   DBIT   1
+   bYPbPrStable:   DBIT   1
+     bVCRStalbe:   DBIT   1
+   bVideoStable:   DBIT   1
+bVBI_INT_Enable:   DBIT   1
+bNotify_Timer1_VBI_Int:   DBIT   1
+   bCCReceiveOK:   DBIT   1
+
+	RSEG  ?PD?VBI
+     CCDataSave:   DS   4
+
+	RSEG  ?CO?VBI
+_?ix1000:
+	DB	000H
+	DB	000H
+
+
+	RSEG  ?C_INITSEG
+	DB	0C1H, bVideoStable + 000H	; bit-init
+
+	DB	0C1H, bVCRStalbe + 000H	; bit-init
+
+	DB	0C1H, bYPbPrStable + 000H	; bit-init
+
+	DB	0C1H, bCCDecodeStalbe + 000H	; bit-init
+
+; /*=============================================
+;   * Copyright (c)      Realtek Semiconductor Corporation, 2005
+;   * All rights reserved.
+;   * ============================================ */
+; 
+; /*================= File Description ================= */
+; 
+; #define _VBI_C
+; 
+; /*================ Module dependency  =============== */
+; #include "Core\Header\Include.h"
+; 
+; #if defined(CONFIG_VBI_ENABLE)
+; 
+; BIT bVideoStable=_FALSE;
+; BIT bVCRStalbe=_FALSE;
+; BIT bYPbPrStable = _FALSE;
+; BIT bCCDecodeStalbe=_FALSE;//jerry0725
+; 
+; static UINT8 CCDataSave[2][2];
+; 
+
+	RSEG  ?PR?VBI
+Com0016:
+L?0023:
+	USING	0
+	MOV  	R3,#0FEH
+	MOV  	R2,#HIGH (cData?248)
+	MOV  	R1,#LOW (cData?248)
+	SETB 	?_CScalerReadByte?BIT
+	MOV  	R5,#01H
+	RET  	
+; END OF Com0016
+
+; void CVbiInitial(void)
+
+	RSEG  ?PR?CVbiInitial?VBI
+CVbiInitial:
+	USING	0
+			; SOURCE LINE # 22
+; {
+			; SOURCE LINE # 23
+; 	ucCCWriteCnt = 0;
+			; SOURCE LINE # 24
+	CLR  	A
+	MOV  	DPTR,#ucCCWriteCnt
+	MOVX 	@DPTR,A
+; 	ucCCReadCnt = 0;
+			; SOURCE LINE # 25
+	MOV  	DPTR,#ucCCReadCnt
+	MOVX 	@DPTR,A
+; 	bCCReceiveOK = 0;
+			; SOURCE LINE # 26
+	CLR  	bCCReceiveOK
+; 	CCDataSave[0][0] = 0;
+			; SOURCE LINE # 27
+	MOV  	R0,#LOW (CCDataSave)
+	MOVX 	@R0,A
+; 	CCDataSave[0][1] = 0;
+			; SOURCE LINE # 28
+	INC  	R0
+	MOVX 	@R0,A
+; 	CCDataSave[1][0] = 0;
+			; SOURCE LINE # 29
+	INC  	R0
+	MOVX 	@R0,A
+; 	CCDataSave[1][1] = 0;
+			; SOURCE LINE # 30
+	INC  	R0
+	MOVX 	@R0,A
+; }
+			; SOURCE LINE # 31
+	RET  	
+; END OF CVbiInitial
+
+; 
+; bit	ParityCheck(UINT8 CCD)
+
+	RSEG  ?PR?_ParityCheck?VBI
+_ParityCheck:
+			; SOURCE LINE # 33
+;---- Variable 'CCD?140' assigned to Register 'R7' ----
+; {
+			; SOURCE LINE # 34
+; 	ACC = CCD;
+			; SOURCE LINE # 35
+	MOV  	A,R7
+; 	#pragma asm
+; 	CLR C
+	  CLR C
+; 	MOV R2, #08H
+	  MOV R2, #08H
+; 	MOV B, #00H
+	  MOV B, #00H
+; 	LOOP8:
+	  LOOP8:
+; 	RLC A
+	  RLC A
+; 	JNC NOINC
+	  JNC NOINC
+; 	INC B
+	  INC B
+; 	NOINC:
+	  NOINC:
+; 	DJNZ R2, LOOP8
+	  DJNZ R2, LOOP8
+; 	#pragma endasm
+; 
+; 	return (bit)(B&_BIT0);
+			; SOURCE LINE # 48
+	MOV  	A,B
+	RRC  	A
+; }
+			; SOURCE LINE # 49
+?C0002:
+	RET  	
+; END OF _ParityCheck
+
+; 
+; void ClearVerLineCompSts(void)
+
+	RSEG  ?PR?ClearVerLineCompSts?VBI
+ClearVerLineCompSts:
+	USING	0
+			; SOURCE LINE # 51
+; {
+			; SOURCE LINE # 52
+; 	UINT8 CC_Data[2] = {0,0}, field_type;
+			; SOURCE LINE # 53
+	MOV  	R0,#LOW (CC_Data?241)
+	MOV  	R4,#HIGH (CC_Data?241)
+	MOV  	R5,#0FEH
+	MOV  	R3,#0FFH
+	MOV  	R2,#HIGH (_?ix1000)
+	MOV  	R1,#LOW (_?ix1000)
+	MOV  	R6,#00H
+	MOV  	R7,#02H
+	LCALL	?C?COPY
+; 	UINT8 Null_Flag=0;
+			; SOURCE LINE # 54
+	CLR  	A
+	MOV  	R0,#LOW (Null_Flag?243)
+	MOVX 	@R0,A
+; 	UINT8 StartCode;
+; 	UINT8 i,ParityOK_Cnt,ParityNG_Cnt;
+; 	UINT8 cData[1];
+; 	bit   ParityCheckCnt;
+; 	
+; 	CI2cRead1(_VIDEO_DEVICE,0x65,1, &StartCode);
+			; SOURCE LINE # 60
+	MOV  	R0,#LOW (?_CI2cRead1?BYTE+03H)
+	MOV  	A,#0FEH
+	MOVX 	@R0,A
+	INC  	R0
+	MOV  	A,#HIGH (StartCode?244)
+	MOVX 	@R0,A
+	INC  	R0
+	MOV  	A,#LOW (StartCode?244)
+	MOVX 	@R0,A
+	MOV  	R3,#01H
+	MOV  	R5,#065H
+	MOV  	R7,#040H
+	LCALL	_CI2cRead1
+; 	if( ((StartCode & _BIT0)&&bVideoStable)||((StartCode & _BIT0)&&bYPbPrStable)) {
+			; SOURCE LINE # 61
+	MOV  	R0,#LOW (StartCode?244)
+	MOVX 	A,@R0
+	MOV  	R7,A
+	JNB  	ACC.0,?C0005
+	JB   	bVideoStable,?C0004
+?C0005:
+	MOV  	A,R7
+	JB   	ACC.0,$ + 6H
+	LJMP 	?C0003
+	JB   	bYPbPrStable,$ + 6H
+	LJMP 	?C0003
+?C0004:
+; 		// Check input source to get field type
+; 		if(bVideoStable){		// input source is Video8/16
+			; SOURCE LINE # 63
+	JNB  	bVideoStable,?C0006
+; 			CScalerReadByte(_IPV_ACT_LEN_H_1A, 1, cData, _NON_AUTOINC);
+			; SOURCE LINE # 64
+	LCALL	L?0023
+	MOV  	R7,#01AH
+	LCALL	_CScalerReadByte
+; 			field_type = (BIT)(cData[0]&_BIT3);
+			; SOURCE LINE # 65
+	MOV  	R0,#LOW (cData?248)
+	MOVX 	A,@R0
+	MOV  	C,ACC.3
+	CLR  	A
+	RLC  	A
+	MOV  	R0,#LOW (field_type?242)
+	MOVX 	@R0,A
+; 		}
+			; SOURCE LINE # 66
+	SJMP 	?C0007
+?C0006:
+; 		else if(bYPbPrStable){	// YPbPr
+			; SOURCE LINE # 67
+	JNB  	bYPbPrStable,?C0007
+; 			CScalerReadByte(_STABLE_HIGH_PERIOD_H_4A,1, cData,_NON_AUTOINC);
+			; SOURCE LINE # 68
+	LCALL	L?0023
+	MOV  	R7,#04AH
+	LCALL	_CScalerReadByte
+; 			field_type = !(BIT)(cData[0]&_BIT7);
+			; SOURCE LINE # 69
+	MOV  	R0,#LOW (cData?248)
+	MOVX 	A,@R0
+	RLC  	A
+	JC   	?C0009
+	MOV  	R7,#01H
+	SJMP 	?C0010
+?C0009:
+	MOV  	R7,#00H
+?C0010:
+	MOV  	R0,#LOW (field_type?242)
+	MOV  	A,R7
+	MOVX 	@R0,A
+; 		}
+			; SOURCE LINE # 70
+?C0007:
+; 		CI2cRead1(_VIDEO_DEVICE,0x61,2, &CC_Data[0]);
+			; SOURCE LINE # 71
+	MOV  	R0,#LOW (?_CI2cRead1?BYTE+03H)
+	MOV  	A,#0FEH
+	MOVX 	@R0,A
+	INC  	R0
+	MOV  	A,#HIGH (CC_Data?241)
+	MOVX 	@R0,A
+	INC  	R0
+	MOV  	A,#LOW (CC_Data?241)
+	MOVX 	@R0,A
+	MOV  	R3,#02H
+	MOV  	R5,#061H
+	MOV  	R7,#040H
+	LCALL	_CI2cRead1
+; 
+; 		for(i=0;i<2;i++){			//Odd parity check
+			; SOURCE LINE # 73
+;---- Variable 'i?245' assigned to Register 'R6' ----
+	CLR  	A
+	MOV  	R6,A
+?C0011:
+; 			ParityCheckCnt = ParityCheck(CC_Data[i]);
+			; SOURCE LINE # 74
+	MOV  	A,#LOW (CC_Data?241)
+	ADD  	A,R6
+	MOV  	R0,A
+	MOVX 	A,@R0
+	MOV  	R7,A
+	LCALL	_ParityCheck
+	MOV  	ParityCheckCnt?249,C
+; 			if(!ParityCheckCnt){	//Odd parity check(NG)
+			; SOURCE LINE # 75
+	JB   	ParityCheckCnt?249,?C0014
+; 				CC_Data[i] = 0x7F;	//insert block mark
+			; SOURCE LINE # 76
+	MOV  	A,#LOW (CC_Data?241)
+	ADD  	A,R6
+	MOV  	R0,A
+	MOV  	A,#07FH
+	MOVX 	@R0,A
+; 				ParityOK_Cnt = 0;	//jerry0725 start
+			; SOURCE LINE # 77
+	CLR  	A
+	MOV  	R0,#LOW (ParityOK_Cnt?246)
+	MOVX 	@R0,A
+; 				ParityNG_Cnt++;		
+			; SOURCE LINE # 78
+	INC  	R0
+	MOVX 	A,@R0
+	INC  	A
+	MOVX 	@R0,A
+; 				if(ParityNG_Cnt>=8){
+			; SOURCE LINE # 79
+	MOVX 	A,@R0
+	CLR  	C
+	SUBB 	A,#08H
+	JC   	?C0013
+; 					ParityNG_Cnt = 8;
+			; SOURCE LINE # 80
+	MOV  	A,#08H
+	MOVX 	@R0,A
+; 					bCCDecodeStalbe = _FALSE;
+			; SOURCE LINE # 81
+	CLR  	bCCDecodeStalbe
+; 				}
+			; SOURCE LINE # 82
+; 			}				
+			; SOURCE LINE # 83
+	SJMP 	?C0013
+?C0014:
+; 			else{
+			; SOURCE LINE # 84
+; 				ParityOK_Cnt++;
+			; SOURCE LINE # 85
+	MOV  	R0,#LOW (ParityOK_Cnt?246)
+	MOVX 	A,@R0
+	INC  	A
+	MOVX 	@R0,A
+; 				if(ParityOK_Cnt>60){
+			; SOURCE LINE # 86
+	MOVX 	A,@R0
+	SETB 	C
+	SUBB 	A,#03CH
+	JC   	?C0013
+; 					ParityNG_Cnt = 0;		
+			; SOURCE LINE # 87
+	CLR  	A
+	INC  	R0
+	MOVX 	@R0,A
+; 					ParityOK_Cnt = 60;
+			; SOURCE LINE # 88
+	DEC  	R0
+	MOV  	A,#03CH
+	MOVX 	@R0,A
+; 					bCCDecodeStalbe = _TRUE;
+			; SOURCE LINE # 89
+	SETB 	bCCDecodeStalbe
+; 				}					
+			; SOURCE LINE # 90
+; 			}						//jerry0725 end
+			; SOURCE LINE # 91
+; 		}
+			; SOURCE LINE # 92
+?C0013:
+	INC  	R6
+	MOV  	A,R6
+	CJNE 	A,#02H,?C0011
+?C0012:
+; 
+; 	   	CC_Data[0] = CC_Data[0]&0x7F;
+			; SOURCE LINE # 94
+	MOV  	R0,#LOW (CC_Data?241)
+	MOVX 	A,@R0
+	ANL  	A,#07FH
+	MOVX 	@R0,A
+; 		CC_Data[1] = CC_Data[1]&0x7F;
+			; SOURCE LINE # 95
+	INC  	R0
+	MOVX 	A,@R0
+	ANL  	A,#07FH
+	MOVX 	@R0,A
+; 		if(CCDataSave[field_type][0] !=0 && CCDataSave[field_type][1] !=0)
+			; SOURCE LINE # 96
+	INC  	R0
+	MOVX 	A,@R0
+	MOV  	R7,A
+	ADD  	A,ACC
+	ADD  	A,#LOW (CCDataSave)
+	MOV  	R0,A
+	MOVX 	A,@R0
+	JZ   	?C0018
+	MOV  	A,R7
+	ADD  	A,ACC
+	ADD  	A,#LOW (CCDataSave+01H)
+	MOV  	R0,A
+	MOVX 	A,@R0
+	JZ   	?C0018
+; 			Null_Flag = 1;
+			; SOURCE LINE # 97
+	MOV  	R0,#LOW (Null_Flag?243)
+	MOV  	A,#01H
+	MOVX 	@R0,A
+?C0018:
+; 		CCDataSave[field_type][0]  = CC_Data[0];
+			; SOURCE LINE # 98
+	MOV  	R0,#LOW (CC_Data?241)
+	MOVX 	A,@R0
+	MOV  	R7,A
+	MOV  	R0,#LOW (field_type?242)
+	MOVX 	A,@R0
+	MOV  	R6,A
+	ADD  	A,ACC
+	ADD  	A,#LOW (CCDataSave)
+	MOV  	R0,A
+	MOV  	A,R7
+	MOVX 	@R0,A
+; 		CCDataSave[field_type][1]  = CC_Data[1];
+			; SOURCE LINE # 99
+	MOV  	R0,#LOW (CC_Data?241+01H)
+	MOVX 	A,@R0
+	MOV  	R7,A
+	MOV  	A,R6
+	ADD  	A,ACC
+	ADD  	A,#LOW (CCDataSave+01H)
+	MOV  	R0,A
+	MOV  	A,R7
+	MOVX 	@R0,A
+; 		field_type = field_type<<7;
+			; SOURCE LINE # 100
+	MOV  	A,R6
+	SWAP 	A
+	RLC  	A
+	RLC  	A
+	RLC  	A
+	ANL  	A,#080H
+	MOV  	R0,#LOW (field_type?242)
+	MOVX 	@R0,A
+; 		I2CSendAddr(_VIDEO_DEVICE, 0x65, 0);
+			; SOURCE LINE # 101
+	CLR  	A
+	MOV  	R3,A
+	MOV  	R5,#065H
+	MOV  	R7,#040H
+	LCALL	_I2CSendAddr
+; 		I2CSendByte(0xff);
+			; SOURCE LINE # 102
+	MOV  	R7,#0FFH
+	LCALL	_I2CSendByte
+; 		I2CSendStop();
+			; SOURCE LINE # 103
+	LCALL	I2CSendStop
+; 	}
+			; SOURCE LINE # 104
+?C0003:
+; 	if(CC_Data[0]!=0 || CC_Data[1]!=0 || Null_Flag) 
+			; SOURCE LINE # 105
+	MOV  	R0,#LOW (CC_Data?241)
+	MOVX 	A,@R0
+	MOV  	R7,A
+	JNZ  	?C0020
+	INC  	R0
+	MOVX 	A,@R0
+	JNZ  	?C0020
+	MOV  	R0,#LOW (Null_Flag?243)
+	MOVX 	A,@R0
+	JZ   	?C0021
+?C0020:
+; 	{
+			; SOURCE LINE # 106
+; 		CCBuffer[ucCCWriteCnt][0] = CC_Data[0] + field_type;
+			; SOURCE LINE # 107
+	MOV  	R0,#LOW (field_type?242)
+	MOVX 	A,@R0
+	ADD  	A,R7
+	MOV  	R7,A
+	MOV  	DPTR,#ucCCWriteCnt
+	MOVX 	A,@DPTR
+	MOV  	R6,A
+	ADD  	A,ACC
+	ADD  	A,#LOW (CCBuffer)
+	MOV  	DPL,A
+	CLR  	A
+	ADDC 	A,#HIGH (CCBuffer)
+	MOV  	DPH,A
+	MOV  	A,R7
+	MOVX 	@DPTR,A
+; 		CCBuffer[ucCCWriteCnt][1] = CC_Data[1];
+			; SOURCE LINE # 108
+	DEC  	R0
+	MOVX 	A,@R0
+	MOV  	R7,A
+	MOV  	A,R6
+	ADD  	A,ACC
+	ADD  	A,#LOW (CCBuffer+01H)
+	MOV  	DPL,A
+	CLR  	A
+	ADDC 	A,#HIGH (CCBuffer+01H)
+	MOV  	DPH,A
+	MOV  	A,R7
+	MOVX 	@DPTR,A
+; 		ucCCWriteCnt = (ucCCWriteCnt + 1) % CCBuffer_Size;
+			; SOURCE LINE # 109
+	MOV  	A,R6
+	INC  	A
+	MOV  	B,#050H
+	DIV  	AB
+	MOV  	DPTR,#ucCCWriteCnt
+	MOV  	A,B
+	MOVX 	@DPTR,A
+; 		bCCReceiveOK = 1;
+			; SOURCE LINE # 110
+	SETB 	bCCReceiveOK
+; 	}
+			; SOURCE LINE # 111
+; }
+			; SOURCE LINE # 112
+?C0021:
+	RET  	
+; END OF ClearVerLineCompSts
+
+	END

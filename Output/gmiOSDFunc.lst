@@ -1,0 +1,1232 @@
+C51 COMPILER V7.20   GMIOSDFUNC                                                            10/05/2015 09:30:20 PAGE 1   
+
+
+C51 COMPILER V7.20, COMPILATION OF MODULE GMIOSDFUNC
+OBJECT MODULE PLACED IN .\Output\gmiOSDFunc.obj
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE OSD\gmiOSDFunc.c LARGE OPTIMIZE(9,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\
+                    -Output\gmiOSDFunc.lst) OBJECT(.\Output\gmiOSDFunc.obj)
+
+line level    source
+
+   1          #define __OSD_FUNC__
+   2          #include "Core\Header\Include.h"
+   3          
+   4          //---------------------------------------------------------------------------
+   5          void SetOsdMap(unsigned char *tOsdMap)
+   6          {
+   7   1           pOsdMap = tOsdMap;
+   8   1           SetOSDRamAddress();
+   9   1           SetRowCmds();
+  10   1      }
+  11          
+  12          //---------------------------------------------------------------------------
+  13          void SetOSDRamAddress()
+  14          {
+  15   1           unsigned int iFontSelectAddress;
+  16   1           unsigned int iFntBaseAddr;
+  17   1      
+  18   1           iFontSelectAddress = GET_OSD_MAP_FONT_SELECT_ADDRESS();
+  19   1           iFntBaseAddr = GET_OSD_MAP_FONTBASEADDRESS();
+  20   1           //CUartPrintf("FontSelectAddress:",iFontSelectAddress);
+  21   1           //CUartPrintf("FntBaseAddr:",iFntBaseAddr);
+  22   1      
+  23   1           pData[0] = 0xc0;
+  24   1           pData[1] = 0x04;
+  25   1           CScalerWrite(_OSD_ADDR_MSB_90, 2, pData, _AUTOINC);
+  26   1      
+  27   1           pData[0] = iFontSelectAddress & 0xff;
+  28   1           pData[1] = ((iFontSelectAddress >> 4) & 0xf0) | (iFntBaseAddr & 0x0f);
+  29   1           pData[2] = ((iFntBaseAddr >> 4) & 0xff);
+  30   1           CScalerWrite(_OSD_DATA_PORT_92, 3, pData, _NON_AUTOINC);
+  31   1      }
+  32          
+  33          //---------------------------------------------------------------------------
+  34          void DirectWOSDRam(WORD iAddress, WORD iLen, BYTE TheByte, BYTE Value)
+  35          {
+  36   1           pData[0] = TheByte | ((iAddress >> 8) & 0x0f);
+  37   1           pData[1] = (BYTE)(iAddress & 0xff);
+  38   1           CScalerWrite(_OSD_ADDR_MSB_90, 2, pData, _AUTOINC);
+  39   1         
+  40   1           if(TheByte == ALL_BYTE)  
+  41   1              iLen *= 3;
+  42   1      
+  43   1           CScalerSendAddr(_OSD_DATA_PORT_92 , _NON_AUTOINC);
+  44   1      
+  45   1           while(iLen)
+  46   1           {
+  47   2               *(&MCU_SCA_INF_DATA_FFF5) = Value;
+  48   2               iLen--;
+  49   2           }
+  50   1      
+  51   1      }
+  52          
+  53          //-------------------------------------------------------------
+  54          void OutputChar(BYTE C)
+C51 COMPILER V7.20   GMIOSDFUNC                                                            10/05/2015 09:30:20 PAGE 2   
+
+  55          {
+  56   1           CScalerSendAddr(_OSD_DATA_PORT_92 , _NON_AUTOINC);
+  57   1           *(&MCU_SCA_INF_DATA_FFF5) = C;
+  58   1      }
+  59          
+  60          //-------------------------------------------------------------
+  61          void COsdColorPalette(BYTE *pColorPaletteArray)
+  62          {
+  63   1              CScalerSetByte(_OVERLAY_LUT_ADDR_6E, 0x80);
+  64   1              CScalerWrite(_COLOR_LUT_PORT_6F, 48, pColorPaletteArray, _NON_AUTOINC);
+  65   1              CScalerSetByte(_OVERLAY_LUT_ADDR_6E, 0x00);
+  66   1      }
+  67          
+  68          //-------------------------------------------------------------
+  69          void SetRowCmds() small
+  70          {
+  71   1          unsigned char i;
+  72   1          unsigned char ucRowCnt = GET_OSD_MAP_ROWCOUNT();
+  73   1      
+  74   1          // Row Command Byte 0
+  75   1          // 0x80
+  76   1          //   Character border/shadow      000: None
+  77   1          //   Double character width         0: 0x01
+  78   1          //   Double character height        0: 0x01
+  79   1          DirectWOSDRam(0x00,ucRowCnt,THE_BYTE0,0x80);
+  80   1      
+  81   1          //Row End Command
+  82   1          OutputChar(0x00);
+  83   1      
+  84   1          //Row Command Byte 1
+  85   1          //    0x90
+  86   1          //    Row height (1~32) : 18
+  87   1          //    Column space      : 0
+  88   1          DirectWOSDRam(0x00,ucRowCnt,THE_BYTE1,0x88);
+  89   1      
+  90   1          // Row Command Byte 2
+  91   1      
+  92   1      //  DirectWOSDRam(0x00,ucRowCnt,THE_BYTE2,ucRowLenght);
+  93   1      
+  94   1          for(i=0;i<ucRowCnt;i++)
+  95   1          {
+  96   2               DirectWOSDRam(i,1,THE_BYTE2,GET_OSD_ROWLENGTH(i));
+  97   2          }    
+  98   1      }
+  99          
+ 100          //---------------------------------------------------------------------------
+ 101          void Gotoxy(unsigned char x,unsigned char y,unsigned char TheByte)
+ 102          {
+ 103   1           unsigned int iAddress = GET_OSD_MAP_FONT_SELECT_ADDRESS();
+ 104   1           unsigned char i;
+ 105   1      
+ 106   1           for(i=0;i<y;i++)
+ 107   1           {
+ 108   2                iAddress += GET_OSD_ROWLENGTH(i);
+ 109   2           }
+ 110   1      
+ 111   1           iAddress += x;
+ 112   1      
+ 113   1           pData[0] = (unsigned char)(((iAddress >> 8 ) & 0x0f) | TheByte);
+ 114   1           pData[1] = (unsigned char)(iAddress & 0xff);
+ 115   1           CScalerWrite(_OSD_ADDR_MSB_90, 2, pData, _AUTOINC);
+ 116   1      }
+C51 COMPILER V7.20   GMIOSDFUNC                                                            10/05/2015 09:30:20 PAGE 3   
+
+ 117          
+ 118          //---------------------------------------------------------------------------
+ 119          /*
+ 120          void PrintfDec(unsigned char Value)
+ 121          {
+ 122               unsigned char a[3];
+ 123               if(Value / 100 > 0)
+ 124               {
+ 125                   a[0] = (Value / 100) + '0';
+ 126                   a[1] = ((Value / 10) % 10) + '0';
+ 127                   a[2] = (Value % 10)  + '0';
+ 128               }
+ 129               else if(Value / 10 > 0)
+ 130               {
+ 131                   a[0] = 0;
+ 132                   a[1] = (Value / 10) + '0';
+ 133                   a[2] = (Value % 10) + '0';
+ 134               }
+ 135               else
+ 136               {
+ 137                   a[0] = 0;
+ 138                   a[1] = 0;
+ 139                   a[2] = Value + '0';
+ 140               }
+ 141          
+ 142               CScalerWrite(_OSD_DATA_PORT_92, 3, a, _NON_AUTOINC);
+ 143          }
+ 144          
+ 145          //-------------------------------------------------------------
+ 146          
+ 147          void PrintfInt(unsigned int Value)
+ 148          {
+ 149               unsigned char i,a[5];
+ 150               bit fBegin = 0;
+ 151          
+ 152               a[0] = (Value / 10000);
+ 153               a[1] = ((Value / 1000) % 10);
+ 154               a[2] = ((Value / 100) % 10);
+ 155               a[3] = ((Value / 10) % 10);
+ 156               a[4] = (Value % 10) + '0';
+ 157          
+ 158               for(i=0;i<4;i++)
+ 159               {
+ 160                   if(fBegin)
+ 161                   {
+ 162                        a[i] += '0';
+ 163                   }
+ 164                   else
+ 165                   {
+ 166                        if(a[i] != 0)
+ 167                           fBegin = 1;
+ 168                   }
+ 169               }
+ 170          
+ 171               CScalerWrite(_OSD_DATA_PORT_92, 5, a, _NON_AUTOINC);
+ 172          }
+ 173          
+ 174          //---------------------------------------------------------------------------
+ 175          void PrintfHex(unsigned char Value)
+ 176          {
+ 177               unsigned char h,l,t;
+ 178               t = (Value & 0x0f);
+C51 COMPILER V7.20   GMIOSDFUNC                                                            10/05/2015 09:30:20 PAGE 4   
+
+ 179               if(t < 10)    l = t + '0';
+ 180               else          l = (t - 10) + 'A';
+ 181          
+ 182               t = (Value >> 4) & 0x0f;
+ 183               if(t < 10)    h = t + '0';
+ 184               else          h = (t - 10) + 'A';
+ 185          
+ 186               pData[0]    = h;
+ 187               pData[1]    = l;
+ 188               CScalerWrite(_OSD_DATA_PORT_92, 2, pData, _AUTOINC);   
+ 189          }
+ 190          
+ 191          //---------------------------------------------------------------------------
+ 192          */
+ 193          void COsdFxCloseWindow(BYTE ucWinID)
+ 194          {
+ 195   1      
+ 196   1          pData[0]    = 0x81;
+ 197   1          pData[1]    = ucWinID * 4 + 3;
+ 198   1          pData[2]    = 0x00;
+ 199   1          CScalerWrite(_OSD_ADDR_MSB_90, 3, pData, _AUTOINC);
+ 200   1      }
+ 201          
+ 202          //-------------------------------------------------------------
+ 203          WORD ValueInRangeChange(WORD ucMin, WORD ucMax, WORD ucCur, BYTE ucOption)//BYTE ucOption, BYTE ucLoop)
+ 204          {
+ 205   1          WORD R;
+ 206   1      
+ 207   1          if((ucOption & _INC) == _INC)
+ 208   1          {
+ 209   2              if(ucCur >= ucMax)
+ 210   2              {
+ 211   3                  if((ucOption & _LOOP) == _LOOP)     return ucMin;
+ 212   3                  else                                                return ucMax;
+ 213   3              }
+ 214   2              R = ucCur + 1;
+ 215   2          }
+ 216   1          else
+ 217   1          {
+ 218   2              if(ucCur <= ucMin)
+ 219   2              {
+ 220   3                  if((ucOption & _LOOP) == _LOOP)     return ucMax;
+ 221   3                  else                                                return ucMin;
+ 222   3              }
+ 223   2              R = ucCur - 1;
+ 224   2          }
+ 225   1          return R;
+ 226   1      }
+ 227          
+ 228          //-------------------------------------------------------------
+ 229          void SetOSDDouble(BYTE ucAttr)
+ 230          {
+ 231   1          pData[0]    = 0x40;
+ 232   1          pData[1]    = 0x03;
+ 233   1          pData[2]    = ucAttr;
+ 234   1          CScalerWrite(_OSD_ADDR_MSB_90, 3, pData, _AUTOINC);     
+ 235   1      }
+ 236          
+ 237          //-------------------------------------------------------------
+ 238          void Textout(BYTE *Text)
+ 239          {
+ 240   1           CScalerSendAddr(_OSD_DATA_PORT_92,  _NON_AUTOINC);
+C51 COMPILER V7.20   GMIOSDFUNC                                                            10/05/2015 09:30:20 PAGE 5   
+
+ 241   1           while(*Text != 0)
+ 242   1           {
+ 243   2                *(&MCU_SCA_INF_DATA_FFF5) =  *Text++;
+ 244   2           }
+ 245   1      }
+ 246                   
+ 247          //---------------------------------------------------------------------------
+ 248          void SetCharWdith(BYTE Index,BYTE Value)
+ 249          {
+ 250   1              BYTE t = Index / 2;
+ 251   1      
+ 252   1      
+ 253   1              if(Index % 2)
+ 254   1              {
+ 255   2                  // 1 3 5 7 9 ... 存在高 4 位
+ 256   2                  g_ucCharWidth[t] = (g_ucCharWidth[t] & 0x0f) | (Value << 4);  
+ 257   2              }
+ 258   1              else 
+ 259   1              {
+ 260   2                  // 0 2 4 6 8 ... 存在低 4 位
+ 261   2                  g_ucCharWidth[t] = (g_ucCharWidth[t] & 0xf0) | Value;
+ 262   2              }
+ 263   1      
+ 264   1      }
+ 265          
+ 266          //---------------------------------------------------------------------------
+ 267          BYTE GetCharWdith(BYTE Index)
+ 268          {
+ 269   1              BYTE w;
+ 270   1              BYTE t = Index / 2;
+ 271   1      
+ 272   1              if(Index % 2)
+ 273   1              {
+ 274   2                  // 1 3 5 7 9 ... 存在高 4 位
+ 275   2                  w = (g_ucCharWidth[t] & 0xf0) >> 4;
+ 276   2              }
+ 277   1              else 
+ 278   1              {
+ 279   2                  // 0 2 4 6 8 ... 存在低 4 位
+ 280   2                  w = g_ucCharWidth[t] & 0x0f;
+ 281   2              }
+ 282   1      
+ 283   1              return w;
+ 284   1           
+ 285   1      }
+ 286          
+ 287          //---------------------------------------------------------------------------
+ 288          
+ 289          void CSetBlankWidth(BYTE x,BYTE y,BYTE ucWidth)
+ 290          {
+ 291   1              //设置 Blank                                                       
+ 292   1              Gotoxy(x,y,ALL_BYTE);
+ 293   1      
+ 294   1              pData[0] = 0x00;
+ 295   1              pData[1] = ucWidth;
+ 296   1              //pData[2] = ucBlankColor;
+ 297   1              //pData[2] = 0x09;
+ 298   1              CScalerWrite(_OSD_DATA_PORT_92, 2, pData, _NON_AUTOINC);
+ 299   1      
+ 300   1      }
+ 301          
+ 302          //---------------------------------------------------------------------------
+C51 COMPILER V7.20   GMIOSDFUNC                                                            10/05/2015 09:30:20 PAGE 6   
+
+ 303          BYTE CTextOutBase(BYTE *str,BYTE x,BYTE y)
+ 304          {
+ 305   1          BYTE i,ucStrLen;
+ 306   1          BYTE ucCharWidth;
+ 307   1          WORD ucPixLen = 0;
+ 308   1          
+ 309   1          // Step 1: Display Menu Item
+ 310   1          Gotoxy(x,y,BYTE_DISPLAY);
+ 311   1          Textout(str);
+ 312   1          
+ 313   1          // Step 2: Set Char Width
+ 314   1          ucStrLen = StrLen(str);
+ 315   1          
+ 316   1          Gotoxy(x,y,BYTE_ATTRIB);
+ 317   1          
+ 318   1          CScalerSendAddr(_OSD_DATA_PORT_92, _NON_AUTOINC);
+ 319   1          for(i=0;i<ucStrLen;i++)
+ 320   1          {
+ 321   2              ucCharWidth = GetCharWdith(*str++);
+ 322   2              //CScalerSendByte(0x80 | ucCharWidth);
+ 323   2              *(&MCU_SCA_INF_DATA_FFF5) =  0x80 | ucCharWidth;
+ 324   2              
+ 325   2              ucPixLen += ucCharWidth;
+ 326   2          }
+ 327   1          //CScalerSendWriteStop();
+ 328   1      
+ 329   1          // calc blank wdith
+ 330   1          //ucPixLen %= 12;
+ 331   1          //if(ucPixLen < 4)
+ 332   1          //    ucPixLen += 12;
+ 333   1      
+ 334   1          return ucPixLen;
+ 335   1      }
+ 336          
+ 337          //---------------------------------------------------------------------------
+ 338          void CTextOutEx(BYTE *str,BYTE x,BYTE y)
+ 339          {
+ 340   1          BYTE ucStrLen = StrLen(str);
+ 341   1          BYTE ucWidth = CTextOutBase(str,x,y);
+ 342   1          ucWidth = 12 - (ucWidth % 12);
+ 343   1              if(ucWidth < 4)
+ 344   1              ucWidth += 12;
+ 345   1              
+ 346   1          CSetBlankWidth(x + ucStrLen,y,ucWidth);
+ 347   1      }
+ 348          
+ 349          //---------------------------------------------------------------------------
+ 350          void CTextOutRightAlign(BYTE *str,BYTE x,BYTE y)
+ 351          {
+ 352   1          BYTE ucWidth;
+ 353   1          BYTE ucStrLen = StrLen(str);
+ 354   1      
+ 355   1          if(ucStrLen > x - 1)
+ 356   1          {
+ 357   2              x = 1;
+ 358   2          }
+ 359   1          else 
+ 360   1          {
+ 361   2              x = x - ucStrLen;
+ 362   2          }
+ 363   1      
+ 364   1          ucWidth = CTextOutBase(str,x,y);
+C51 COMPILER V7.20   GMIOSDFUNC                                                            10/05/2015 09:30:20 PAGE 7   
+
+ 365   1          ucWidth = 12 - (ucWidth % 12);
+ 366   1              if(ucWidth < 4)
+ 367   1              ucWidth += 12;
+ 368   1       
+ 369   1          CSetBlankWidth(x - 1,y,ucWidth);    
+ 370   1      }
+ 371          
+ 372          //---------------------------------------------------------------------------
+ 373          void CCenterTextout(BYTE *str,BYTE y,BYTE ucSta,BYTE ucCharWidth)
+ 374          {
+ 375   1           WORD usLen = CCalcTextPixcelLen(str);
+ 376   1           BYTE x;
+ 377   1           usLen = (((WORD)ucCharWidth * 12) - usLen);
+ 378   1      
+ 379   1           x = usLen / 24 + ucSta;
+ 380   1               if((usLen % 12) >= 6)
+ 381   1               {
+ 382   2              x++;
+ 383   2           }
+ 384   1           
+ 385   1           //usLen = (((WORD)ucCharWidth * 12) - usLen) / 24 + ucSta; // 24 = 12 * 2
+ 386   1           CTextOutEx(str, x, y);
+ 387   1      }
+ 388          
+ 389          //---------------------------------------------------------------------------
+ 390          WORD CCalcTextPixcelLen(BYTE *str)
+ 391          {
+ 392   1          WORD usPixcelLen = 0;
+ 393   1      
+ 394   1          while(*str)
+ 395   1          { 
+ 396   2              usPixcelLen += GetCharWdith(*str++);
+ 397   2          }
+ 398   1      
+ 399   1          return usPixcelLen;
+ 400   1      }
+ 401          
+ 402          //---------------------------------------------------------------------------
+ 403          void CShowNumber(BYTE x,BYTE y,BYTE Value)
+ 404          {
+ 405   1              unsigned char a[4];
+ 406   1              BYTE ucWdith;
+ 407   1              
+ 408   1              if(Value / 100 > 0)
+ 409   1              {
+ 410   2                  a[0] = (Value / 100) + '0';
+ 411   2                  a[1] = ((Value / 10) % 10) + '0';
+ 412   2                  a[2] = (Value % 10)  + '0';
+ 413   2              }
+ 414   1              else if(Value / 10 > 0)
+ 415   1              {
+ 416   2                  a[0] = (Value / 10) + '0';
+ 417   2                  a[1] = (Value % 10) + '0';
+ 418   2                  a[2] = 0x01;
+ 419   2              }
+ 420   1              else
+ 421   1              {
+ 422   2      
+ 423   2                  a[0] = Value + '0';
+ 424   2                  a[1] = 0x01;
+ 425   2                  a[2] = 0x01;            
+ 426   2              }
+C51 COMPILER V7.20   GMIOSDFUNC                                                            10/05/2015 09:30:20 PAGE 8   
+
+ 427   1              
+ 428   1              a[3] = 0x00;
+ 429   1          ucWdith = CTextOutBase(a,x,y);
+ 430   1          CSetBlankWidth(x + 3,y,ucWdith);
+ 431   1      }
+ 432          
+ 433          #if(_FAC_OSD)
+              void CFacShowNumber(BYTE x,BYTE y,BYTE Value)
+              {
+                      unsigned char a[4];
+                      
+                      if(Value / 100 > 0)
+                      {
+                          a[0] = (Value / 100) + '0';
+                          a[1] = ((Value / 10) % 10) + '0';
+                          a[2] = (Value % 10)  + '0';
+                      }
+                      else if(Value / 10 > 0)
+                      {
+                          a[0] = (Value / 10) + '0';
+                          a[1] = (Value % 10) + '0';
+                          a[2] = 0x01;
+                      }
+                      else
+                      {
+              
+                          a[0] = Value + '0';
+                          a[1] = 0x01;
+                          a[2] = 0x01;            
+                      }
+                      
+                      a[3] = 0x00;
+                      Gotoxy( x, y, BYTE_DISPLAY);
+                      Textout(a);
+              //      TextOutCalcWidth(a, y, x,4,4*12);
+              }
+              #endif
+ 464          
+ 465          //---------------------------------------------------------------------------
+ 466          // OSD_Position : Restore OSD position according to global settings
+ 467          // para : OSD font parameter
+ 468          // OSD_GLOBAL_BLINK    : 0x10
+ 469          // OSD_DISP_ZONE_LEFT  : 0x04
+ 470          // OSD_DISP_ZONE_RIGHT : 0x08
+ 471          // OSD_ROTATE          : 0x02
+ 472          // OSD_ENABLE          : 0x01
+ 473          //---------------------------------------------------------------------------
+ 474          void OSDPosition(WORD usOsdActWidth, WORD usOsdActHeight, BYTE ucHPos, BYTE ucVPos, BYTE ucPar)
+ 475          {
+ 476   1          if(ucHPos > 100)
+ 477   1              ucHPos = 50;
+ 478   1      
+ 479   1          if(ucVPos > 100)
+ 480   1              ucVPos = 50;
+ 481   1      
+ 482   1      
+ 483   1              #if(_PANEL_DOUBLE_H)
+                  usOsdActWidth  = _OSD_HPOSITION_OFFSET + 
+                                  (DWORD)(Panel[ucPanelSelect]->DHStartPos / 8) + 
+                                  (DWORD)(ucHPos * (Panel[ucPanelSelect]->DHWidth / 8 - usOsdActWidth/4 - 7)) / 100;
+                      #else
+ 488   1          usOsdActWidth  = _OSD_HPOSITION_OFFSET + 
+C51 COMPILER V7.20   GMIOSDFUNC                                                            10/05/2015 09:30:20 PAGE 9   
+
+ 489   1                          (DWORD)(Panel[ucPanelSelect]->DHStartPos / 4) + 
+ 490   1                          (DWORD)(ucHPos * (Panel[ucPanelSelect]->DHWidth / 4 - usOsdActWidth/4 - 7)) / 100;
+ 491   1              #endif
+ 492   1      
+ 493   1          usOsdActHeight = _OSD_VPOSITION_OFFSET + 
+ 494   1                          (DWORD)(Panel[ucPanelSelect]->DVStartPos / 4) + 
+ 495   1                          (DWORD)(ucVPos * (Panel[ucPanelSelect]->DVHeight / 4 - usOsdActHeight/4 - 6)) / 100;
+ 496   1      
+ 497   1      
+ 498   1          CScalerSetBit(_OSD_SCRAMBLE_93, 0xf8, 0x02);
+ 499   1      
+ 500   1          pData[0] = CScalerGetBit(_OVERLAY_CTRL_6C, _BIT0);
+ 501   1      
+ 502   1          pData[0] = (pData[0] == 0x00) ? 0xc0 : 0xe0;
+ 503   1          pData[1] = 0x00;
+ 504   1          CScalerWrite(_OSD_ADDR_MSB_90, 2, pData, _AUTOINC);
+ 505   1      
+ 506   1              pData[0] = usOsdActHeight >> 1;
+ 507   1              pData[1] = (UINT8) (usOsdActWidth >> 2);
+ 508   1              pData[2] = ((UINT8) (usOsdActWidth & 0x0003) << 6) |    ((usOsdActHeight & 0x01) << 5) | ucPar;
+ 509   1              CScalerWrite(_OSD_DATA_PORT_92, 3, pData, _NON_AUTOINC);
+ 510   1       
+ 511   1          CTimerWaitForEvent(_EVENT_DEN_STOP);
+ 512   1          CTimerWaitForEvent(_EVENT_DEN_STOP);
+ 513   1          CScalerSetBit(_OSD_SCRAMBLE_93, 0xf8, 0x05);
+ 514   1      }
+ 515          
+ 516          //---------------------------------------------------------------------------
+ 517          void OSDLine(BYTE row, BYTE col, BYTE length, BYTE value, BYTE TheByte)
+ 518          {
+ 519   1          BYTE ucRowCharLength = GET_OSD_ROWLENGTH(row);
+ 520   1      
+ 521   1          //if(ucRowCharLength < col)    return;
+ 522   1      
+ 523   1          if(ucRowCharLength < (col + length))    
+ 524   1          {
+ 525   2               length = ucRowCharLength - col;
+ 526   2          }
+ 527   1      
+ 528   1          Gotoxy(col,row,TheByte);
+ 529   1      
+ 530   1          if(TheByte == ALL_BYTE)
+ 531   1          {
+ 532   2             length *= 3;
+ 533   2          }
+ 534   1      
+ 535   1          CScalerSendAddr(_OSD_DATA_PORT_92,  _NON_AUTOINC);
+ 536   1          while(length)
+ 537   1          {
+ 538   2               *(&MCU_SCA_INF_DATA_FFF5) = value;
+ 539   2               length--;
+ 540   2          }
+ 541   1      }
+ 542          
+ 543          //---------------------------------------------------------------------------
+ 544          void OSDClear(BYTE row_start, BYTE height,
+ 545                        BYTE col_start, BYTE width,
+ 546                        BYTE Value, BYTE indicate)
+ 547          {          
+ 548   1          if (height)
+ 549   1          {
+ 550   2              do
+C51 COMPILER V7.20   GMIOSDFUNC                                                            10/05/2015 09:30:20 PAGE 10  
+
+ 551   2              {
+ 552   3                  OSDLine(row_start, col_start, width, Value, indicate);
+ 553   3                  row_start++;
+ 554   3              }
+ 555   2              while (--height);
+ 556   2          }
+ 557   1      }
+ 558          
+ 559          //---------------------------------------------------------------------------
+ 560          /*
+ 561          void OutputDisplaySize()
+ 562          {
+ 563               //unsigned int  usHwid;
+ 564               //Data[0] 长度不定所以在后面才能得到
+ 565               //pData[1] = N_INC;
+ 566               //pData[2] = _OSD_DATA_PORT_92;
+ 567               if(stModeInfo.IHWidth / 1000)    pData[0] = '1';
+ 568               else                             pData[0] = 0;
+ 569               pData[1] = (unsigned char)((stModeInfo.IHWidth / 100) % 10) + '0';
+ 570               pData[2] = (unsigned char)((stModeInfo.IHWidth / 10) % 10) + '0';
+ 571               pData[3] = (unsigned char)(stModeInfo.IHWidth % 10) + '0';
+ 572          
+ 573               Gotoxy(2,11,BYTE_DISPLAY);
+ 574               CScalerWrite(_OSD_DATA_PORT_92, 4, pData, _NON_AUTOINC);
+ 575          
+ 576          
+ 577          
+ 578               if(stModeInfo.IVHeight / 1000)
+ 579                   pData[0] = '1';
+ 580               else
+ 581                   pData[0] = 0;
+ 582          
+ 583               pData[1] = (unsigned char)((stModeInfo.IVHeight / 100) % 10) + '0';
+ 584               pData[2] = (unsigned char)((stModeInfo.IVHeight / 10) % 10) + '0';
+ 585               pData[3] = (unsigned char)(stModeInfo.IVHeight % 10) + '0';
+ 586          
+ 587               Gotoxy(10,11,BYTE_DISPLAY);
+ 588               CScalerWrite(_OSD_DATA_PORT_92,4,pData,_NON_AUTOINC);
+ 589          }
+ 590          
+ 591          //--------------------------------------------------------------------------------------------------------
+             --------------
+ 592          void OutputRefrushRate()
+ 593          {                      
+ 594               BYTE ucIVFreq = stModeInfo.IVFreq/10;
+ 595               pData[0] = (unsigned char)((ucIVFreq / 10) % 10) + '0';
+ 596               pData[1] = (unsigned char)(ucIVFreq % 10) + '0';
+ 597              
+ 598               Gotoxy(20,11,BYTE_DISPLAY);
+ 599               CScalerWrite(_OSD_DATA_PORT_92,2,pData,_NON_AUTOINC);
+ 600          }
+ 601          
+ 602          //--------------------------------------------------------------------------------------------------------
+             --------------
+ 603          void OutputHFreqRate()
+ 604          {
+ 605               BYTE ucFreq = stModeInfo.IHFreq/10;
+ 606               pData[0] = (unsigned char)((ucFreq / 10) % 10) + '0';
+ 607               pData[1] = (unsigned char)(ucFreq % 10) + '0';
+ 608              
+ 609               Gotoxy(20,11,BYTE_DISPLAY);
+ 610               CScalerWrite(_OSD_DATA_PORT_92,2,pData,_NON_AUTOINC);
+C51 COMPILER V7.20   GMIOSDFUNC                                                            10/05/2015 09:30:20 PAGE 11  
+
+ 611          }
+ 612          */
+ 613          //--------------------------------------------------------------------------------------------------------
+             --------------
+ 614          void COsdFxCodeWrite(BYTE *pArray)
+ 615          {
+ 616   1          BYTE cnt, temp;
+ 617   1      
+ 618   1          CScalerWrite(_OSD_ADDR_MSB_90, 2, pArray, _AUTOINC);
+ 619   1          pArray += 2;
+ 620   1      
+ 621   1          cnt = 0;
+ 622   1      
+ 623   1          while(_TRUE)
+ 624   1          {
+ 625   2              if(*pArray == _EXT_)
+ 626   2              {
+ 627   3                  CScalerWrite(_OSD_DATA_PORT_92, cnt, pArray - cnt, _NON_AUTOINC);
+ 628   3                  cnt = 0;
+ 629   3      
+ 630   3                  if(*(pArray + 1) > 3)
+ 631   3                      return;
+ 632   3      
+ 633   3                  temp = _EXT_ + *(pArray + 1);
+ 634   3      
+ 635   3                  if(*(pArray + 2) == _REPEAT_)
+ 636   3                  {
+ 637   4                      CScalerWriteAmount(_OSD_DATA_PORT_92, *(pArray + 3), temp, _NON_AUTOINC);
+ 638   4                      pArray += 4;
+ 639   4                  }
+ 640   3                  else
+ 641   3                  {
+ 642   4                      CScalerWrite(_OSD_DATA_PORT_92, 1, &temp, _NON_AUTOINC);
+ 643   4                      pArray += 2;
+ 644   4                  }
+ 645   3              }
+ 646   2              else if(*pArray == _REPEAT_)
+ 647   2              {
+ 648   3                  CScalerWrite(_OSD_DATA_PORT_92, cnt, pArray - cnt, _NON_AUTOINC);
+ 649   3      
+ 650   3                  CScalerWriteAmount(_OSD_DATA_PORT_92, *(pArray + 1) - 1, *(pArray - 1), _NON_AUTOINC);
+ 651   3      
+ 652   3                  pArray += 2;
+ 653   3                  cnt = 0;
+ 654   3              }
+ 655   2              else if(*pArray == _NEXT_)
+ 656   2              {
+ 657   3                  CScalerWrite(_OSD_DATA_PORT_92, cnt, pArray - cnt, _NON_AUTOINC);
+ 658   3                  pArray++;
+ 659   3                  cnt = 0;
+ 660   3      
+ 661   3                  if(*(pArray + 1) != _END_)
+ 662   3                  {
+ 663   4                      CScalerWrite(_OSD_ADDR_MSB_90, 2, pArray, _AUTOINC);
+ 664   4                      pArray += 2;
+ 665   4                  }
+ 666   3                  else
+ 667   3                  {
+ 668   4                      break;
+ 669   4                  }
+ 670   3              }
+ 671   2              else if(*(pArray) == _END_)
+C51 COMPILER V7.20   GMIOSDFUNC                                                            10/05/2015 09:30:20 PAGE 12  
+
+ 672   2              {
+ 673   3                  CScalerWrite(_OSD_DATA_PORT_92, cnt, pArray - cnt, _NON_AUTOINC);
+ 674   3                  break;
+ 675   3              }
+ 676   2              else
+ 677   2              {
+ 678   3                  pArray++;
+ 679   3                  cnt++;
+ 680   3              }
+ 681   2          }
+ 682   1      }
+ 683          
+ 684          //--------------------------------------------------
+ 685          void COsdFxEnableOsd(void)
+ 686          {
+ 687   1          CTimerWaitForEvent(_EVENT_DEN_STOP);
+ 688   1              #if(_PANEL_DOUBLE_H)
+                  CScalerSetBit(_OVERLAY_CTRL_6C, ~_BIT0, (_BIT0|_BIT1));   
+                      #else
+ 691   1          CScalerSetBit(_OVERLAY_CTRL_6C, ~_BIT0, _BIT0);   
+ 692   1              #endif
+ 693   1      }
+ 694          
+ 695          //--------------------------------------------------
+ 696          void COsdFxDisableOsd(void)
+ 697          {       
+ 698   1          CTimerWaitForEvent(_EVENT_DEN_STOP);
+ 699   1          CScalerSetBit(_OVERLAY_CTRL_6C, ~_BIT0, 0x00);
+ 700   1          CLR_KEYREPEATENABLE();
+ 701   1      
+ 702   1              #if(_VIDEO_TV_SUPPORT)
+                      #if(_SLEEP_FUNC)
+                          bTimerOnScreen = 0;
+                          bOSDOnScreen   = 0;
+                      #endif 
+                      #endif
+ 708   1      
+ 709   1          SET_CLEAR_OSD_EN();
+ 710   1          
+ 711   1              #if(_VIDEO_TV_SUPPORT)
+                      #if(_SHOW_TV_NO_SIGNAL)
+                  ucSignalOSDState = 0;
+                      #endif
+                      #endif
+ 716   1      
+ 717   1              #if(_OSD_TYPE == _OSD003)
+ 718   1          ucStartItem = 0;
+ 719   1          ucEndItem   = 0;
+ 720   1              #endif
+ 721   1      }
+ 722          
+ 723          //--------------------------------------------------
+ 724          void COsdFxDrawWindow(WORD usXStart, WORD usYStart, WORD usXEnd, WORD usYEnd, BYTE *pStyle)
+ 725          {
+ 726   1          BYTE cnt0, cnt1;
+ 727   1      
+ 728   1          cnt0    = CScalerGetBit(_OVERLAY_CTRL_6C, _BIT0);
+ 729   1      
+ 730   1          pData[0]    = (cnt0 == 0x00) ? 0xc1 : 0xe1;
+ 731   1          pData[1]    = ((*(pStyle)) * 4) + 1;
+ 732   1          CScalerWrite(_OSD_ADDR_MSB_90, 2, pData, _AUTOINC);
+ 733   1      
+C51 COMPILER V7.20   GMIOSDFUNC                                                            10/05/2015 09:30:20 PAGE 13  
+
+ 734   1          pData[0]    = ((usXStart & 0x03F) << 2);
+ 735   1          pData[1]    = (((usYStart & 0x007) << 5) | ((usXStart & 0x7C0) >> 6));
+ 736   1          pData[2]    = (usYStart >> 3);
+ 737   1          pData[3]    = ((usXEnd & 0x03F) << 2);
+ 738   1          pData[4]    = (((usYEnd & 0x007) << 5) | ((usXEnd & 0x7C0) >> 6));
+ 739   1          pData[5]    = (usYEnd >> 3);
+ 740   1          CScalerWrite(_OSD_DATA_PORT_92, 6, pData, _NON_AUTOINC);
+ 741   1      
+ 742   1          CTimerDelayXms(40);
+ 743   1      
+ 744   1          for(cnt1=0;cnt1<2;cnt1++)
+ 745   1          {   
+ 746   2              pData[0]    = 0xc1;
+ 747   2              pData[1]    = ((*(pStyle)) * 4) + (cnt1 * 3);
+ 748   2              CScalerWrite(_OSD_ADDR_MSB_90, 2, pData, _AUTOINC);
+ 749   2      
+ 750   2              for(cnt0=0;cnt0<3;cnt0++)
+ 751   2                  pData[cnt0]   = (*(pStyle + ((cnt1 * 3) + cnt0) + 1));
+ 752   2      
+ 753   2              CScalerWrite(_OSD_DATA_PORT_92, 3, pData, _NON_AUTOINC);
+ 754   2          }
+ 755   1      }
+ 756          //--------------------------------------------------
+ 757          /*
+ 758          void COsdFxChangeWindowColor(BYTE ucWindowColor, BYTE *pStyle)
+ 759          {
+ 760              pData[0]    = 0x41;
+ 761              pData[1]    = ((*(pStyle)) * 4) + (3);
+ 762              CScalerWrite(_OSD_ADDR_MSB_90, 2, pData, _AUTOINC);
+ 763          
+ 764              pData[0]    = ((*(pStyle + ((3) + 1) + 1)) & 0xf0) | (ucWindowColor & 0x0f);
+ 765              CScalerWrite(_OSD_DATA_PORT_92, 1, pData, _NON_AUTOINC);
+ 766          }
+ 767          */
+ 768          //--------------------------------------------------
+ 769          
+ 770          // if is 1ibt font use this func load font
+ 771          void COsdLoad1BitFont(BYTE *pFont,WORD usOffset,BYTE ucFntCount,BYTE *pFntCharWidth)
+ 772          {
+ 773   1           BYTE i;
+ 774   1           CScalerLoadHardwareVLCFont(pFont, usOffset);
+ 775   1      
+ 776   1           if(usOffset > 0x100)               return;
+ 777   1      
+ 778   1           if(usOffset + ucFntCount > 0x100)
+ 779   1              ucFntCount = 0x100 - usOffset; 
+ 780   1      
+ 781   1      
+ 782   1           for(i=0;i<ucFntCount;i++)
+ 783   1           {
+ 784   2               SetCharWdith(usOffset,*pFntCharWidth);
+ 785   2      
+ 786   2               pFntCharWidth++;
+ 787   2               usOffset ++;
+ 788   2           }
+ 789   1           
+ 790   1      }
+ 791          
+ 792          //---------------------------------------------------------------------------
+ 793          BYTE COsdCtrlGetHPosition(void)
+ 794          {
+ 795   1              unsigned int ucMin = stModeUserCenterData.CenterHPos - _HPOSITION_BIAS;
+C51 COMPILER V7.20   GMIOSDFUNC                                                            10/05/2015 09:30:20 PAGE 14  
+
+ 796   1              unsigned int iTmp = (stModeUserData.HPosition - ucMin) * 100 / (_HPOSITION_BIAS * 2);
+ 797   1              return (unsigned char)iTmp;
+ 798   1      }
+ 799          
+ 800          
+ 801          //---------------------------------------------------------------------------
+ 802          /*
+ 803          WORD COsdFxGetVPositionRange(BYTE ucPar)
+ 804          {
+ 805              if(ucPar == _GET_VPOSITIONRANGE_MAX)
+ 806                  return (stModeUserCenterData.CenterVPos + _VPOSITION_BIAS);
+ 807              else if(ucPar == _GET_VPOSITIONRANGE_MIN)
+ 808                  return (stModeUserCenterData.CenterVPos - _VPOSITION_BIAS);
+ 809          }
+ 810          
+ 811          //---------------------------------------------------------------------------
+ 812          */
+ 813          BYTE COsdCtrlGetVPosition(void)
+ 814          {
+ 815   1      //      return 100 - (stModeUserData.VPosition-COsdFxGetVPositionRange(_GET_VPOSITIONRANGE_MIN))*100/(COsdFxGet
+             -VPositionRange(_GET_VPOSITIONRANGE_MAX)-COsdFxGetVPositionRange(_GET_VPOSITIONRANGE_MIN));
+ 816   1              unsigned int ucMin = stModeUserCenterData.CenterVPos - _VPOSITION_BIAS;
+ 817   1              unsigned int iTmp = (stModeUserData.VPosition - ucMin) * 100 / (_VPOSITION_BIAS * 2);
+ 818   1              return (unsigned char)iTmp;
+ 819   1      }
+ 820          
+ 821          //---------------------------------------------------------------------------
+ 822          WORD COsdFxGetAdcClockRange(BYTE ucPar)
+ 823          {
+ 824   1          WORD delta;
+ 825   1      
+ 826   1          if(ucPar == _GET_CLOCKRANGE_MAX)
+ 827   1          {
+ 828   2              CAdjustCheckAdcClockRange(stModeUserCenterData.CenterClock, &delta);
+ 829   2      
+ 830   2              if(delta > _CLOCK_BIAS)
+ 831   2                  return (stModeUserCenterData.CenterClock + _CLOCK_BIAS);
+ 832   2              else
+ 833   2                  return (stModeUserCenterData.CenterClock + delta);
+ 834   2          }
+ 835   1          else if(ucPar == _GET_CLOCKRANGE_MIN)
+ 836   1          {
+ 837   2              CAdjustCheckAdcClockRange(stModeUserCenterData.CenterClock, &delta);
+ 838   2      
+ 839   2              if(delta > _CLOCK_BIAS)
+ 840   2                  return (stModeUserCenterData.CenterClock - _CLOCK_BIAS);
+ 841   2              else
+ 842   2                  return (stModeUserCenterData.CenterClock - delta);
+ 843   2          }
+ 844   1      }
+ 845          
+ 846          //---------------------------------------------------------------------------
+ 847          BYTE COsdCtrlGetClock(void)
+ 848          {
+ 849   1            WORD iMin;
+ 850   1            WORD  iTmp;
+ 851   1      
+ 852   1            iMin = COsdFxGetAdcClockRange(_GET_CLOCKRANGE_MIN);
+ 853   1            iTmp = (stModeUserData.Clock - iMin) * 100 / (COsdFxGetAdcClockRange(_GET_CLOCKRANGE_MAX) - iMin);
+ 854   1      
+ 855   1            return (BYTE)iTmp;
+ 856   1      }
+C51 COMPILER V7.20   GMIOSDFUNC                                                            10/05/2015 09:30:20 PAGE 15  
+
+ 857          
+ 858          //---------------------------------------------------------------------------
+ 859          BYTE COsdCtrlGetPhase(void)
+ 860          {
+ 861   1              return ((WORD)stModeUserData.Phase*100/63);             
+ 862   1      }
+ 863          
+ 864          //---------------------------------------------------------------------------
+ 865          
+ 866          
+ 867          BYTE StrLen(BYTE  *Str)
+ 868          {
+ 869   1          BYTE i = 0;
+ 870   1      
+ 871   1          while(*Str != 0)
+ 872   1          {
+ 873   2              i++;
+ 874   2              Str++;
+ 875   2          }
+ 876   1      
+ 877   1          return i;
+ 878   1      }
+ 879          
+ 880          //----------------------------------------------------------------------------------------------------
+ 881          BYTE GetNextLanguage(BYTE CurrIndex)
+ 882          {
+ 883   1           BYTE i;
+ 884   1           WORD iMask = usLANGUAGE_MASK;
+ 885   1      
+ 886   1           iMask >>= (CurrIndex+1);
+ 887   1      
+ 888   1           for(i=CurrIndex+1;i<16;i++)
+ 889   1           {
+ 890   2               if(iMask&0x01)
+ 891   2               {
+ 892   3                   return i;
+ 893   3               }
+ 894   2               iMask >>= 1;
+ 895   2           }
+ 896   1      
+ 897   1           //???????????Next Langage
+ 898   1           iMask = usLANGUAGE_MASK;
+ 899   1           for(i=0;i<CurrIndex;i++)
+ 900   1           {
+ 901   2               if(iMask&0x01)
+ 902   2               {
+ 903   3                   return i;
+ 904   3               }
+ 905   2               iMask >>= 1;
+ 906   2           }
+ 907   1           return CurrIndex;
+ 908   1      }
+ 909          
+ 910          //----------------------------------------------------------------------------------------------------
+ 911          BYTE GetPrevLanguage(BYTE CurrIndex)
+ 912          {
+ 913   1           char i;
+ 914   1           WORD iMask = usLANGUAGE_MASK;
+ 915   1      
+ 916   1           iMask <<= (16 - CurrIndex);
+ 917   1      
+ 918   1           for(i=CurrIndex - 1;i>=0;i--)
+C51 COMPILER V7.20   GMIOSDFUNC                                                            10/05/2015 09:30:20 PAGE 16  
+
+ 919   1           {
+ 920   2               if(iMask & 0x8000)
+ 921   2               {
+ 922   3                   return i;
+ 923   3               }
+ 924   2               iMask <<= 1;
+ 925   2           }
+ 926   1      
+ 927   1           //???????????Prev Langage
+ 928   1           iMask = usLANGUAGE_MASK;
+ 929   1           for(i=15;i>=CurrIndex;i--)
+ 930   1           {
+ 931   2               if(iMask & 0x8000)
+ 932   2               {
+ 933   3                   return i;
+ 934   3               }
+ 935   2               iMask <<= 1;
+ 936   2           }
+ 937   1           return CurrIndex;
+ 938   1      }
+ 939          
+ 940          //----------------------------------------------------------------------------------------------------
+ 941          BYTE CheckLanguage(void)
+ 942          {
+ 943   1           BYTE ucLanguage = GET_LANGUAGE();
+ 944   1           WORD iMask      = usLANGUAGE_MASK;
+ 945   1      
+ 946   1           iMask >>= ucLanguage;
+ 947   1      
+ 948   1           if(iMask & 0x01)
+ 949   1           {
+ 950   2               return ucLanguage;
+ 951   2           }
+ 952   1           else
+ 953   1           {
+ 954   2               ucLanguage = FirstLanguage();
+ 955   2               SET_LANGUAGE(ucLanguage);
+ 956   2      
+ 957   2               return ucLanguage;
+ 958   2           }
+ 959   1      }
+ 960          
+ 961          //----------------------------------------------------------------------------------------------------
+ 962          BYTE FirstLanguage(void)
+ 963          {
+ 964   1           BYTE i;
+ 965   1           WORD iMask = usLANGUAGE_MASK;
+ 966   1      
+ 967   1           for(i=0;i<16;i++)
+ 968   1           {
+ 969   2               if(iMask&0x01)
+ 970   2               {
+ 971   3                   return i;
+ 972   3               }
+ 973   2               iMask >>= 1;
+ 974   2           }
+ 975   1           return 255;
+ 976   1      }
+ 977          
+ 978          //---------------------------------------------
+ 979          //#if(_BURNIN_EN)
+ 980          void InitBurnIn()
+C51 COMPILER V7.20   GMIOSDFUNC                                                            10/05/2015 09:30:20 PAGE 17  
+
+ 981          {     
+ 982   1           CModeSetFreeRun();
+ 983   1           CAdjustBackgroundColor(0x00,0x00,0x00);
+ 984   1           CPowerPanelOn();
+ 985   1           CPowerLightPowerOn();
+ 986   1      }
+ 987          //---------------------------------------------
+ 988          void BurnInRun()
+ 989          {
+ 990   1              static BYTE ucBurnInDelay = 0;
+ 991   1              static BYTE ucBurnInColor = 0;
+ 992   1              BYTE R = 0;
+ 993   1              BYTE G = 0;
+ 994   1              BYTE B = 0;
+ 995   1      
+ 996   1      
+ 997   1      
+ 998   1              if(ucBurnInDelay < 200)
+ 999   1              {
+1000   2                      ucBurnInDelay++;
+1001   2                      CTimerDelayXms(10);
+1002   2                      return;
+1003   2              }
+1004   1      
+1005   1              ucBurnInDelay = 0;
+1006   1      
+1007   1              if(ucBurnInColor & 0x80)
+1008   1              {
+1009   2                      if(ucBurnInColor & 0x01)     R = 0xff;
+1010   2                      if(ucBurnInColor & 0x02)     G = 0xff;
+1011   2                      if(ucBurnInColor & 0x04)     B = 0xff;
+1012   2              }
+1013   1              else
+1014   1              {
+1015   2                      if(ucBurnInColor & 0x01)     R = 0x7f;
+1016   2                      if(ucBurnInColor & 0x02)     G = 0x7f;
+1017   2                      if(ucBurnInColor & 0x04)     B = 0x7f;
+1018   2              }
+1019   1              CAdjustBackgroundColor(R,G,B);
+1020   1              ucBurnInColor++;
+1021   1      }
+1022          //---------------------------------------------
+1023          
+1024          //#endif   // if(BURNIN_EN)
+1025          
+1026          //----------------------------------------------------------- 
+1027          //  ucNumber:      0~65535
+1028          //  ucUserDefLong: 0   --> 自动计算ucNumber长度，有几位输出几位
+1029          //                 1~5 --> 输出1~5位，不足用0补
+1030          //  exp:           ucNumber = 12
+1031          //                 ucUserDefLong = 0    Output:  12
+1032          //                 ucUserDefLong = 3    Output:  012
+1033          //----------------------------------------------------------- 
+1034          void CShowNumber1(const WORD ucNumber, BYTE ucUserDefLong)
+1035          {
+1036   1          BYTE uctemp[5];
+1037   1          
+1038   1          uctemp[4] = (ucNumber / 10000) % 10;
+1039   1          uctemp[3] = (ucNumber / 1000) % 10;
+1040   1          uctemp[2] = (ucNumber / 100) % 10;
+1041   1          uctemp[1] = (ucNumber / 10) % 10;
+1042   1          uctemp[0] = ucNumber  % 10;
+C51 COMPILER V7.20   GMIOSDFUNC                                                            10/05/2015 09:30:20 PAGE 18  
+
+1043   1          
+1044   1          if (ucUserDefLong)
+1045   1              ucUserDefLong -= 1;     
+1046   1          else    
+1047   1          {
+1048   2              for(pData[15] = 4; pData[15]>0;pData[15]--)
+1049   2              {
+1050   3                  if(uctemp[pData[15]] != 0)
+1051   3                      break;          
+1052   3              }
+1053   2              
+1054   2              ucUserDefLong = pData[15];
+1055   2          }
+1056   1          
+1057   1          CScalerSendAddr(_OSD_DATA_PORT_92 , _NON_AUTOINC);
+1058   1          do
+1059   1          {
+1060   2              *(&MCU_SCA_INF_DATA_FFF5) = (uctemp[ucUserDefLong]+'0');
+1061   2          }
+1062   1          while(ucUserDefLong--);
+1063   1      } 
+1064          
+1065          //----------------------------------------------------------- 
+1066          void CDoReset(void) 
+1067          {
+1068   1          BYTE ucTemp0 = GET_POWERSTATUS();
+1069   1          BYTE ucTemp1 = _GET_INPUT_SOURCE();
+1070   1          BYTE ucTemp2 = GET_LANGUAGE();
+1071   1          BYTE ucTemp3 = GET_DISPLAYMODE();
+1072   1      
+1073   1          CEepromLoadDefault(0);
+1074   1      
+1075   1          if (ucTemp0)    
+1076   1             SET_POWERSTATUS();
+1077   1          else
+1078   1             CLR_POWERSTATUS();
+1079   1      
+1080   1          _SET_INPUT_SOURCE(ucTemp1);
+1081   1          SET_LANGUAGE(ucTemp2);
+1082   1          SET_DISPLAYMODE(ucTemp3);
+1083   1          CEepromSaveSystemData();
+1084   1          CEepromSaveOsdUserData();
+1085   1      
+1086   1          COsdFxDisableOsd();
+1087   1          if (GET_OSD_SIZE())
+1088   1          {
+1089   2              SetOSDDouble(0x03 | OSD_WINDOWCHAR_BLENDING);
+1090   2      #if(_OSD_TYPE == _OSD003)
+1091   2              OSDPosition(_OSD_DOUBLE_WIDTH(_MAINMENU_WIDTH), _OSD_DOUBLE_HEIGHT(_MAINMENU_HEIGHT), stOsdUserDat
+             -a.OsdHPos, stOsdUserData.OsdVPos, 0x03);
+1092   2      #else
+                      OSDPosition(_MAINMENU_WIDTH * 12+680, _MAINMENU_HEIGHT * 18+520, stOsdUserData.OsdHPos, stOsdUserD
+             -ata.OsdVPos, 0x03);
+              #endif
+1095   2          }
+1096   1          else
+1097   1          {
+1098   2              SetOSDDouble(OSD_WINDOWCHAR_BLENDING);
+1099   2      #if(_OSD_TYPE == _OSD003)
+1100   2              OSDPosition(_MAINMENU_WIDTH, _MAINMENU_HEIGHT, stOsdUserData.OsdHPos, stOsdUserData.OsdVPos, 0x03)
+             -;
+1101   2      #else
+C51 COMPILER V7.20   GMIOSDFUNC                                                            10/05/2015 09:30:20 PAGE 19  
+
+                      OSDPosition(_MAINMENU_WIDTH * 12, _MAINMENU_HEIGHT * 18, stOsdUserData.OsdHPos, stOsdUserData.OsdV
+             -Pos, 0x03);
+              #endif
+1104   2          }
+1105   1          COsdFxEnableOsd();
+1106   1              CScalerSetBit(_OVERLAY_CTRL_6C, 0x23, ((stOsdUserData.OsdBlending & 0x07) << 2));
+1107   1          CAdjustBrightness();
+1108   1          CAdjustContrast();
+1109   1          CSetVolume();
+1110   1          CAdjustPeakingCoding();
+1111   1          if(bSourceVideo())
+1112   1          {
+1113   2              gmi_CAdjustVDCHue(GET_HUE());
+1114   2              CVideoSetSaturation(GET_SATURATION());
+1115   2          }
+1116   1          else
+1117   1          {
+1118   2              if(_GET_INPUT_SOURCE() == _SOURCE_YPBPR)
+1119   2              {
+1120   3                  CAdjustYpbprhue(GET_HUE());
+1121   3                  CAdjustYpbprSaturation(GET_SATURATION());
+1122   3              }
+1123   2              else if(_GET_INPUT_SOURCE() == _SOURCE_VGA)
+1124   2              {
+1125   3                  CAutoDoAutoConfig();
+1126   3                  CAutoDoWhiteBalance();
+1127   3                              stModeUserData.FirstAuto = 1;
+1128   3                  CEepromSaveModeData(stModeInfo.ModeCurr);
+1129   3              }
+1130   2          }
+1131   1      }
+1132          
+1133              
+1134          /*  OSD Window Templet
+1135          //BASE ADDRESS + 000 Shadow/Border/Gradient
+1136          SB_THICKNESS(1) | SB_HEIGHT(1) ,
+1137          SHADOW_COLOR(1) | BORDER_COLOR(2),
+1138          R_GRADIENT_POLARITY_DEC |
+1139            G_GRADIENT_POLARITY_INC |
+1140            B_GRADIENT_POLARITY_DEC |
+1141            GRADIENT_LEVEL(1) |
+1142            R_COLOR_GRADIENT_EN(1) |
+1143            G_COLOR_GRADIENT_EN(1) |
+1144            B_COLOR_GRADIENT_EN(1),
+1145          
+1146          //BASE ADDRESS + 001 START POSITION
+1147          W_START_POS(10,300),
+1148          //BASE ADDRESS + 002 END POSITION
+1149          W_END_POS(20,350),
+1150          
+1151          //BASE ADDRESS + 003  Control
+1152          RESERVED,
+1153          GRADIENT_PER_LEVEL(2) | WINDOW_COLOR(3),
+1154          
+1155          GRADIENT_FUNCTION_EN(1) |
+1156            GRADIENT_DIRECTION_HOR |
+1157            SHADOW_BORDER_EN(1) |
+1158            WINDOW_TYPE(WT_3DBUTTON_TYPE1) |
+1159            WINDOW_ENABLE(1),
+1160          
+1161          */
+1162          
+C51 COMPILER V7.20   GMIOSDFUNC                                                            10/05/2015 09:30:20 PAGE 20  
+
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   4052    ----
+   CONSTANT SIZE    =      7    ----
+   XDATA SIZE       =      5     135
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       2
+   IDATA SIZE       =      2    ----
+   BIT SIZE         =      1    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
